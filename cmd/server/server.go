@@ -11,6 +11,9 @@ import (
 
 func Serve() {
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 
 	fmt.Printf("! Listening on http://localhost:%s\n\n", port)
 
