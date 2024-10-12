@@ -52,7 +52,7 @@ func Migrate() {
 		log.Fatalf("failed to find current working directory: %v\n", err)
 	}
 
-	dir := filepath.Join(cwd, "./migrations")
+	dir := filepath.Join(cwd, "./db/migrations")
 
 	files, err := os.ReadDir(dir)
 	if err != nil {
@@ -67,4 +67,6 @@ func Migrate() {
 	if err := goose.Up(db, dir); err != nil {
 		log.Fatalf("failed to apply migrations: %v\n", err)
 	}
+
+	fmt.Println("")
 }
