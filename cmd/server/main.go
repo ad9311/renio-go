@@ -12,9 +12,11 @@ import (
 func main() {
 	fmt.Print("RENIO\n\n")
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("error loading .env file")
+	if os.Getenv("ENV") == "development" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("error loading .env file")
+		}
 	}
 
 	db.Init()
