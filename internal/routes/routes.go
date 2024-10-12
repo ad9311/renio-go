@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	infoct "github.com/ad9311/renio-go/internal/controllers/infoCon"
+	infoct "github.com/ad9311/renio-go/internal/controllers/infoct"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
