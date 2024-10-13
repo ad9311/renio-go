@@ -1,18 +1,25 @@
-package lib
+package auth
 
 import (
 	"os"
 	"time"
 
-	"github.com/ad9311/renio-go/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var jwtSecret = []byte(os.Getenv("JWT_KEY"))
 
-func CreateJWTToken(username string) (model.NewJWT, error) {
-	var newJWT model.NewJWT
+type JWT struct {
+	Token string
+	JTI   string
+	AUD   string
+	EXP   time.Time
+}
+
+func CreateJWTToken(username string) (JWT, error) {
+	var newJWT JWT
 
 	aud := "https://renio.dev"
 	iss := "https://api.renio.dev"
@@ -40,4 +47,16 @@ func CreateJWTToken(username string) (model.NewJWT, error) {
 	newJWT.Token = tokenString
 
 	return newJWT, nil
+}
+
+func HashPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), nil
+}
+
+func ComparePasswords(hashedPassword string, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }

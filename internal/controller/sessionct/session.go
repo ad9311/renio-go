@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ad9311/renio-go/internal/auth"
 	"github.com/ad9311/renio-go/internal/controller"
-	"github.com/ad9311/renio-go/internal/lib"
 	"github.com/ad9311/renio-go/internal/model"
-	"github.com/ad9311/renio-go/internal/model/allowedjwtmodel"
-	"github.com/ad9311/renio-go/internal/model/usermodel"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -29,31 +27,32 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := usermodel.FindForAuth(signInData.Email)
+	var user model.User
+	err = user.FindForAuth(signInData.Email)
 	if err != nil {
 		controller.WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return
 	}
 
-	err = lib.ComparePasswords(user.HashedPassword, signInData.Password)
+	err = auth.ComparePasswords(user.Password, signInData.Password)
 	if err != nil {
 		controller.WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return
 	}
 
-	newJWT, err := lib.CreateJWTToken(user.Username)
+	newJWT, err := auth.CreateJWTToken(user.Username)
 	if err != nil {
 		controller.WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return
 	}
 
-	var allowedJWT = model.AllowedJWT{
+	allowedJWT := model.AllowedJWT{
 		JTI:    newJWT.JTI,
 		AUD:    newJWT.AUD,
 		EXP:    newJWT.EXP,
 		UserID: user.ID,
 	}
-	err = allowedjwtmodel.Create(allowedJWT)
+	err = allowedJWT.Insert()
 	if err != nil {
 		controller.WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return

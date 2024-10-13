@@ -6,7 +6,6 @@ import (
 
 	"github.com/ad9311/renio-go/internal/controller"
 	"github.com/ad9311/renio-go/internal/model"
-	"github.com/ad9311/renio-go/internal/model/usermodel"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -29,7 +28,8 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = usermodel.Create(signUpData)
+	var user model.User
+	err = user.Create(signUpData)
 	if err != nil {
 		controller.WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return
