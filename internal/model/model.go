@@ -1,11 +1,14 @@
 package model
 
-import "database/sql"
+import (
+	"database/sql"
+	"time"
+)
 
 // User models
 
 type User struct {
-	ID       int64          `json:"id"`
+	ID       int            `json:"id"`
 	Username string         `json:"username"`
 	Name     string         `json:"name"`
 	Email    string         `json:"email"`
@@ -23,4 +26,21 @@ type SignUpData struct {
 type SignInData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+// Allowed JWT
+
+type AllowedJWT struct {
+	ID     int
+	JTI    string
+	AUD    string
+	EXP    time.Time
+	UserID int
+}
+
+type NewJWT struct {
+	Token string
+	JTI   string
+	AUD   string
+	EXP   time.Time
 }

@@ -9,11 +9,12 @@ import (
 )
 
 type UserToConfirm struct {
-	Username       string `json:"username"`
-	HashedPassword string `json:"password"`
+	ID             int
+	Username       string
+	HashedPassword string
 }
 
-func Create(signUpData model.SignUpData) (*model.User, error) {
+func Create(signUpData model.SignUpData) (model.User, error) {
 	pool := db.GetPool()
 	ctx := context.Background()
 	query := `INSERT INTO users (username, name, email, password)
@@ -27,7 +28,7 @@ func Create(signUpData model.SignUpData) (*model.User, error) {
 	email := signUpData.Email
 	password, err := lib.HashPassword(signUpData.Password)
 	if err != nil {
-		return nil, err
+		return user, err
 	}
 
 	err = pool.QueryRow(ctx, query, username, name, email, password).Scan(
@@ -38,19 +39,19 @@ func Create(signUpData model.SignUpData) (*model.User, error) {
 		&user.Image,
 	)
 	if err != nil {
-		return &user, err
+		return user, err
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func FindForAuth(email string) (UserToConfirm, error) {
-	query := `SELECT username, password FROM users WHERE email = $1`
+	query := `SELECT id, username, password FROM users WHERE email = $1`
 	var user UserToConfirm
 	pool := db.GetPool()
 	ctx := context.Background()
 
-	err := pool.QueryRow(ctx, query, email).Scan(&user.Username, &user.HashedPassword)
+	err := pool.QueryRow(ctx, query, email).Scan(&user.ID, &user.Username, &user.HashedPassword)
 
 	if err != nil {
 		return user, err

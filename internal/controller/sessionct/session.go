@@ -8,6 +8,7 @@ import (
 	"github.com/ad9311/renio-go/internal/controller"
 	"github.com/ad9311/renio-go/internal/lib"
 	"github.com/ad9311/renio-go/internal/model"
+	"github.com/ad9311/renio-go/internal/model/allowedjwtmodel"
 	"github.com/ad9311/renio-go/internal/model/usermodel"
 	"github.com/go-chi/chi/v5"
 )
@@ -40,13 +41,25 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := lib.CreateJWTToken(user.Username)
+	newJWT, err := lib.CreateJWTToken(user.Username)
 	if err != nil {
 		controller.WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return
 	}
 
-	w.Header().Add("Authorization", fmt.Sprintf("Bearer %s", token))
+	var allowedJWT = model.AllowedJWT{
+		JTI:    newJWT.JTI,
+		AUD:    newJWT.AUD,
+		EXP:    newJWT.EXP,
+		UserID: user.ID,
+	}
+	err = allowedjwtmodel.Create(allowedJWT)
+	if err != nil {
+		controller.WriteError(w, []string{err.Error()}, http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Add("Authorization", fmt.Sprintf("Bearer %s", newJWT.Token))
 	controller.WriteOK(w, "user signed in successfully", http.StatusCreated)
 }
 

@@ -4,27 +4,40 @@ import (
 	"os"
 	"time"
 
+	"github.com/ad9311/renio-go/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
 var jwtSecret = []byte(os.Getenv("JWT_KEY"))
 
-func CreateJWTToken(username string) (string, error) {
+func CreateJWTToken(username string) (model.NewJWT, error) {
+	var newJWT model.NewJWT
+
+	aud := "https://renio.dev"
+	iss := "https://api.renio.dev"
+	jti := uuid.New().String()
+	exp := time.Now().Add(time.Hour * 24 * 7)
+
 	claims := jwt.MapClaims{
 		"sub": username,
-		"aud": "https://renio.dev",
-		"iss": "https://api.renio.dev",
-		"exp": time.Now().Add(time.Hour * 24 * 7).Unix(),
+		"aud": aud,
+		"iss": iss,
+		"jti": jti,
+		"exp": exp.Unix(),
 		"iat": time.Now().Unix(),
-		"jti": uuid.New().String(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtSecret)
 	if err != nil {
-		return "", err
+		return newJWT, err
 	}
 
-	return tokenString, nil
+	newJWT.AUD = aud
+	newJWT.EXP = exp
+	newJWT.JTI = jti
+	newJWT.Token = tokenString
+
+	return newJWT, nil
 }
