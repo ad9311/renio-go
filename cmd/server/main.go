@@ -12,8 +12,11 @@ import (
 func main() {
 	fmt.Print("RENIO\n\n")
 
-	if os.Getenv("ENV") == "development" {
+	env := os.Getenv("RENIO_ENV")
+	if env != "production" {
 		err := godotenv.Load()
+		env = os.Getenv("RENIO_ENV")
+		fmt.Printf("! Loaded .env file in %s mode\n", env)
 		if err != nil {
 			log.Fatal("error loading .env file")
 		}

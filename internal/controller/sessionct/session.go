@@ -14,10 +14,8 @@ type credentials struct {
 
 func Router(r chi.Router) func(r chi.Router) {
 	return func(r chi.Router) {
-		r.Route("/auth", func(r chi.Router) {
-			r.Post("/sign-in", create)
-			r.Delete("/sign-out", delete)
-		})
+		r.Post("/", create)
+		r.Delete("/", delete)
 	}
 }
 

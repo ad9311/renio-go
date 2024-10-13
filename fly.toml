@@ -12,7 +12,7 @@ primary_region = 'bog'
 
 [env]
   PORT = '8080'
-  ENV = 'production'
+  RENIO_ENV = 'production'
 
 [http_service]
   internal_port = 8080
