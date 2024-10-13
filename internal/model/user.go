@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/ad9311/renio-go/internal/auth"
 	"github.com/ad9311/renio-go/internal/db"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -41,7 +41,7 @@ func (u *User) Create(signUpData SignUpData) error {
 	username := signUpData.Username
 	name := signUpData.Name
 	email := signUpData.Email
-	password, err := auth.HashPassword(signUpData.Password)
+	password, err := hashPassword(signUpData.Password)
 	if err != nil {
 		return err
 	}
@@ -71,4 +71,12 @@ func (u *User) FindForAuth(email string) error {
 	}
 
 	return nil
+}
+
+func hashPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), nil
 }
