@@ -48,7 +48,7 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newJWT, err := createJWTToken(user.Username)
+	newJWT, err := createJWTToken(user.ID)
 	if err != nil {
 		WriteError(w, []string{err.Error()}, http.StatusInternalServerError)
 		return
@@ -106,7 +106,7 @@ func getPasswordError(err error) (string, int) {
 	return message, status
 }
 
-func createJWTToken(username string) (JWT, error) {
+func createJWTToken(userID int) (JWT, error) {
 	var newJWT JWT
 
 	aud := "https://renio.dev"
@@ -115,7 +115,7 @@ func createJWTToken(username string) (JWT, error) {
 	exp := time.Now().Add(time.Hour * 24 * 7)
 
 	claims := jwt.MapClaims{
-		"sub": username,
+		"sub": userID,
 		"aud": aud,
 		"iss": iss,
 		"jti": jti,
