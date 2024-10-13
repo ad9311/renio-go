@@ -1,16 +1,14 @@
-package route
+package router
 
 import (
 	"net/http"
 
-	"github.com/ad9311/renio-go/internal/controller/infoct"
-	"github.com/ad9311/renio-go/internal/controller/registrationct"
-	"github.com/ad9311/renio-go/internal/controller/sessionct"
+	"github.com/ad9311/renio-go/internal/ct"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func Router() http.Handler {
+func RoutesHandler() http.Handler {
 	r := chi.NewRouter()
 
 	// Middlewares
@@ -19,20 +17,22 @@ func Router() http.Handler {
 
 	r.Route("/", func(r chi.Router) {
 		// Info
-		r.Get("/info", infoct.Index)
+		r.Route("/info", ct.InfoRouter(r))
 
 		// Auth
 		r.Route("/auth", func(r chi.Router) {
 			// Sessions
-			r.Route("/sign-in", sessionct.Router(r))
+			r.Route("/sign-in", ct.SignInRouter(r))
 
-			// Registrations
-			r.Route("/sign-up", registrationct.Router(r))
+			// Sign Up
+			r.Route("/sign-up", ct.SignUpRouter(r))
 		})
 	})
 
 	return r
 }
+
+// Middlewares //
 
 func headerRouter(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

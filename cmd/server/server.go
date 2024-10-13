@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ad9311/renio-go/internal/route"
+	"github.com/ad9311/renio-go/internal/router"
 )
 
 func Serve() {
@@ -17,7 +17,7 @@ func Serve() {
 
 	fmt.Printf("! Listening on http://localhost:%s\n\n", port)
 
-	err := http.ListenAndServe(fmt.Sprintf(":%s", port), route.Router())
+	err := http.ListenAndServe(fmt.Sprintf(":%s", port), router.RoutesHandler())
 	if err != nil {
 		log.Fatalf("there's been an error: %s", err.Error())
 	}
