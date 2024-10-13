@@ -2,9 +2,18 @@ package model
 
 import (
 	"context"
+	"time"
 
 	"github.com/ad9311/renio-go/internal/db"
 )
+
+type AllowedJWT struct {
+	ID     int
+	JTI    string
+	AUD    string
+	EXP    time.Time
+	UserID int
+}
 
 func (aJWT *AllowedJWT) Insert() error {
 	pool := db.GetPool()
