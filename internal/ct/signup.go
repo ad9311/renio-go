@@ -14,6 +14,8 @@ func SignUpRouter(r chi.Router) func(r chi.Router) {
 	}
 }
 
+// Actions //
+
 func createUser(w http.ResponseWriter, r *http.Request) {
 	var signUpData model.SignUpData
 	err := json.NewDecoder(r.Body).Decode(&signUpData)

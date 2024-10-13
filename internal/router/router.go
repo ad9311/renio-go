@@ -32,6 +32,8 @@ func RoutesHandler() http.Handler {
 	return r
 }
 
+// Middlewares //
+
 func headerRouter(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

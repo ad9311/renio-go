@@ -15,6 +15,8 @@ type AllowedJWT struct {
 	UserID int
 }
 
+// Query functions //
+
 func (aJWT *AllowedJWT) Insert() error {
 	pool := db.GetPool()
 	ctx := context.Background()

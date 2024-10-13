@@ -12,7 +12,9 @@ func InfoRouter(r chi.Router) func(r chi.Router) {
 	}
 }
 
+// Actions //
+
 func displayInfo(w http.ResponseWriter, _ *http.Request) {
-	var message = "RENIO APP"
+	message := "RENIO APP"
 	WriteOK(w, message, http.StatusOK)
 }
