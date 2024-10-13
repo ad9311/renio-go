@@ -6,7 +6,6 @@ import (
 	"github.com/ad9311/renio-go/internal/controller/infoct"
 	"github.com/ad9311/renio-go/internal/controller/registrationct"
 	"github.com/ad9311/renio-go/internal/controller/sessionct"
-	reniomiddleware "github.com/ad9311/renio-go/internal/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -16,7 +15,7 @@ func Router() http.Handler {
 
 	// Middlewares
 	r.Use(middleware.Logger)
-	r.Use(reniomiddleware.HeaderRouter)
+	r.Use(headerRouter)
 
 	r.Route("/", func(r chi.Router) {
 		// Info
@@ -33,4 +32,11 @@ func Router() http.Handler {
 	})
 
 	return r
+}
+
+func headerRouter(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		next.ServeHTTP(w, r)
+	})
 }
