@@ -76,8 +76,6 @@ func deleteSession(w http.ResponseWriter, r *http.Request) {
 
 // Helpers //
 
-var jwtSecret = []byte(os.Getenv("JWT_KEY"))
-
 func getFindUserError(err error) (string, int) {
 	var message string
 	var status int
@@ -126,7 +124,8 @@ func createJWTToken(username string) (JWT, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtSecret)
+	secret := []byte(os.Getenv("JWT_KEY"))
+	tokenString, err := token.SignedString(secret)
 	if err != nil {
 		return newJWT, err
 	}

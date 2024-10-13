@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/ct"
+	"github.com/ad9311/renio-go/internal/mw"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -13,7 +14,8 @@ func RoutesHandler() http.Handler {
 
 	// Middlewares
 	r.Use(middleware.Logger)
-	r.Use(headerRouter)
+	r.Use(mw.HeaderRouter)
+	r.Use(mw.RoutesProtector)
 
 	r.Route("/", func(r chi.Router) {
 		// Info
@@ -30,13 +32,4 @@ func RoutesHandler() http.Handler {
 	})
 
 	return r
-}
-
-// Middlewares //
-
-func headerRouter(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		next.ServeHTTP(w, r)
-	})
 }

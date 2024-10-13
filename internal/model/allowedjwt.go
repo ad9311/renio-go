@@ -30,3 +30,16 @@ func (aJWT *AllowedJWT) Insert() error {
 
 	return nil
 }
+
+func (aJWT *AllowedJWT) FindByJTI(jit string) error {
+	pool := db.GetPool()
+	ctx := context.Background()
+	query := `SELECT user_id FROM allowed_jwts WHERE jti = $1`
+
+	err := pool.QueryRow(ctx, query, jit).Scan(&aJWT.UserID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
