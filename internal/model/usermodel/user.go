@@ -8,6 +8,11 @@ import (
 	"github.com/ad9311/renio-go/internal/model"
 )
 
+type UserToConfirm struct {
+	Username       string `json:"username"`
+	HashedPassword string `json:"password"`
+}
+
 func Create(signUpData model.SignUpData) (*model.User, error) {
 	pool := db.GetPool()
 	ctx := context.Background()
@@ -39,26 +44,17 @@ func Create(signUpData model.SignUpData) (*model.User, error) {
 	return &user, nil
 }
 
-func FindUserByCreds(email string, password string) (*model.User, error) {
-	query := `SELECT id, username, email, image FROM users WHERE email = $1`
-	return findUser(query, email)
-}
-
-func FindUserByID(id int) (*model.User, error) {
-	query := `SELECT id, username, email, image FROM users WHERE id = $1`
-	return findUser(query, id)
-}
-
-func findUser(query string, arg any) (*model.User, error) {
-	var user model.User
+func FindForAuth(email string) (UserToConfirm, error) {
+	query := `SELECT username, password FROM users WHERE email = $1`
+	var user UserToConfirm
 	pool := db.GetPool()
 	ctx := context.Background()
 
-	err := pool.QueryRow(ctx, query, arg).Scan(&user.ID, &user.Username, &user.Email, &user.Image)
+	err := pool.QueryRow(ctx, query, email).Scan(&user.Username, &user.HashedPassword)
 
 	if err != nil {
-		return nil, err
+		return user, err
 	}
 
-	return &user, nil
+	return user, nil
 }

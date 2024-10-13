@@ -2,15 +2,15 @@ package sessionct
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
+	"github.com/ad9311/renio-go/internal/controller"
+	"github.com/ad9311/renio-go/internal/lib"
+	"github.com/ad9311/renio-go/internal/model"
+	"github.com/ad9311/renio-go/internal/model/usermodel"
 	"github.com/go-chi/chi/v5"
 )
-
-type credentials struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
 
 func Router(r chi.Router) func(r chi.Router) {
 	return func(r chi.Router) {
@@ -20,9 +20,34 @@ func Router(r chi.Router) func(r chi.Router) {
 }
 
 func create(w http.ResponseWriter, r *http.Request) {
-	var creds credentials
-	json.NewDecoder(r.Body).Decode(&creds)
-	json.NewEncoder(w).Encode("{}")
+	var signInData model.SignInData
+
+	err := json.NewDecoder(r.Body).Decode(&signInData)
+	if err != nil {
+		controller.WriteError(w, []string{err.Error()}, http.StatusBadRequest)
+		return
+	}
+
+	user, err := usermodel.FindForAuth(signInData.Email)
+	if err != nil {
+		controller.WriteError(w, []string{err.Error()}, http.StatusBadRequest)
+		return
+	}
+
+	err = lib.ComparePasswords(user.HashedPassword, signInData.Password)
+	if err != nil {
+		controller.WriteError(w, []string{err.Error()}, http.StatusBadRequest)
+		return
+	}
+
+	token, err := lib.CreateJWTToken(user.Username)
+	if err != nil {
+		controller.WriteError(w, []string{err.Error()}, http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Add("Authorization", fmt.Sprintf("Bearer %s", token))
+	controller.WriteOK(w, "user signed in successfully", http.StatusCreated)
 }
 
 func delete(w http.ResponseWriter, r *http.Request) {
