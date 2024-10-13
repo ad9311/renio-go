@@ -1,6 +1,8 @@
-package auth
+package ct
 
 import (
+	"encoding/json"
+	"net/http"
 	"os"
 	"time"
 
@@ -9,8 +11,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var jwtSecret = []byte(os.Getenv("JWT_KEY"))
-
 type JWT struct {
 	Token string
 	JTI   string
@@ -18,7 +18,19 @@ type JWT struct {
 	EXP   time.Time
 }
 
-func CreateJWTToken(username string) (JWT, error) {
+func WriteError(w http.ResponseWriter, errors []string, httpStatus int) error {
+	w.WriteHeader(httpStatus)
+	return json.NewEncoder(w).Encode(map[string][]string{"errors": errors})
+}
+
+func WriteOK(w http.ResponseWriter, data any, httpStatus int) error {
+	w.WriteHeader(httpStatus)
+	return json.NewEncoder(w).Encode(map[string]any{"data": data})
+}
+
+var jwtSecret = []byte(os.Getenv("JWT_KEY"))
+
+func createJWTToken(username string) (JWT, error) {
 	var newJWT JWT
 
 	aud := "https://renio.dev"
@@ -49,6 +61,6 @@ func CreateJWTToken(username string) (JWT, error) {
 	return newJWT, nil
 }
 
-func ComparePasswords(hashedPassword string, password string) error {
+func comparePasswords(hashedPassword string, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
