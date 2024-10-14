@@ -3,8 +3,8 @@ package router
 import (
 	"net/http"
 
-	"github.com/ad9311/renio-go/internal/ct"
-	"github.com/ad9311/renio-go/internal/mw"
+	"github.com/ad9311/renio-go/internal/ctrl"
+	"github.com/ad9311/renio-go/internal/midware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -14,24 +14,24 @@ func RoutesHandler() http.Handler {
 
 	// Middlewares
 	r.Use(middleware.Logger)
-	r.Use(mw.HeaderRouter)
-	r.Use(mw.RoutesProtector)
+	r.Use(midware.HeaderRouter)
+	r.Use(midware.RoutesProtector)
 
 	r.Route("/", func(r chi.Router) {
 		// Info
-		r.Route("/info", ct.InfoRouter(r))
+		r.Route("/info", ctrl.InfoRouter(r))
 
 		// Auth
 		r.Route("/auth", func(r chi.Router) {
 			// Sessions
-			r.Route("/sign-in", ct.SignInRouter(r))
+			r.Route("/sign-in", ctrl.SignInRouter(r))
 
 			// Sign Up
-			r.Route("/sign-up", ct.SignUpRouter(r))
+			r.Route("/sign-up", ctrl.SignUpRouter(r))
 		})
 
 		// Budgets
-		r.Route("/budgets", ct.BudgetRouter(r))
+		r.Route("/budgets", ctrl.BudgetRouter(r))
 	})
 
 	return r
