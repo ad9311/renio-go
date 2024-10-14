@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/ad9311/renio-go/internal/conf"
-	"github.com/ad9311/renio-go/internal/ct"
+	"github.com/ad9311/renio-go/internal/ctrl"
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -40,32 +40,32 @@ func RoutesProtector(next http.Handler) http.Handler {
 
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			ct.WriteError(w, []string{"invalid request authorization"}, http.StatusUnauthorized)
+			ctrl.WriteError(w, []string{"invalid request authorization"}, http.StatusUnauthorized)
 			return
 		}
 
 		splitValue := strings.Split(authHeader, " ")
 		if len(splitValue) != 2 {
-			ct.WriteError(w, []string{"invalid request authorization"}, http.StatusUnauthorized)
+			ctrl.WriteError(w, []string{"invalid request authorization"}, http.StatusUnauthorized)
 			return
 		}
 
 		jwtToken := splitValue[1]
 		claims, err := decodeJWT(jwtToken)
 		if err != nil {
-			ct.WriteError(w, []string{"invalid jwt token"}, http.StatusUnauthorized)
+			ctrl.WriteError(w, []string{"invalid jwt token"}, http.StatusUnauthorized)
 			return
 		}
 
 		var allowedJWT model.AllowedJWT
 		err = allowedJWT.FindByJTI(claims.JTI)
 		if err != nil {
-			ct.WriteError(w, []string{err.Error()}, http.StatusUnauthorized)
+			ctrl.WriteError(w, []string{err.Error()}, http.StatusUnauthorized)
 			return
 		}
 		if allowedJWT.UserID != claims.SUB {
 			str := fmt.Sprintf("%d - %d", allowedJWT.UserID, claims.SUB)
-			ct.WriteError(w, []string{str}, http.StatusUnauthorized)
+			ctrl.WriteError(w, []string{str}, http.StatusUnauthorized)
 			return
 		}
 
