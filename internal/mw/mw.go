@@ -28,7 +28,7 @@ func HeaderRouter(next http.Handler) http.Handler {
 func RoutesProtector(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
-		if path == "/auth/sign-in" {
+		if path == "/auth/sign-in" || path == "/info" {
 			next.ServeHTTP(w, r)
 			return
 		}

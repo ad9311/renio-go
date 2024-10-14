@@ -107,17 +107,11 @@ func getPasswordError(err error) (string, int) {
 }
 
 func createJWTToken(userID int) (JWT, error) {
-	var newJWT JWT
-
-	aud := "https://renio.dev"
-	iss := "https://api.renio.dev"
 	jti := uuid.New().String()
 	exp := time.Now().Add(time.Hour * 24 * 7)
 
 	claims := jwt.MapClaims{
 		"sub": userID,
-		"aud": aud,
-		"iss": iss,
 		"jti": jti,
 		"exp": exp.Unix(),
 		"iat": time.Now().Unix(),
@@ -127,13 +121,14 @@ func createJWTToken(userID int) (JWT, error) {
 	secret := []byte(os.Getenv("JWT_KEY"))
 	tokenString, err := token.SignedString(secret)
 	if err != nil {
-		return newJWT, err
+		return JWT{}, err
 	}
 
-	newJWT.AUD = aud
-	newJWT.EXP = exp
-	newJWT.JTI = jti
-	newJWT.Token = tokenString
+	var newJWT = JWT{
+		JTI:   jti,
+		EXP:   exp,
+		Token: tokenString,
+	}
 
 	return newJWT, nil
 }
