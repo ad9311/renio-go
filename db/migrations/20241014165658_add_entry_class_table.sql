@@ -1,16 +1,12 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS transaction_types (
+CREATE TABLE IF NOT EXISTS entry_classes (
     id SERIAL PRIMARY KEY,
     uid VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(50) NOT NULL UNIQUE,
-    budget_account_id INT NOT NULL,
+    "group" INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_budget_account
-      FOREIGN KEY (budget_account_id)
-      REFERENCES budget_accounts(id)
-      ON DELETE CASCADE
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 -- +goose StatementEnd
 
