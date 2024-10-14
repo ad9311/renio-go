@@ -14,6 +14,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// --- Actions --- //
+
 func PostSession(w http.ResponseWriter, r *http.Request) {
 	var signInData model.SignInData
 
@@ -59,6 +61,8 @@ func PostSession(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Authorization", fmt.Sprintf("Bearer %s", newJWT.Token))
 	WriteOK(w, "user signed in successfully", http.StatusCreated)
 }
+
+// --- Helpers --- //
 
 func getFindUserError(err error) (string, int) {
 	var message string

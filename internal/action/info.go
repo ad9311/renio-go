@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-// Actions //
+// --- Actions --- //
 
 func IndexInfo(w http.ResponseWriter, _ *http.Request) {
 	message := "RENIO APP"

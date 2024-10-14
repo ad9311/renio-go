@@ -7,7 +7,7 @@ import (
 	"github.com/ad9311/renio-go/internal/model"
 )
 
-// Actions //
+// --- Actions --- //
 
 func PostUser(w http.ResponseWriter, r *http.Request) {
 	var signUpData model.SignUpData

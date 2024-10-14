@@ -11,7 +11,7 @@ type BudgetAccount struct {
 	UserID int
 }
 
-// Query functions //
+// --- Query --- //
 
 func (b *BudgetAccount) Insert(userID int) error {
 	pool := db.GetPool()

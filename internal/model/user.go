@@ -31,7 +31,7 @@ type SignInData struct {
 	Password string `json:"password"`
 }
 
-// Query functions //
+// --- Query --- //
 
 func (u *User) Create(signUpData SignUpData) error {
 	pool := db.GetPool()
@@ -103,7 +103,7 @@ func (u *User) FindByID(userID int) error {
 	return nil
 }
 
-// Helpers //
+// --- Helpers --- //
 
 func hashPassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)

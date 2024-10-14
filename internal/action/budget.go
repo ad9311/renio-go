@@ -7,13 +7,10 @@ import (
 	"github.com/ad9311/renio-go/internal/model"
 )
 
+// --- Actions --- //
+
 func IndexBudgets(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value(conf.UserIDContext).(int)
-	var budgetAccount model.BudgetAccount
-	if err := budgetAccount.FindByUserID(userID); err != nil {
-		WriteError(w, []string{"no budget account found"}, http.StatusInternalServerError)
-		return
-	}
+	budgetAccount := r.Context().Value(conf.BudgetAccountContext).(model.BudgetAccount)
 
 	var budgets model.Budgets
 	if err := budgets.Index(budgetAccount.ID); err != nil {
@@ -25,15 +22,10 @@ func IndexBudgets(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostBudget(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value(conf.UserIDContext).(int)
-	var budgetAccount model.BudgetAccount
-	if err := budgetAccount.FindByUserID(userID); err != nil {
-		WriteError(w, []string{"no budget account found"}, http.StatusInternalServerError)
-		return
-	}
+	budgetAccount := r.Context().Value(conf.BudgetAccountContext).(model.BudgetAccount)
 
 	var budget model.Budget
-	if err := budget.Create(budgetAccount.ID); err != nil {
+	if err := budget.Insert(budgetAccount.ID); err != nil {
 		WriteError(w, []string{err.Error()}, http.StatusNotFound)
 		return
 	}
@@ -42,5 +34,6 @@ func PostBudget(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBudget(w http.ResponseWriter, r *http.Request) {
-	WriteOK(w, "", http.StatusCreated)
+	budget := r.Context().Value(conf.BudgetContext).(model.Budget)
+	WriteOK(w, budget, http.StatusCreated)
 }

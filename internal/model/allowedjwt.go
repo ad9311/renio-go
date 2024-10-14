@@ -15,7 +15,7 @@ type AllowedJWT struct {
 	UserID int
 }
 
-// Query functions //
+// --- Query --- //
 
 func (aJWT *AllowedJWT) Insert() error {
 	pool := db.GetPool()
@@ -31,7 +31,7 @@ func (aJWT *AllowedJWT) Insert() error {
 	return nil
 }
 
-func (aJWT *AllowedJWT) FindByJTI(jit string) error {
+func (aJWT *AllowedJWT) SelectByJTI(jit string) error {
 	pool := db.GetPool()
 	ctx := context.Background()
 	query := `SELECT user_id FROM allowed_jwts WHERE jti = $1`

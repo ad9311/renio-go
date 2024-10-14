@@ -61,7 +61,7 @@ func routesProtector(next http.Handler) http.Handler {
 		}
 
 		var allowedJWT model.AllowedJWT
-		err = allowedJWT.FindByJTI(claims.JTI)
+		err = allowedJWT.SelectByJTI(claims.JTI)
 		if err != nil {
 			action.WriteError(w, []string{err.Error()}, http.StatusUnauthorized)
 			return

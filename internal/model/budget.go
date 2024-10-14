@@ -60,7 +60,7 @@ func (bs *Budgets) Index(budgetAccountID int) error {
 	return nil
 }
 
-func (b *Budget) Create(budgetAccountID int) error {
+func (b *Budget) Insert(budgetAccountID int) error {
 	pool := db.GetPool()
 	ctx := context.Background()
 	query := `INSERT INTO budgets (uid, budget_account_id) VALUES ($1, $2) RETURNING`
@@ -84,7 +84,7 @@ func (b *Budget) Create(budgetAccountID int) error {
 	return nil
 }
 
-func (b *Budget) FindByUID(budgetAccountID int, uid string) error {
+func (b *Budget) SelectByUID(budgetAccountID int, uid string) error {
 	pool := db.GetPool()
 	ctx := context.Background()
 	condition := "budget_account_id = $1 AND uid = $2"
@@ -106,7 +106,7 @@ func (b *Budget) FindByUID(budgetAccountID int, uid string) error {
 	return nil
 }
 
-// Helpers //
+// --- Helpers --- //
 
 func (b *Budget) genUID(budgetAccountID int) {
 	currentTime := time.Now()
