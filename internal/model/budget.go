@@ -21,16 +21,15 @@ type Budget struct {
 
 type Budgets []Budget
 
-const budgetSelectedColumns = `id, uid, balance, total_income, total_expenses, transaction_count, income_count, expense_count`
+const budgetColumns = `id, uid, balance, total_income, total_expenses, transaction_count, income_count, expense_count`
 
 // Query functions //
 
 func (bs *Budgets) Index(budgetAccountID int) error {
 	pool := db.GetPool()
 	ctx := context.Background()
-	query := `SELECT id, uid, balance, total_income, total_expenses,
-						transaction_count, income_count, expense_count
-						FROM budgets WHERE budget_account_id = $1`
+	condition := "budget_account_id = $1"
+	query := fmt.Sprintf("SELECT %s FROM budgets WHERE %s", budgetColumns, condition)
 
 	rows, err := pool.Query(ctx, query, budgetAccountID)
 	if err != nil {
@@ -64,10 +63,8 @@ func (bs *Budgets) Index(budgetAccountID int) error {
 func (b *Budget) Create(budgetAccountID int) error {
 	pool := db.GetPool()
 	ctx := context.Background()
-	query := `INSERT INTO budgets (uid, budget_account_id)
-						VALUES ($1, $2)
-						RETURNING id, uid, balance, total_income, total_expenses,
-						transaction_count, income_count, expense_count`
+	query := `INSERT INTO budgets (uid, budget_account_id) VALUES ($1, $2) RETURNING`
+	query = fmt.Sprintf("%s %s", query, budgetColumns)
 
 	b.genUID(budgetAccountID)
 	err := pool.QueryRow(ctx, query, b.UID, budgetAccountID).Scan(
@@ -87,11 +84,12 @@ func (b *Budget) Create(budgetAccountID int) error {
 	return nil
 }
 
-func (b *Budget) FindByUID(uid string) error {
+func (b *Budget) FindByUID(budgetAccountID int, uid string) error {
 	pool := db.GetPool()
 	ctx := context.Background()
-	query := ``
-	err := pool.QueryRow(ctx, query, uid).Scan(
+	condition := "budget_account_id = $1 AND uid = $2"
+	query := fmt.Sprintf("SELECT %s FROM budgets WHERE %s", budgetColumns, condition)
+	err := pool.QueryRow(ctx, query, budgetAccountID, uid).Scan(
 		&b.ID,
 		&b.UID,
 		&b.Balance,
