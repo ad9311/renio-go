@@ -62,7 +62,7 @@ func (u *User) Create(signUpData SignUpData) error {
 	return nil
 }
 
-func (u *User) FindForAuth(email string) error {
+func (u *User) SelectForAuth(email string) error {
 	query := `SELECT id, username, password FROM users WHERE email = $1`
 	pool := db.GetPool()
 	ctx := context.Background()
@@ -84,7 +84,7 @@ func (u *User) SetUpAccounts() error {
 	return nil
 }
 
-func (u *User) FindByID(userID int) error {
+func (u *User) SelectByID(userID int) error {
 	query := `SELECT id, username, name, email, image FROM users WHERE id = $1`
 	pool := db.GetPool()
 	ctx := context.Background()

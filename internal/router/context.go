@@ -15,7 +15,7 @@ func BudgetAccountCTX(next http.Handler) http.Handler {
 		userID := r.Context().Value(conf.UserIDContext).(int)
 
 		var budgetAccount model.BudgetAccount
-		if err := budgetAccount.FindByUserID(userID); err != nil {
+		if err := budgetAccount.SelectByUserID(userID); err != nil {
 			action.WriteError(w, []string{"user not signed in"}, http.StatusUnauthorized)
 			return
 		}
@@ -30,7 +30,7 @@ func BudgetCTX(next http.Handler) http.Handler {
 		userID := r.Context().Value(conf.UserIDContext).(int)
 
 		var budgetAccount model.BudgetAccount
-		if err := budgetAccount.FindByUserID(userID); err != nil {
+		if err := budgetAccount.SelectByUserID(userID); err != nil {
 			action.WriteError(w, []string{"user not signed in"}, http.StatusUnauthorized)
 			return
 		}

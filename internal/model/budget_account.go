@@ -28,7 +28,7 @@ func (b *BudgetAccount) Insert(userID int) error {
 	return nil
 }
 
-func (b *BudgetAccount) FindByUserID(userID int) error {
+func (b *BudgetAccount) SelectByUserID(userID int) error {
 	query := `SELECT id, user_id FROM budget_accounts WHERE user_id = $1`
 	pool := db.GetPool()
 	ctx := context.Background()

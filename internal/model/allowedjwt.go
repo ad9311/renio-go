@@ -15,15 +15,22 @@ type AllowedJWT struct {
 	UserID int
 }
 
+type JWT struct {
+	Token string
+	JTI   string
+	AUD   string
+	EXP   time.Time
+}
+
 // --- Query --- //
 
-func (aJWT *AllowedJWT) Insert() error {
+func (aJWT *AllowedJWT) Insert(token JWT, userID int) error {
 	pool := db.GetPool()
 	ctx := context.Background()
 	query := `INSERT INTO allowed_jwts (jti, aud, exp, user_id)
 						VALUES ($1, $2, $3, $4)`
 
-	_, err := pool.Exec(ctx, query, aJWT.JTI, aJWT.AUD, aJWT.EXP, aJWT.UserID)
+	_, err := pool.Exec(ctx, query, token.JTI, token.AUD, token.EXP, userID)
 	if err != nil {
 		return err
 	}

@@ -26,9 +26,9 @@ func PostSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user model.User
-	err = user.FindForAuth(signInData.Email)
+	err = user.SelectForAuth(signInData.Email)
 	if err != nil {
-		message, status := getFindUserError(err)
+		message, status := getSelectUserError(err)
 		WriteError(w, []string{message}, status)
 		return
 	}
@@ -46,13 +46,8 @@ func PostSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	allowedJWT := model.AllowedJWT{
-		JTI:    newJWT.JTI,
-		AUD:    newJWT.AUD,
-		EXP:    newJWT.EXP,
-		UserID: user.ID,
-	}
-	err = allowedJWT.Insert()
+	var allowedJWT model.AllowedJWT
+	err = allowedJWT.Insert(newJWT, user.ID)
 	if err != nil {
 		WriteError(w, []string{err.Error()}, http.StatusInternalServerError)
 		return
@@ -64,7 +59,7 @@ func PostSession(w http.ResponseWriter, r *http.Request) {
 
 // --- Helpers --- //
 
-func getFindUserError(err error) (string, int) {
+func getSelectUserError(err error) (string, int) {
 	var message string
 	var status int
 
@@ -94,7 +89,7 @@ func getPasswordError(err error) (string, int) {
 	return message, status
 }
 
-func createJWTToken(userID int) (JWT, error) {
+func createJWTToken(userID int) (model.JWT, error) {
 	jti := uuid.New().String()
 	exp := time.Now().Add(time.Hour * 24 * 7)
 
@@ -109,10 +104,10 @@ func createJWTToken(userID int) (JWT, error) {
 	secret := []byte(os.Getenv("JWT_KEY"))
 	tokenString, err := token.SignedString(secret)
 	if err != nil {
-		return JWT{}, err
+		return model.JWT{}, err
 	}
 
-	newJWT := JWT{
+	newJWT := model.JWT{
 		JTI:   jti,
 		EXP:   exp,
 		Token: tokenString,
