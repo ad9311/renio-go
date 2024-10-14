@@ -91,7 +91,7 @@ var entryClassesSeed = []model.EntryClass{
 
 func seedEntryClasses() {
 	for _, entryClass := range entryClassesSeed {
-		if err := entryClass.Insert(); err != nil {
+		if err := entryClass.InsertIfNotExists(); err != nil {
 			fmt.Printf("could not insert entry class: %s", err.Error())
 		}
 	}
