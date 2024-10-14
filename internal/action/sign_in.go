@@ -1,4 +1,4 @@
-package ct
+package action
 
 import (
 	"encoding/json"
@@ -8,23 +8,15 @@ import (
 	"time"
 
 	"github.com/ad9311/renio-go/internal/model"
-	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func SignInRouter(r chi.Router) func(r chi.Router) {
-	return func(r chi.Router) {
-		r.Post("/", createSession)
-		r.Delete("/", deleteSession)
-	}
-}
+// --- Actions --- //
 
-// Actions //
-
-func createSession(w http.ResponseWriter, r *http.Request) {
+func PostSession(w http.ResponseWriter, r *http.Request) {
 	var signInData model.SignInData
 
 	err := json.NewDecoder(r.Body).Decode(&signInData)
@@ -34,9 +26,9 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user model.User
-	err = user.FindForAuth(signInData.Email)
+	err = user.SelectForAuth(signInData.Email)
 	if err != nil {
-		message, status := getFindUserError(err)
+		message, status := getSelectUserError(err)
 		WriteError(w, []string{message}, status)
 		return
 	}
@@ -48,19 +40,14 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newJWT, err := createJWTToken(user.Username)
+	newJWT, err := createJWTToken(user.ID)
 	if err != nil {
 		WriteError(w, []string{err.Error()}, http.StatusInternalServerError)
 		return
 	}
 
-	allowedJWT := model.AllowedJWT{
-		JTI:    newJWT.JTI,
-		AUD:    newJWT.AUD,
-		EXP:    newJWT.EXP,
-		UserID: user.ID,
-	}
-	err = allowedJWT.Insert()
+	var allowedJWT model.AllowedJWT
+	err = allowedJWT.Insert(newJWT, user.ID)
 	if err != nil {
 		WriteError(w, []string{err.Error()}, http.StatusInternalServerError)
 		return
@@ -70,15 +57,9 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	WriteOK(w, "user signed in successfully", http.StatusCreated)
 }
 
-func deleteSession(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode("{}")
-}
+// --- Helpers --- //
 
-// Helpers //
-
-var jwtSecret = []byte(os.Getenv("JWT_KEY"))
-
-func getFindUserError(err error) (string, int) {
+func getSelectUserError(err error) (string, int) {
 	var message string
 	var status int
 
@@ -108,33 +89,29 @@ func getPasswordError(err error) (string, int) {
 	return message, status
 }
 
-func createJWTToken(username string) (JWT, error) {
-	var newJWT JWT
-
-	aud := "https://renio.dev"
-	iss := "https://api.renio.dev"
+func createJWTToken(userID int) (model.JWT, error) {
 	jti := uuid.New().String()
 	exp := time.Now().Add(time.Hour * 24 * 7)
 
 	claims := jwt.MapClaims{
-		"sub": username,
-		"aud": aud,
-		"iss": iss,
+		"sub": fmt.Sprintf("%d", userID),
 		"jti": jti,
 		"exp": exp.Unix(),
 		"iat": time.Now().Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtSecret)
+	secret := []byte(os.Getenv("JWT_KEY"))
+	tokenString, err := token.SignedString(secret)
 	if err != nil {
-		return newJWT, err
+		return model.JWT{}, err
 	}
 
-	newJWT.AUD = aud
-	newJWT.EXP = exp
-	newJWT.JTI = jti
-	newJWT.Token = tokenString
+	newJWT := model.JWT{
+		JTI:   jti,
+		EXP:   exp,
+		Token: tokenString,
+	}
 
 	return newJWT, nil
 }

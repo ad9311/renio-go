@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"github.com/ad9311/renio-go/internal/ct"
+	"github.com/ad9311/renio-go/internal/action"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -11,32 +11,36 @@ import (
 func RoutesHandler() http.Handler {
 	r := chi.NewRouter()
 
-	// Middlewares
+	// --- Middlewares --- //
 	r.Use(middleware.Logger)
 	r.Use(headerRouter)
+	r.Use(routesProtector)
 
 	r.Route("/", func(r chi.Router) {
-		// Info
-		r.Route("/info", ct.InfoRouter(r))
+		// --- Info --- //
+		r.Route("/info", func(r chi.Router) {
+			r.Get("/", action.IndexInfo)
+		})
 
-		// Auth
+		// --- Auth --- //
 		r.Route("/auth", func(r chi.Router) {
-			// Sessions
-			r.Route("/sign-in", ct.SignInRouter(r))
+			r.Post("/sign-in", action.PostSession)
+			r.Post("/sign-up", action.PostUser)
+		})
 
-			// Sign Up
-			r.Route("/sign-up", ct.SignUpRouter(r))
+		// --- Budget --- //
+		r.Route("/budgets", func(r chi.Router) {
+			r.Use(BudgetAccountCTX)
+			r.Route("/", func(r chi.Router) {
+				r.Get("/", action.IndexBudgets)
+				r.Route("/{budgetUID}", func(r chi.Router) {
+					r.Use(BudgetCTX)
+					r.Get("/", action.GetBudget)
+				})
+				r.Post("/", action.PostBudget)
+			})
 		})
 	})
 
 	return r
-}
-
-// Middlewares //
-
-func headerRouter(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		next.ServeHTTP(w, r)
-	})
 }

@@ -1,25 +1,17 @@
-package ct
+package action
 
 import (
 	"encoding/json"
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/model"
-	"github.com/go-chi/chi/v5"
 )
 
-func SignUpRouter(r chi.Router) func(r chi.Router) {
-	return func(r chi.Router) {
-		r.Post("/", createUser)
-	}
-}
+// --- Actions --- //
 
-// Actions //
-
-func createUser(w http.ResponseWriter, r *http.Request) {
+func PostUser(w http.ResponseWriter, r *http.Request) {
 	var signUpData model.SignUpData
-	err := json.NewDecoder(r.Body).Decode(&signUpData)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&signUpData); err != nil {
 		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return
 	}
@@ -30,8 +22,12 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user model.User
-	err = user.Create(signUpData)
-	if err != nil {
+	if err := user.Create(signUpData); err != nil {
+		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
+		return
+	}
+
+	if err := user.SetUpAccounts(); err != nil {
 		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return
 	}

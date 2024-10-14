@@ -1,17 +1,9 @@
-package ct
+package action
 
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 )
-
-type JWT struct {
-	Token string
-	JTI   string
-	AUD   string
-	EXP   time.Time
-}
 
 func WriteError(w http.ResponseWriter, errors []string, httpStatus int) error {
 	w.WriteHeader(httpStatus)
