@@ -1,0 +1,79 @@
+[[entries]]
+uid = "banking"
+name = "Banking"
+group = 0
+
+[[entries]]
+uid = "clothing"
+name = "Clothing"
+group = 0
+
+[[entries]]
+uid = "entertainment"
+name = "Entertainment"
+group = 0
+
+[[entries]]
+uid = "extra"
+name = "Extra"
+group = 1
+
+[[entries]]
+uid = "foodDelivery"
+name = "Food Delivery"
+group = 0
+
+[[entries]]
+uid = "groceries"
+name = "Groceries"
+group = 0
+
+[[entries]]
+uid = "home"
+name = "Home"
+group = 0
+
+[[entries]]
+uid = "insurance"
+name = "Insurance"
+group = 0
+
+[[entries]]
+uid = "onlineShopping"
+name = "Online Shopping"
+group = 0
+
+[[entries]]
+uid = "other"
+name = "Other"
+group = 0
+
+[[entries]]
+uid = "restaurants"
+name = "Restaurants"
+group = 0
+
+[[entries]]
+uid = "savings"
+name = "Savings"
+group = 0
+
+[[entries]]
+uid = "subscriptions"
+name = "Subscriptions"
+group = 0
+
+[[entries]]
+uid = "transportation"
+name = "Transportation"
+group = 0
+
+[[entries]]
+uid = "utilities"
+name = "Utilities"
+group = 0
+
+[[entries]]
+uid = "wages"
+name = "Wages"
+group = 1

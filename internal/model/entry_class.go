@@ -8,9 +8,9 @@ import (
 
 type EntryClass struct {
 	ID        int    `json:"id"`
-	UID       string `json:"uid"`
-	Name      string `json:"name"`
-	Group     int    `json:"group"`
+	UID       string `json:"uid" toml:"uid"`
+	Name      string `json:"name" toml:"name"`
+	Group     int    `toml:"group"`
 	GroupName string `json:"groupName"`
 }
 
@@ -22,8 +22,8 @@ const (
 )
 
 var EntryClassGroupNames = map[int]string{
-	0: IncomeGroupName,
-	1: ExpenseGroupName,
+	0: ExpenseGroupName,
+	1: IncomeGroupName,
 }
 
 // --- Query --- //
@@ -31,7 +31,7 @@ var EntryClassGroupNames = map[int]string{
 func (e *EntryClass) Insert() error {
 	pool := db.GetPool()
 	ctx := context.Background()
-	query := `INSERT INTO entry_classes (uid, name) VALUES ($1, $2, $3)`
+	query := `INSERT INTO entry_classes (uid, name, "group") VALUES ($1, $2, $3)`
 
 	if _, err := pool.Exec(ctx, query, e.UID, e.Name, e.Group); err != nil {
 		return err

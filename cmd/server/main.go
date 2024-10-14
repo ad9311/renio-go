@@ -7,6 +7,7 @@ import (
 
 	"github.com/ad9311/renio-go/internal/db"
 	"github.com/ad9311/renio-go/internal/db/migration"
+	"github.com/ad9311/renio-go/internal/db/seed"
 	"github.com/joho/godotenv"
 )
 
@@ -23,8 +24,11 @@ func main() {
 	}
 
 	db.Init()
-	if os.Getenv("MIGRATE") == "auto" {
+	if os.Getenv("MIGRATE") == "on" {
 		migration.Migrate()
+	}
+	if os.Getenv("SEED") == "on" {
+		seed.RunSeeds()
 	}
 
 	Serve()
