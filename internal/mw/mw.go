@@ -16,6 +16,12 @@ type CurrentUserContext string
 
 const UserIDContext = CurrentUserContext("currentUserID")
 
+var FreeRoutes = []string{
+	"/info",
+	"/auth/sign-in",
+	"/auth/sign-up",
+}
+
 // Middlewares //
 
 func HeaderRouter(next http.Handler) http.Handler {
@@ -28,7 +34,7 @@ func HeaderRouter(next http.Handler) http.Handler {
 func RoutesProtector(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
-		if path == "/auth/sign-in" || path == "/info" {
+		if findInFreeRoutes(path) {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -63,6 +69,16 @@ func RoutesProtector(next http.Handler) http.Handler {
 }
 
 // Helpers //
+
+func findInFreeRoutes(path string) bool {
+	for _, str := range FreeRoutes {
+		if str == path {
+			return true
+		}
+	}
+
+	return false
+}
 
 func decodeJWT(tokenStr string) (string, error) {
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
