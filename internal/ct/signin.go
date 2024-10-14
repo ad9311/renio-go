@@ -111,7 +111,7 @@ func createJWTToken(userID int) (JWT, error) {
 	exp := time.Now().Add(time.Hour * 24 * 7)
 
 	claims := jwt.MapClaims{
-		"sub": userID,
+		"sub": fmt.Sprintf("%d", userID),
 		"jti": jti,
 		"exp": exp.Unix(),
 		"iat": time.Now().Unix(),
@@ -124,7 +124,7 @@ func createJWTToken(userID int) (JWT, error) {
 		return JWT{}, err
 	}
 
-	var newJWT = JWT{
+	newJWT := JWT{
 		JTI:   jti,
 		EXP:   exp,
 		Token: tokenString,

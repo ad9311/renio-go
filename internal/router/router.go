@@ -29,6 +29,9 @@ func RoutesHandler() http.Handler {
 			// Sign Up
 			r.Route("/sign-up", ct.SignUpRouter(r))
 		})
+
+		// Budgets
+		r.Route("/budgets", ct.BudgetRouter(r))
 	})
 
 	return r

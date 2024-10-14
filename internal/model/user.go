@@ -84,6 +84,25 @@ func (u *User) SetUpAccounts() error {
 	return nil
 }
 
+func (u *User) FindByID(userID int) error {
+	query := `SELECT id, username, name, email, image FROM users WHERE id = $1`
+	pool := db.GetPool()
+	ctx := context.Background()
+
+	err := pool.QueryRow(ctx, query, userID).Scan(
+		&u.ID,
+		&u.Username,
+		&u.Name,
+		&u.Email,
+		&u.Image,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Helpers //
 
 func hashPassword(password string) (string, error) {
