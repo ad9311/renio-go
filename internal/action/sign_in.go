@@ -1,4 +1,4 @@
-package ctrl
+package action
 
 import (
 	"encoding/json"
@@ -8,23 +8,13 @@ import (
 	"time"
 
 	"github.com/ad9311/renio-go/internal/model"
-	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func SignInRouter(r chi.Router) func(r chi.Router) {
-	return func(r chi.Router) {
-		r.Post("/", createSession)
-		r.Delete("/", deleteSession)
-	}
-}
-
-// Actions //
-
-func createSession(w http.ResponseWriter, r *http.Request) {
+func PostSession(w http.ResponseWriter, r *http.Request) {
 	var signInData model.SignInData
 
 	err := json.NewDecoder(r.Body).Decode(&signInData)
@@ -69,12 +59,6 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Authorization", fmt.Sprintf("Bearer %s", newJWT.Token))
 	WriteOK(w, "user signed in successfully", http.StatusCreated)
 }
-
-func deleteSession(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode("{}")
-}
-
-// Helpers //
 
 func getFindUserError(err error) (string, int) {
 	var message string

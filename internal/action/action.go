@@ -1,4 +1,4 @@
-package ctrl
+package action
 
 import (
 	"encoding/json"
@@ -22,7 +22,3 @@ func WriteOK(w http.ResponseWriter, data any, httpStatus int) error {
 	w.WriteHeader(httpStatus)
 	return json.NewEncoder(w).Encode(map[string]any{"data": data})
 }
-
-type BudgetIdentify string
-
-const BudgetUIDParam = BudgetIdentify("budgetUID")

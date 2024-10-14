@@ -1,4 +1,4 @@
-package midware
+package router
 
 import (
 	"context"
@@ -8,21 +8,24 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ad9311/renio-go/internal/action"
 	"github.com/ad9311/renio-go/internal/conf"
-	"github.com/ad9311/renio-go/internal/ctrl"
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var FreeRoutes = []string{
+type jwtClaims struct {
+	JTI string
+	SUB int
+}
+
+var freeRoutes = []string{
 	"/info",
 	"/auth/sign-in",
 	"/auth/sign-up",
 }
 
-// Middlewares //
-
-func HeaderRouter(next http.Handler) http.Handler {
+func headerRouter(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Accept", "application/json")
@@ -30,7 +33,7 @@ func HeaderRouter(next http.Handler) http.Handler {
 	})
 }
 
-func RoutesProtector(next http.Handler) http.Handler {
+func routesProtector(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
 		if findInFreeRoutes(path) {
@@ -40,32 +43,32 @@ func RoutesProtector(next http.Handler) http.Handler {
 
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			ctrl.WriteError(w, []string{"invalid request authorization"}, http.StatusUnauthorized)
+			action.WriteError(w, []string{"invalid request authorization"}, http.StatusUnauthorized)
 			return
 		}
 
 		splitValue := strings.Split(authHeader, " ")
 		if len(splitValue) != 2 {
-			ctrl.WriteError(w, []string{"invalid request authorization"}, http.StatusUnauthorized)
+			action.WriteError(w, []string{"invalid request authorization"}, http.StatusUnauthorized)
 			return
 		}
 
 		jwtToken := splitValue[1]
 		claims, err := decodeJWT(jwtToken)
 		if err != nil {
-			ctrl.WriteError(w, []string{"invalid jwt token"}, http.StatusUnauthorized)
+			action.WriteError(w, []string{"invalid jwt token"}, http.StatusUnauthorized)
 			return
 		}
 
 		var allowedJWT model.AllowedJWT
 		err = allowedJWT.FindByJTI(claims.JTI)
 		if err != nil {
-			ctrl.WriteError(w, []string{err.Error()}, http.StatusUnauthorized)
+			action.WriteError(w, []string{err.Error()}, http.StatusUnauthorized)
 			return
 		}
 		if allowedJWT.UserID != claims.SUB {
 			str := fmt.Sprintf("%d - %d", allowedJWT.UserID, claims.SUB)
-			ctrl.WriteError(w, []string{str}, http.StatusUnauthorized)
+			action.WriteError(w, []string{str}, http.StatusUnauthorized)
 			return
 		}
 
@@ -74,15 +77,8 @@ func RoutesProtector(next http.Handler) http.Handler {
 	})
 }
 
-// Helpers //
-
-type jwtClaims struct {
-	JTI string
-	SUB int
-}
-
 func findInFreeRoutes(path string) bool {
-	for _, str := range FreeRoutes {
+	for _, str := range freeRoutes {
 		if str == path {
 			return true
 		}
