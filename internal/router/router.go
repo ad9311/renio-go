@@ -37,6 +37,7 @@ func RoutesHandler() http.Handler {
 					r.Use(BudgetCTX)
 					r.Get("/", action.GetBudget)
 				})
+				r.Get("/current", action.GetCurrentBudget)
 				r.Post("/", action.PostBudget)
 			})
 		})

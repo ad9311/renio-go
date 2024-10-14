@@ -40,7 +40,7 @@ func (b *Budget) Insert(budgetAccountID int) error {
 	query := `INSERT INTO budgets (uid, budget_account_id) VALUES ($1, $2) RETURNING`
 	query = fmt.Sprintf("%s %s", query, budgetColumns)
 
-	b.genUID(budgetAccountID)
+	b.setCurrentUID(budgetAccountID)
 	if err := b.queryBudget(query, b.UID, budgetAccountID); err != nil {
 		return err
 	}
@@ -58,9 +58,20 @@ func (b *Budget) SelectByUID(budgetAccountID int, uid string) error {
 	return nil
 }
 
+func (b *Budget) SelectCurrent(budgetAccountID int) error {
+	condition := "budget_account_id = $1 AND uid = $2"
+	query := fmt.Sprintf("SELECT %s FROM budgets WHERE %s", budgetColumns, condition)
+	b.setCurrentUID(budgetAccountID)
+	if err := b.queryBudget(query, budgetAccountID, b.UID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // --- Helpers --- //
 
-func (b *Budget) genUID(budgetAccountID int) {
+func (b *Budget) setCurrentUID(budgetAccountID int) {
 	currentTime := time.Now()
 	year := currentTime.Local().Year()
 	month := currentTime.Local().Month()

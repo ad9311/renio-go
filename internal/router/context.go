@@ -27,13 +27,7 @@ func BudgetAccountCTX(next http.Handler) http.Handler {
 
 func BudgetCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value(conf.UserIDContext).(int)
-
-		var budgetAccount model.BudgetAccount
-		if err := budgetAccount.SelectByUserID(userID); err != nil {
-			action.WriteError(w, []string{"user not signed in"}, http.StatusUnauthorized)
-			return
-		}
+		budgetAccount := r.Context().Value(conf.BudgetAccountContext).(model.BudgetAccount)
 
 		budgetUID := chi.URLParam(r, "budgetUID")
 		var budget model.Budget
