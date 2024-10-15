@@ -11,9 +11,9 @@ import (
 type Budget struct {
 	ID               int     `json:"id"`
 	UID              string  `json:"uid"`
-	Balance          float64 `json:"balance"`
-	TotalIncome      float64 `json:"totalIncome"`
-	TotalExpenses    float64 `json:"totalExpenses"`
+	Balance          float32 `json:"balance"`
+	TotalIncome      float32 `json:"totalIncome"`
+	TotalExpenses    float32 `json:"totalExpenses"`
 	TransactionCount int     `json:"transactionCount"`
 	IncomeCount      int     `json:"incomeCount"`
 	ExpenseCount     int     `json:"expenseCount"`
