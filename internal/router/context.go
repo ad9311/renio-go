@@ -28,11 +28,10 @@ func BudgetAccountCTX(next http.Handler) http.Handler {
 
 func BudgetCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		budgetAccount := r.Context().Value(conf.BudgetAccountContext).(model.BudgetAccount)
-
 		budgetUID := chi.URLParam(r, "budgetUID")
+
 		var budget model.Budget
-		if err := budget.SelectByUID(budgetAccount.ID, budgetUID); err != nil {
+		if err := budget.SelectByUID(budgetUID); err != nil {
 			action.WriteError(w, []string{"budget not found"}, http.StatusNotFound)
 			return
 		}
