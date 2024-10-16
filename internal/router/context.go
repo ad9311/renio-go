@@ -3,6 +3,7 @@ package router
 import (
 	"context"
 	"net/http"
+	"strconv"
 
 	"github.com/ad9311/renio-go/internal/action"
 	"github.com/ad9311/renio-go/internal/conf"
@@ -37,6 +38,24 @@ func BudgetCTX(next http.Handler) http.Handler {
 		}
 
 		ctx := context.WithValue(r.Context(), conf.BudgetContext, budget)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func IncomeCTX(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		incomeID := chi.URLParam(r, "incomeID")
+		id, _ := strconv.Atoi(incomeID)
+		var income = model.Income{
+			ID: id,
+		}
+		if err := income.SelectByID(); err != nil {
+			action.WriteError(w, []string{"income not found"}, http.StatusNotFound)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), conf.IncomeContext, income)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

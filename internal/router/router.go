@@ -42,6 +42,11 @@ func RoutesHandler() http.Handler {
 					// --- Income ---
 					r.Route("/income-list", func(r chi.Router) {
 						r.Post("/", action.PostIncome)
+						r.Route("/{incomeID}", func(r chi.Router) {
+							r.Use(IncomeCTX)
+							r.Get("/", action.GetIncome)
+							r.Patch("/", action.PatchIncome)
+						})
 					})
 				})
 			})

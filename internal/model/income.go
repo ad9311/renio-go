@@ -41,6 +41,37 @@ func (i *Income) Insert(budgetID int, entryClassID int) error {
 	return nil
 }
 
+func (i *Income) SelectByID() error {
+	query := `SELECT id, amount, description FROM incomes WHERE id = $1`
+
+	if err := i.queryIncome(query, i.ID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i *Income) Update(incomeFormData IncomeFormData) error {
+	query := `UPDATE incomes SET
+						amount = $1,
+						description = $2,
+						entry_class_id = $3
+						WHERE id = $4 RETURNING`
+	query = fmt.Sprintf("%s %s", query, incomeColumns)
+
+	if err := i.queryIncome(
+		query,
+		incomeFormData.Amount,
+		incomeFormData.Description,
+		incomeFormData.EntryClassID,
+		i.ID,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // --- Helpers --- //
 
 func (i *Income) queryIncome(query string, params ...any) error {
