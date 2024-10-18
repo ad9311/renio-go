@@ -72,8 +72,6 @@ func (b *Budget) OnIncomeInsert(incomeAmount float32) error {
 	columns := "balance = $1, total_income = $2, entry_count = $3, income_count = $4"
 	query := fmt.Sprintf("UPDATE budgets SET %s WHERE id = $5 RETURNING *", columns)
 
-	fmt.Println(query)
-
 	b.setBalance(incomeAmount, 0)
 	b.setTotalIncome(incomeAmount, 0)
 	b.addToEntryCount(1)
@@ -97,8 +95,6 @@ func (b *Budget) OnIncomeUpdate(prevIncomeAmount float32, incomeAmount float32) 
 	columns := "balance = $1, total_income = $2"
 	query := fmt.Sprintf("UPDATE budgets SET %s WHERE id = $3 RETURNING *", columns)
 
-	fmt.Println(query)
-
 	b.setBalance(incomeAmount, prevIncomeAmount)
 	b.setTotalIncome(incomeAmount, prevIncomeAmount)
 
@@ -106,6 +102,29 @@ func (b *Budget) OnIncomeUpdate(prevIncomeAmount float32, incomeAmount float32) 
 		query,
 		b.Balance,
 		b.TotalIncome,
+		b.ID,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (b *Budget) OnIncomeDelete(incomeAmount float32) error {
+	columns := "balance = $1, total_income = $2, entry_count = $3, income_count = $4"
+	query := fmt.Sprintf("UPDATE budgets SET %s WHERE id = $5 RETURNING *", columns)
+
+	b.setBalance(0, incomeAmount)
+	b.setTotalIncome(0, incomeAmount)
+	b.addToEntryCount(-1)
+	b.addToIncomeCount(-1)
+
+	if err := b.queryBudget(
+		query,
+		b.Balance,
+		b.TotalIncome,
+		b.EntryCount,
+		b.IncomeCount,
 		b.ID,
 	); err != nil {
 		return err
@@ -136,7 +155,7 @@ func (bs *Budgets) queryBudgets(query string, params ...any) error {
 
 	for rows.Next() {
 		var budget Budget
-		if err := rows.Scan(spreadValues(&budget)...); err != nil {
+		if err := rows.Scan(spreadBudgetValues(&budget)...); err != nil {
 			return nil
 		}
 
@@ -150,7 +169,7 @@ func (b *Budget) queryBudget(query string, params ...any) error {
 	pool := db.GetPool()
 	ctx := context.Background()
 
-	err := pool.QueryRow(ctx, query, params...).Scan(spreadValues(b)...)
+	err := pool.QueryRow(ctx, query, params...).Scan(spreadBudgetValues(b)...)
 	if err != nil {
 		return err
 	}
@@ -174,7 +193,7 @@ func (b *Budget) addToIncomeCount(change int) {
 	b.IncomeCount = b.IncomeCount + change
 }
 
-func spreadValues(budget *Budget) []any {
+func spreadBudgetValues(budget *Budget) []any {
 	return []any{
 		&budget.ID,
 		&budget.UID,

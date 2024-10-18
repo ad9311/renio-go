@@ -11,7 +11,7 @@ import (
 func RoutesHandler() http.Handler {
 	r := chi.NewRouter()
 
-	// --- Middlewares --- //
+	// --- Middleware --- //
 	r.Use(middleware.Logger)
 	r.Use(headerRouter)
 	r.Use(routesProtector)
@@ -46,6 +46,7 @@ func RoutesHandler() http.Handler {
 							r.Use(IncomeCTX)
 							r.Get("/", action.GetIncome)
 							r.Patch("/", action.PatchIncome)
+							r.Delete("/", action.DeleteIncome)
 						})
 					})
 				})

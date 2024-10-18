@@ -72,6 +72,16 @@ func (i *Income) Update(incomeFormData IncomeFormData) error {
 	return nil
 }
 
+func (i *Income) Delete() error {
+	query := "DELETE FROM incomes WHERE id = $1 RETURNING id, amount, description"
+
+	if err := i.queryIncome(query, i.ID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // --- Helpers --- //
 
 func (i *Income) queryIncome(query string, params ...any) error {

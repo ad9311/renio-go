@@ -56,8 +56,26 @@ func PatchIncome(w http.ResponseWriter, r *http.Request) {
 		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return
 	}
+
 	if err := budget.OnIncomeUpdate(prevIncomeAmount, income.Amount); err != nil {
 		WriteError(w, []string{"failed to updated budget"}, http.StatusInternalServerError)
+		return
+	}
+
+	WriteOK(w, income, http.StatusOK)
+}
+
+func DeleteIncome(w http.ResponseWriter, r *http.Request) {
+	income := r.Context().Value(conf.IncomeContext).(model.Income)
+	budget := r.Context().Value(conf.BudgetContext).(model.Budget)
+
+	if err := income.Delete(); err != nil {
+		WriteError(w, []string{"failed to delete income"}, http.StatusInternalServerError)
+		return
+	}
+
+	if err := budget.OnIncomeDelete(income.Amount); err != nil {
+		WriteError(w, []string{"failed to update budget"}, http.StatusInternalServerError)
 		return
 	}
 
