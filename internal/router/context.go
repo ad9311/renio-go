@@ -32,7 +32,7 @@ func BudgetCTX(next http.Handler) http.Handler {
 
 		var budget model.Budget
 		if err := budget.SelectByUID(budgetUID); err != nil {
-			action.WriteError(w, []string{"budget not found"}, http.StatusNotFound)
+			action.WriteError(w, []string{err.Error()}, http.StatusNotFound)
 			return
 		}
 
@@ -43,10 +43,9 @@ func BudgetCTX(next http.Handler) http.Handler {
 
 func IncomeCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		incomeID := chi.URLParam(r, "incomeID")
 		id, _ := strconv.Atoi(incomeID)
-		var income = model.Income{
+		income := model.Income{
 			ID: id,
 		}
 		if err := income.SelectByID(); err != nil {

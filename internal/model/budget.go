@@ -24,12 +24,10 @@ type Budget struct {
 
 type Budgets []Budget
 
-const budgetQuery1 = "SELECT * FROM budgets WHERE"
-
 // Query functions //
 
 func (bs *Budgets) Index(budgetAccountID int) error {
-	query := fmt.Sprintf("%s budget_account_id = $1", budgetQuery1)
+	query := "SELECT * FROM budgets WHERE budget_account_id = $1"
 
 	if err := bs.queryBudgets(query, budgetAccountID); err != nil {
 		return err
@@ -39,8 +37,12 @@ func (bs *Budgets) Index(budgetAccountID int) error {
 }
 
 func (b *Budget) SelectByUID(uid string) error {
-	query := fmt.Sprintf("%s uid = $1", budgetQuery1)
-	if err := b.queryBudget(query, uid); err != nil {
+	dbExec := db.DBExec{
+		QueryStr:  "SELECT * FROM budgets WHERE uid = $1",
+		QueryArgs: []any{uid},
+		ScanArgs:  spreadBudgetValues(b),
+	}
+	if err := db.QueryRow(dbExec); err != nil {
 		return err
 	}
 
@@ -48,9 +50,13 @@ func (b *Budget) SelectByUID(uid string) error {
 }
 
 func (b *Budget) SelectCurrent(budgetAccountID int) error {
-	query := fmt.Sprintf("%s uid = $1", budgetQuery1)
 	b.setCurrentUID(budgetAccountID)
-	if err := b.queryBudget(query, b.UID); err != nil {
+	dbExec := db.DBExec{
+		QueryStr:  "SELECT * FROM budgets WHERE uid = $1",
+		QueryArgs: []any{b.UID},
+		ScanArgs:  spreadBudgetValues(b),
+	}
+	if err := db.QueryRow(dbExec); err != nil {
 		return err
 	}
 
@@ -59,9 +65,12 @@ func (b *Budget) SelectCurrent(budgetAccountID int) error {
 
 func (b *Budget) Insert(budgetAccountID int) error {
 	query := "INSERT INTO budgets (uid, budget_account_id) VALUES ($1, $2) RETURNING *"
-
-	b.setCurrentUID(budgetAccountID)
-	if err := b.queryBudget(query, b.UID, budgetAccountID); err != nil {
+	dbExec := db.DBExec{
+		QueryStr:  query,
+		QueryArgs: []any{b.UID, budgetAccountID},
+		ScanArgs:  spreadBudgetValues(b),
+	}
+	if err := db.QueryRow(dbExec); err != nil {
 		return err
 	}
 
@@ -69,22 +78,27 @@ func (b *Budget) Insert(budgetAccountID int) error {
 }
 
 func (b *Budget) OnIncomeInsert(incomeAmount float32) error {
-	columns := "balance = $1, total_income = $2, entry_count = $3, income_count = $4"
-	query := fmt.Sprintf("UPDATE budgets SET %s WHERE id = $5 RETURNING *", columns)
+	query := `UPDATE budgets SET
+            balance = $1, total_income = $2, entry_count = $3, income_count = $4
+            WHERE ID = $5 RETURNING *`
 
 	b.setBalance(incomeAmount, 0)
 	b.setTotalIncome(incomeAmount, 0)
 	b.addToEntryCount(1)
 	b.addToIncomeCount(1)
 
-	if err := b.queryBudget(
-		query,
-		b.Balance,
-		b.TotalIncome,
-		b.EntryCount,
-		b.IncomeCount,
-		b.ID,
-	); err != nil {
+	dbExec := db.DBExec{
+		QueryStr: query,
+		QueryArgs: []any{
+			b.Balance,
+			b.TotalIncome,
+			b.EntryCount,
+			b.IncomeCount,
+			b.ID,
+		},
+		ScanArgs: spreadBudgetValues(b),
+	}
+	if err := db.QueryRow(dbExec); err != nil {
 		return err
 	}
 
@@ -92,18 +106,20 @@ func (b *Budget) OnIncomeInsert(incomeAmount float32) error {
 }
 
 func (b *Budget) OnIncomeUpdate(prevIncomeAmount float32, incomeAmount float32) error {
-	columns := "balance = $1, total_income = $2"
-	query := fmt.Sprintf("UPDATE budgets SET %s WHERE id = $3 RETURNING *", columns)
+	query := `UPDATE budgets SET balance = $1, total_income = $2 WHERE id = $3 RETURNING *`
 
 	b.setBalance(incomeAmount, prevIncomeAmount)
 	b.setTotalIncome(incomeAmount, prevIncomeAmount)
-
-	if err := b.queryBudget(
-		query,
-		b.Balance,
-		b.TotalIncome,
-		b.ID,
-	); err != nil {
+	dbExec := db.DBExec{
+		QueryStr: query,
+		QueryArgs: []any{
+			b.Balance,
+			b.TotalIncome,
+			b.ID,
+		},
+		ScanArgs: spreadBudgetValues(b),
+	}
+	if err := db.QueryRow(dbExec); err != nil {
 		return err
 	}
 
@@ -111,22 +127,27 @@ func (b *Budget) OnIncomeUpdate(prevIncomeAmount float32, incomeAmount float32) 
 }
 
 func (b *Budget) OnIncomeDelete(incomeAmount float32) error {
-	columns := "balance = $1, total_income = $2, entry_count = $3, income_count = $4"
-	query := fmt.Sprintf("UPDATE budgets SET %s WHERE id = $5 RETURNING *", columns)
+	query := `UPDATE budgets SET
+            balance = $1, total_income = $2, entry_count = $3, income_count = $4
+            WHERE ID = $5 RETURNING *`
 
 	b.setBalance(0, incomeAmount)
 	b.setTotalIncome(0, incomeAmount)
 	b.addToEntryCount(-1)
 	b.addToIncomeCount(-1)
 
-	if err := b.queryBudget(
-		query,
-		b.Balance,
-		b.TotalIncome,
-		b.EntryCount,
-		b.IncomeCount,
-		b.ID,
-	); err != nil {
+	dbExec := db.DBExec{
+		QueryStr: query,
+		QueryArgs: []any{
+			b.Balance,
+			b.TotalIncome,
+			b.EntryCount,
+			b.IncomeCount,
+			b.ID,
+		},
+		ScanArgs: spreadBudgetValues(b),
+	}
+	if err := db.QueryRow(dbExec); err != nil {
 		return err
 	}
 
@@ -160,18 +181,6 @@ func (bs *Budgets) queryBudgets(query string, params ...any) error {
 		}
 
 		*bs = append(*bs, budget)
-	}
-
-	return nil
-}
-
-func (b *Budget) queryBudget(query string, params ...any) error {
-	pool := db.GetPool()
-	ctx := context.Background()
-
-	err := pool.QueryRow(ctx, query, params...).Scan(spreadBudgetValues(b)...)
-	if err != nil {
-		return err
 	}
 
 	return nil

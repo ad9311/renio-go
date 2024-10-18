@@ -11,6 +11,13 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
+type DBExec struct {
+	QueryStr   string
+	QueryArgs  []any
+	ScanArgs   []any
+	ModelSlice *[]any
+}
+
 var (
 	pool *pgxpool.Pool
 	once sync.Once
@@ -36,4 +43,43 @@ func Init() {
 
 func GetPool() *pgxpool.Pool {
 	return pool
+}
+
+func QueryRow(dbExec DBExec) error {
+	ctx := context.Background()
+	pool := GetPool()
+
+	if err := pool.QueryRow(
+		ctx,
+		dbExec.QueryStr,
+		dbExec.QueryArgs...,
+	).Scan(
+		dbExec.ScanArgs...,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Query(dbExec DBExec) error {
+	ctx := context.Background()
+	pool := GetPool()
+
+	rows, err := pool.Query(ctx, dbExec.QueryStr, dbExec.QueryArgs...)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var v []any
+		if err := rows.Scan(dbExec.ScanArgs...); err != nil {
+			return err
+		}
+
+		*dbExec.ModelSlice = append(*dbExec.ModelSlice, v)
+	}
+
+	return nil
 }
