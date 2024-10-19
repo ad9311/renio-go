@@ -16,12 +16,37 @@ type Income struct {
 	UpdatedAt    time.Time `json:"updatedAt"`
 }
 
-type Incomes []Income
+type IncomeList []Income
 
 type IncomeFormData struct {
 	Amount       float32 `json:"amount"`
 	Description  string  `json:"description"`
 	EntryClassID int     `json:"entryClassId"`
+}
+
+// --- Query functions --- //
+
+func (il *IncomeList) Index(budgetID int) error {
+	query := "SELECT * FROM incomes WHERE budget_id = $1 ORDER BY created_at DESC"
+
+	var incomeList []any
+	queryExec := db.QueryExe{
+		QueryStr:   query,
+		QueryArgs:  []any{budgetID},
+		Model:      Income{},
+		ModelSlice: &incomeList,
+	}
+
+	if err := queryExec.Query(); err != nil {
+		return err
+	}
+
+	for _, i := range incomeList {
+		income := i.(*Income)
+		*il = append(*il, *income)
+	}
+
+	return nil
 }
 
 func (i *Income) Insert(budgetID int, entryClassID int) error {

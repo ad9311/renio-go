@@ -10,6 +10,19 @@ import (
 
 // --- Actions --- //
 
+func IndexIncomeList(w http.ResponseWriter, r *http.Request) {
+	budget := r.Context().Value(conf.BudgetContext).(model.Budget)
+
+	var incomeList model.IncomeList
+	if err := incomeList.Index(budget.ID); err != nil {
+		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
+		return
+
+	}
+
+	WriteOK(w, incomeList, http.StatusCreated)
+}
+
 func PostIncome(w http.ResponseWriter, r *http.Request) {
 	budget := r.Context().Value(conf.BudgetContext).(model.Budget)
 
