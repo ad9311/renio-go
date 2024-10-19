@@ -26,7 +26,7 @@ func PostSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user model.User
-	err = user.SelectForAuth(signInData.Email)
+	err = user.SelectByEmail(signInData.Email)
 	if err != nil {
 		message, status := getSelectUserError(err)
 		WriteError(w, []string{message}, status)

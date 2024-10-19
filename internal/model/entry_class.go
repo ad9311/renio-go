@@ -1,16 +1,18 @@
 package model
 
 import (
-	"context"
+	"time"
 
 	"github.com/ad9311/renio-go/internal/db"
 )
 
 type EntryClass struct {
-	ID    int    `json:"id"`
-	UID   string `json:"uid" toml:"uid"`
-	Name  string `json:"name" toml:"name"`
-	Group int    `toml:"group"`
+	ID        int    `json:"id"`
+	UID       string `json:"uid"`
+	Name      string `json:"name"`
+	Group     int
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type EntryClasses []EntryClass
@@ -28,11 +30,15 @@ var EntryClassGroupNames = map[int]string{
 // --- Query --- //
 
 func (e *EntryClass) Insert() error {
-	pool := db.GetPool()
-	ctx := context.Background()
-	query := `INSERT INTO entry_classes (uid, name, "group") VALUES ($1, $2, $3)`
+	query := `INSERT INTO entry_classes (uid, name, "group")
+            VALUES ($1, $2, $3) RETURNING *`
 
-	if _, err := pool.Exec(ctx, query, e.UID, e.Name, e.Group); err != nil {
+	queryExec := db.QueryExe{
+		QueryStr:  query,
+		QueryArgs: []any{e.UID, e.Name, e.Group},
+		Model:     EntryClass{},
+	}
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
 
@@ -40,13 +46,16 @@ func (e *EntryClass) Insert() error {
 }
 
 func (e *EntryClass) InsertIfNotExists() error {
-	pool := db.GetPool()
-	ctx := context.Background()
 	query := `INSERT INTO entry_classes (uid, name, "group")
-						VALUES ($1, $2, $3)
+						VALUES ($1, $2, $3) RETURNING *
 						ON CONFLICT (uid) DO NOTHING`
 
-	if _, err := pool.Exec(ctx, query, e.UID, e.Name, e.Group); err != nil {
+	queryExec := db.QueryExe{
+		QueryStr:  query,
+		QueryArgs: []any{e.UID, e.Name, e.Group},
+		Model:     EntryClass{},
+	}
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
 
