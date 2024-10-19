@@ -48,7 +48,7 @@ func GetPool() *pgxpool.Pool {
 }
 
 func (x *QueryExe) QueryRow() error {
-	fmt.Printf("BEGIN %s\n", x.QueryStr)
+	fmt.Printf("BEGIN `%s`\n", x.QueryStr)
 	ctx := context.Background()
 	pool := GetPool()
 
@@ -71,7 +71,7 @@ func (x *QueryExe) QueryRow() error {
 }
 
 func (x *QueryExe) Query() error {
-	fmt.Printf("BEGIN %s\n", x.QueryStr)
+	fmt.Printf("BEGIN `%s`\n", x.QueryStr)
 	ctx := context.Background()
 	pool := GetPool()
 
