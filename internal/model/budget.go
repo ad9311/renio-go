@@ -90,6 +90,7 @@ func (b *Budget) SelectCurrent(budgetAccountID int) error {
 
 func (b *Budget) Insert(budgetAccountID int) error {
 	query := "INSERT INTO budgets (uid, budget_account_id) VALUES ($1, $2) RETURNING *"
+	b.setCurrentUID(budgetAccountID)
 	queryExec := db.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{b.UID, budgetAccountID},
