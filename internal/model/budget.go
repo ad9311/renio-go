@@ -1,7 +1,6 @@
 package model
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -27,7 +26,7 @@ type Budgets []Budget
 // Query functions //
 
 func (bs *Budgets) Index(budgetAccountID int) error {
-	query := "SELECT * FROM budgets WHERE budget_account_id = $1"
+	query := "SELECT * FROM budgets WHERE budget_account_id = $1 ORDER BY uid DESC"
 
 	var budgets []any
 	queryExec := db.QueryExe{
@@ -41,57 +40,70 @@ func (bs *Budgets) Index(budgetAccountID int) error {
 		return err
 	}
 
-	fmt.Println(&queryExec.ModelSlice)
-
 	for _, b := range budgets {
-		budget := b.(*Budget) // Type assertion
+		budget := b.(*Budget)
 		*bs = append(*bs, *budget)
 	}
-
-	// if err := bs.queryBudgets(query, budgetAccountID); err != nil {
-	//	return err
-	// }
 
 	return nil
 }
 
 func (b *Budget) SelectByUID(uid string) error {
-	dbExec := db.QueryExe{
+	queryExec := db.QueryExe{
 		QueryStr:  "SELECT * FROM budgets WHERE uid = $1",
 		QueryArgs: []any{uid},
-		ScanArgs:  spreadBudgetValues(b),
+		Model:     Budget{},
 	}
-	if err := db.QueryRow(dbExec); err != nil {
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
+
+	value, ok := queryExec.Model.(*Budget)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*b = *value
 
 	return nil
 }
 
 func (b *Budget) SelectCurrent(budgetAccountID int) error {
 	b.setCurrentUID(budgetAccountID)
-	dbExec := db.QueryExe{
+
+	queryExec := db.QueryExe{
 		QueryStr:  "SELECT * FROM budgets WHERE uid = $1",
 		QueryArgs: []any{b.UID},
-		ScanArgs:  spreadBudgetValues(b),
+		Model:     Budget{},
 	}
-	if err := db.QueryRow(dbExec); err != nil {
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
+
+	value, ok := queryExec.Model.(*Budget)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*b = *value
 
 	return nil
 }
 
 func (b *Budget) Insert(budgetAccountID int) error {
 	query := "INSERT INTO budgets (uid, budget_account_id) VALUES ($1, $2) RETURNING *"
-	dbExec := db.QueryExe{
+	queryExec := db.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{b.UID, budgetAccountID},
-		ScanArgs:  spreadBudgetValues(b),
+		Model:     Budget{},
 	}
-	if err := db.QueryRow(dbExec); err != nil {
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
+
+	value, ok := queryExec.Model.(*Budget)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*b = *value
 
 	return nil
 }
@@ -106,7 +118,7 @@ func (b *Budget) OnIncomeInsert(incomeAmount float32) error {
 	b.addToEntryCount(1)
 	b.addToIncomeCount(1)
 
-	dbExec := db.QueryExe{
+	queryExec := db.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			b.Balance,
@@ -115,11 +127,17 @@ func (b *Budget) OnIncomeInsert(incomeAmount float32) error {
 			b.IncomeCount,
 			b.ID,
 		},
-		ScanArgs: spreadBudgetValues(b),
+		Model: Budget{},
 	}
-	if err := db.QueryRow(dbExec); err != nil {
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
+
+	value, ok := queryExec.Model.(*Budget)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*b = *value
 
 	return nil
 }
@@ -129,18 +147,24 @@ func (b *Budget) OnIncomeUpdate(prevIncomeAmount float32, incomeAmount float32) 
 
 	b.setBalance(incomeAmount, prevIncomeAmount)
 	b.setTotalIncome(incomeAmount, prevIncomeAmount)
-	dbExec := db.QueryExe{
+	queryExec := db.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			b.Balance,
 			b.TotalIncome,
 			b.ID,
 		},
-		ScanArgs: spreadBudgetValues(b),
+		Model: Budget{},
 	}
-	if err := db.QueryRow(dbExec); err != nil {
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
+
+	value, ok := queryExec.Model.(*Budget)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*b = *value
 
 	return nil
 }
@@ -155,7 +179,7 @@ func (b *Budget) OnIncomeDelete(incomeAmount float32) error {
 	b.addToEntryCount(-1)
 	b.addToIncomeCount(-1)
 
-	dbExec := db.QueryExe{
+	queryExec := db.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			b.Balance,
@@ -164,11 +188,17 @@ func (b *Budget) OnIncomeDelete(incomeAmount float32) error {
 			b.IncomeCount,
 			b.ID,
 		},
-		ScanArgs: spreadBudgetValues(b),
+		Model: Budget{},
 	}
-	if err := db.QueryRow(dbExec); err != nil {
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
+
+	value, ok := queryExec.Model.(*Budget)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*b = *value
 
 	return nil
 }
@@ -181,28 +211,6 @@ func (b *Budget) setCurrentUID(budgetAccountID int) {
 	month := currentTime.Local().Month()
 	uid := fmt.Sprintf("%d-%d-%02d", budgetAccountID, year, month)
 	b.UID = uid
-}
-
-func (bs *Budgets) queryBudgets(query string, params ...any) error {
-	pool := db.GetPool()
-	ctx := context.Background()
-
-	rows, err := pool.Query(ctx, query, params...)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var budget Budget
-		if err := rows.Scan(spreadBudgetValues(&budget)...); err != nil {
-			return nil
-		}
-
-		*bs = append(*bs, budget)
-	}
-
-	return nil
 }
 
 func (b *Budget) setBalance(credit float32, debit float32) {
@@ -219,20 +227,4 @@ func (b *Budget) addToEntryCount(change int) {
 
 func (b *Budget) addToIncomeCount(change int) {
 	b.IncomeCount = b.IncomeCount + change
-}
-
-func spreadBudgetValues(budget *Budget) []any {
-	return []any{
-		&budget.ID,
-		&budget.UID,
-		&budget.Balance,
-		&budget.TotalIncome,
-		&budget.TotalExpenses,
-		&budget.EntryCount,
-		&budget.IncomeCount,
-		&budget.ExpenseCount,
-		&budget.BudgetAccountID,
-		&budget.CreatedAt,
-		&budget.UpdatedAt,
-	}
 }

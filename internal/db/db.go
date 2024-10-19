@@ -47,19 +47,24 @@ func GetPool() *pgxpool.Pool {
 	return pool
 }
 
-func QueryRow(dbExec QueryExe) error {
+func (x *QueryExe) QueryRow() error {
 	ctx := context.Background()
 	pool := GetPool()
 
+	model := reflect.New(reflect.TypeOf(x.Model)).Interface()
+	x.ScanArgs = spreadValues(model)
+
 	if err := pool.QueryRow(
 		ctx,
-		dbExec.QueryStr,
-		dbExec.QueryArgs...,
+		x.QueryStr,
+		x.QueryArgs...,
 	).Scan(
-		dbExec.ScanArgs...,
+		x.ScanArgs...,
 	); err != nil {
 		return err
 	}
+
+	x.Model = model
 
 	return nil
 }
@@ -68,7 +73,6 @@ func (x *QueryExe) Query() error {
 	ctx := context.Background()
 	pool := GetPool()
 
-	// Execute the query
 	rows, err := pool.Query(ctx, x.QueryStr, x.QueryArgs...)
 	if err != nil {
 		return err
@@ -76,19 +80,14 @@ func (x *QueryExe) Query() error {
 	defer rows.Close()
 
 	for rows.Next() {
-		// Create a new instance of the model for each row
-		newModelPtr := reflect.New(reflect.TypeOf(x.Model)).Interface()
+		model := reflect.New(reflect.TypeOf(x.Model)).Interface()
 
-		// Prepare ScanArgs for the new model instance
-		x.ScanArgs = spreadValues(newModelPtr)
-
-		// Scan the row into the new model instance
+		x.ScanArgs = spreadValues(model)
 		if err := rows.Scan(x.ScanArgs...); err != nil {
 			return err
 		}
 
-		// Append the new model to the ModelSlice
-		*x.ModelSlice = append(*x.ModelSlice, newModelPtr)
+		*x.ModelSlice = append(*x.ModelSlice, model)
 	}
 
 	return nil
@@ -99,10 +98,8 @@ func (x *QueryExe) Query() error {
 func spreadValues(model any) []any {
 	v := reflect.ValueOf(model).Elem()
 
-	// Slice to hold pointers to the fields of the struct
 	var values []any
 
-	// Loop over the fields and append their addresses
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Field(i)
 		if field.CanAddr() {
