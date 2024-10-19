@@ -29,15 +29,34 @@ type Budgets []Budget
 func (bs *Budgets) Index(budgetAccountID int) error {
 	query := "SELECT * FROM budgets WHERE budget_account_id = $1"
 
-	if err := bs.queryBudgets(query, budgetAccountID); err != nil {
+	var budgets []any
+	queryExec := db.QueryExe{
+		QueryStr:   query,
+		QueryArgs:  []any{budgetAccountID},
+		Model:      Budget{},
+		ModelSlice: &budgets,
+	}
+
+	if err := queryExec.Query(); err != nil {
 		return err
 	}
+
+	fmt.Println(&queryExec.ModelSlice)
+
+	for _, b := range budgets {
+		budget := b.(*Budget) // Type assertion
+		*bs = append(*bs, *budget)
+	}
+
+	// if err := bs.queryBudgets(query, budgetAccountID); err != nil {
+	//	return err
+	// }
 
 	return nil
 }
 
 func (b *Budget) SelectByUID(uid string) error {
-	dbExec := db.DBExec{
+	dbExec := db.QueryExe{
 		QueryStr:  "SELECT * FROM budgets WHERE uid = $1",
 		QueryArgs: []any{uid},
 		ScanArgs:  spreadBudgetValues(b),
@@ -51,7 +70,7 @@ func (b *Budget) SelectByUID(uid string) error {
 
 func (b *Budget) SelectCurrent(budgetAccountID int) error {
 	b.setCurrentUID(budgetAccountID)
-	dbExec := db.DBExec{
+	dbExec := db.QueryExe{
 		QueryStr:  "SELECT * FROM budgets WHERE uid = $1",
 		QueryArgs: []any{b.UID},
 		ScanArgs:  spreadBudgetValues(b),
@@ -65,7 +84,7 @@ func (b *Budget) SelectCurrent(budgetAccountID int) error {
 
 func (b *Budget) Insert(budgetAccountID int) error {
 	query := "INSERT INTO budgets (uid, budget_account_id) VALUES ($1, $2) RETURNING *"
-	dbExec := db.DBExec{
+	dbExec := db.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{b.UID, budgetAccountID},
 		ScanArgs:  spreadBudgetValues(b),
@@ -87,7 +106,7 @@ func (b *Budget) OnIncomeInsert(incomeAmount float32) error {
 	b.addToEntryCount(1)
 	b.addToIncomeCount(1)
 
-	dbExec := db.DBExec{
+	dbExec := db.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			b.Balance,
@@ -110,7 +129,7 @@ func (b *Budget) OnIncomeUpdate(prevIncomeAmount float32, incomeAmount float32) 
 
 	b.setBalance(incomeAmount, prevIncomeAmount)
 	b.setTotalIncome(incomeAmount, prevIncomeAmount)
-	dbExec := db.DBExec{
+	dbExec := db.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			b.Balance,
@@ -136,7 +155,7 @@ func (b *Budget) OnIncomeDelete(incomeAmount float32) error {
 	b.addToEntryCount(-1)
 	b.addToIncomeCount(-1)
 
-	dbExec := db.DBExec{
+	dbExec := db.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			b.Balance,

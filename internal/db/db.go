@@ -5,16 +5,18 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 	"sync"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-type DBExec struct {
+type QueryExe struct {
 	QueryStr   string
 	QueryArgs  []any
 	ScanArgs   []any
+	Model      any
 	ModelSlice *[]any
 }
 
@@ -45,7 +47,7 @@ func GetPool() *pgxpool.Pool {
 	return pool
 }
 
-func QueryRow(dbExec DBExec) error {
+func QueryRow(dbExec QueryExe) error {
 	ctx := context.Background()
 	pool := GetPool()
 
@@ -62,24 +64,51 @@ func QueryRow(dbExec DBExec) error {
 	return nil
 }
 
-func Query(dbExec DBExec) error {
+func (x *QueryExe) Query() error {
 	ctx := context.Background()
 	pool := GetPool()
 
-	rows, err := pool.Query(ctx, dbExec.QueryStr, dbExec.QueryArgs...)
+	// Execute the query
+	rows, err := pool.Query(ctx, x.QueryStr, x.QueryArgs...)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var v []any
-		if err := rows.Scan(dbExec.ScanArgs...); err != nil {
+		// Create a new instance of the model for each row
+		newModelPtr := reflect.New(reflect.TypeOf(x.Model)).Interface()
+
+		// Prepare ScanArgs for the new model instance
+		x.ScanArgs = spreadValues(newModelPtr)
+
+		// Scan the row into the new model instance
+		if err := rows.Scan(x.ScanArgs...); err != nil {
 			return err
 		}
 
-		*dbExec.ModelSlice = append(*dbExec.ModelSlice, v)
+		// Append the new model to the ModelSlice
+		*x.ModelSlice = append(*x.ModelSlice, newModelPtr)
 	}
 
 	return nil
+}
+
+// --- Helpers --- //
+
+func spreadValues(model any) []any {
+	v := reflect.ValueOf(model).Elem()
+
+	// Slice to hold pointers to the fields of the struct
+	var values []any
+
+	// Loop over the fields and append their addresses
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		if field.CanAddr() {
+			values = append(values, field.Addr().Interface())
+		}
+	}
+
+	return values
 }
