@@ -41,6 +41,10 @@ func (e *EntryClass) Insert() error {
 		return err
 	}
 
+	if err := e.saveEntryClassFromDB(queryExec); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -60,4 +64,16 @@ func (e *EntryClass) InsertIfNotExists() error {
 
 func (e *EntryClass) TypeName() string {
 	return EntryClassTypeNames[e.Type]
+}
+
+// --- Helpers  --- //
+
+func (e *EntryClass) saveEntryClassFromDB(queryExec db.QueryExe) error {
+	value, ok := queryExec.Model.(*EntryClass)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*e = *value
+
+	return nil
 }

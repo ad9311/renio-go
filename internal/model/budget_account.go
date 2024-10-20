@@ -27,11 +27,9 @@ func (b *BudgetAccount) Insert(userID int) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*BudgetAccount)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := b.saveBudgetAccountFromDB(queryExec); err != nil {
+		return err
 	}
-	*b = *value
 
 	return nil
 }
@@ -47,6 +45,16 @@ func (b *BudgetAccount) SelectByUserID(userID int) error {
 		return err
 	}
 
+	if err := b.saveBudgetAccountFromDB(queryExec); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// --- Helpers --- //
+
+func (b *BudgetAccount) saveBudgetAccountFromDB(queryExec db.QueryExe) error {
 	value, ok := queryExec.Model.(*BudgetAccount)
 	if !ok {
 		return ErrIncompleteQuery{}

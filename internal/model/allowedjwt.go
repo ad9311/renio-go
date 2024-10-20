@@ -25,7 +25,7 @@ type JWT struct {
 
 // --- Query --- //
 
-func (aJWT *AllowedJWT) Insert(token JWT, userID int) error {
+func (a *AllowedJWT) Insert(token JWT, userID int) error {
 	query := `INSERT INTO allowed_jwts (jti, aud, exp, user_id)
 						VALUES ($1, $2, $3, $4) RETURNING *`
 
@@ -43,16 +43,14 @@ func (aJWT *AllowedJWT) Insert(token JWT, userID int) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*AllowedJWT)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := a.saveExpenseFromDB(queryExec); err != nil {
+		return err
 	}
-	*aJWT = *value
 
 	return nil
 }
 
-func (aJWT *AllowedJWT) SelectByJTI(jti string) error {
+func (a *AllowedJWT) SelectByJTI(jti string) error {
 	query := `SELECT * FROM allowed_jwts WHERE jti = $1`
 
 	queryExec := db.QueryExe{
@@ -64,11 +62,21 @@ func (aJWT *AllowedJWT) SelectByJTI(jti string) error {
 		return err
 	}
 
+	if err := a.saveExpenseFromDB(queryExec); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// --- Helpers --- //
+
+func (a *AllowedJWT) saveExpenseFromDB(queryExec db.QueryExe) error {
 	value, ok := queryExec.Model.(*AllowedJWT)
 	if !ok {
 		return ErrIncompleteQuery{}
 	}
-	*aJWT = *value
+	*a = *value
 
 	return nil
 }

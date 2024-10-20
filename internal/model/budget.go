@@ -58,11 +58,9 @@ func (b *Budget) SelectByUID(uid string) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Budget)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := b.saveBudgetFromDB(queryExec); err != nil {
+		return err
 	}
-	*b = *value
 
 	return nil
 }
@@ -79,11 +77,9 @@ func (b *Budget) SelectCurrent(budgetAccountID int) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Budget)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := b.saveBudgetFromDB(queryExec); err != nil {
+		return err
 	}
-	*b = *value
 
 	return nil
 }
@@ -100,11 +96,9 @@ func (b *Budget) Insert(budgetAccountID int) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Budget)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := b.saveBudgetFromDB(queryExec); err != nil {
+		return err
 	}
-	*b = *value
 
 	return nil
 }
@@ -132,11 +126,9 @@ func (b *Budget) OnIncomeInsert(incomeAmount float32) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Budget)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := b.saveBudgetFromDB(queryExec); err != nil {
+		return err
 	}
-	*b = *value
 
 	return nil
 }
@@ -159,11 +151,9 @@ func (b *Budget) OnIncomeUpdate(prevIncomeAmount float32, incomeAmount float32) 
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Budget)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := b.saveBudgetFromDB(queryExec); err != nil {
+		return err
 	}
-	*b = *value
 
 	return nil
 }
@@ -191,11 +181,9 @@ func (b *Budget) OnIncomeDelete(incomeAmount float32) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Budget)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := b.saveBudgetFromDB(queryExec); err != nil {
+		return err
 	}
-	*b = *value
 
 	return nil
 }
@@ -223,11 +211,9 @@ func (b *Budget) OnExpenseInsert(expenseAmount float32) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Budget)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := b.saveBudgetFromDB(queryExec); err != nil {
+		return err
 	}
-	*b = *value
 
 	return nil
 }
@@ -250,11 +236,9 @@ func (b *Budget) OnExpenseUpdate(prevExpenseAmount float32, expenseAmount float3
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Budget)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := b.saveBudgetFromDB(queryExec); err != nil {
+		return err
 	}
-	*b = *value
 
 	return nil
 }
@@ -282,11 +266,9 @@ func (b *Budget) OnExpenseDelete(expenseAmount float32) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Budget)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := b.saveBudgetFromDB(queryExec); err != nil {
+		return err
 	}
-	*b = *value
 
 	return nil
 }
@@ -323,4 +305,14 @@ func (b *Budget) addToIncomeCount(change int) {
 
 func (b *Budget) addToExpenseCount(change int) {
 	b.ExpenseCount = b.ExpenseCount + change
+}
+
+func (b *Budget) saveBudgetFromDB(queryExec db.QueryExe) error {
+	value, ok := queryExec.Model.(*Budget)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*b = *value
+
+	return nil
 }

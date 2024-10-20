@@ -67,11 +67,9 @@ func (e *Expense) Insert(budgetID int, entryClassID int) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Expense)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := e.saveExpenseFromDB(queryExec); err != nil {
+		return err
 	}
-	*e = *value
 
 	return nil
 }
@@ -88,11 +86,9 @@ func (e *Expense) SelectByID() error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Expense)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := e.saveExpenseFromDB(queryExec); err != nil {
+		return err
 	}
-	*e = *value
 
 	return nil
 }
@@ -114,11 +110,9 @@ func (e *Expense) Update(expenseFormData ExpenseFormData) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Expense)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := e.saveExpenseFromDB(queryExec); err != nil {
+		return err
 	}
-	*e = *value
 
 	return nil
 }
@@ -135,6 +129,14 @@ func (e *Expense) Delete() error {
 		return err
 	}
 
+	if err := e.saveExpenseFromDB(queryExec); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (e *Expense) saveExpenseFromDB(queryExec db.QueryExe) error {
 	value, ok := queryExec.Model.(*Expense)
 	if !ok {
 		return ErrIncompleteQuery{}

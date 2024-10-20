@@ -77,11 +77,9 @@ func (u *User) SelectByEmail(email string) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*User)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := u.saveUserFromDB(queryExec); err != nil {
+		return err
 	}
-	*u = *value
 
 	return nil
 }
@@ -107,11 +105,9 @@ func (u *User) SelectByID(userID int) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*User)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := u.saveUserFromDB(queryExec); err != nil {
+		return err
 	}
-	*u = *value
 
 	return nil
 }
@@ -124,4 +120,14 @@ func hashPassword(password string) (string, error) {
 		return "", err
 	}
 	return string(hash), nil
+}
+
+func (u *User) saveUserFromDB(queryExec db.QueryExe) error {
+	value, ok := queryExec.Model.(*User)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*u = *value
+
+	return nil
 }

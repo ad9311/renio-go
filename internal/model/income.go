@@ -67,11 +67,9 @@ func (i *Income) Insert(budgetID int, entryClassID int) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Income)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := i.saveIncomeFromDB(queryExec); err != nil {
+		return err
 	}
-	*i = *value
 
 	return nil
 }
@@ -88,11 +86,9 @@ func (i *Income) SelectByID() error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Income)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := i.saveIncomeFromDB(queryExec); err != nil {
+		return err
 	}
-	*i = *value
 
 	return nil
 }
@@ -114,11 +110,9 @@ func (i *Income) Update(incomeFormData IncomeFormData) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*Income)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := i.saveIncomeFromDB(queryExec); err != nil {
+		return err
 	}
-	*i = *value
 
 	return nil
 }
@@ -135,6 +129,16 @@ func (i *Income) Delete() error {
 		return err
 	}
 
+	if err := i.saveIncomeFromDB(queryExec); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// --- Helpers --- //
+
+func (i *Income) saveIncomeFromDB(queryExec db.QueryExe) error {
 	value, ok := queryExec.Model.(*Income)
 	if !ok {
 		return ErrIncompleteQuery{}
