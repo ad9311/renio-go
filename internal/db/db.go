@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"os"
 	"reflect"
 	"sync"
 
@@ -24,12 +25,12 @@ var (
 	once sync.Once
 )
 
-func Init(dabataseURL string) {
+func Init() {
 	once.Do(func() {
 		console.Info("Connecting to database...")
 
 		var err error
-		pool, err = pgxpool.New(context.Background(), dabataseURL)
+		pool, err = pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 		if err != nil {
 			console.Fatal(fmt.Sprintf("x Unable to connect to database: %s", err.Error()))
 		}

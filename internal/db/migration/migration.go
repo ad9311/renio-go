@@ -18,9 +18,9 @@ type MigExec struct {
 
 const emptyMigrations = "Migrations directory is empty, skipping migrations"
 
-func Up(databaseURL string) {
+func Up() {
 	var migExec MigExec
-	migExec.setUp(databaseURL)
+	migExec.setUp()
 	defer migExec.DB.Close()
 
 	if migExec.Skip {
@@ -33,9 +33,9 @@ func Up(databaseURL string) {
 	}
 }
 
-func Reset(databaseURL string) {
+func Reset() {
 	var migExec MigExec
-	migExec.setUp(databaseURL)
+	migExec.setUp()
 	defer migExec.DB.Close()
 
 	if migExec.Skip {
@@ -50,8 +50,8 @@ func Reset(databaseURL string) {
 
 // --- Helpers --- //
 
-func (m *MigExec) setUp(databaseURL string) {
-	db, err := goose.OpenDBWithDriver("pgx", databaseURL)
+func (m *MigExec) setUp() {
+	db, err := goose.OpenDBWithDriver("pgx", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		console.Fatal(fmt.Sprintf("failed to open database, %s", err.Error()))
 	}

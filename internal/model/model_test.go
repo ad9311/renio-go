@@ -12,21 +12,20 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	if err := godotenv.Load("../../.env"); err != nil {
+	if err := godotenv.Load("../../.env.test"); err != nil {
 		console.Error(err.Error())
 		os.Exit(1)
 	}
 
 	console.ResetEnv()
 
-	databaseURL := os.Getenv("TEST_DATABASE_URL")
-	db.Init(databaseURL)
-	migration.Up(databaseURL)
+	db.Init()
+	migration.Up()
 	seed.RunSeeds()
 
 	code := m.Run()
 
-	migration.Reset(databaseURL)
+	migration.Reset()
 
 	os.Exit(code)
 }
