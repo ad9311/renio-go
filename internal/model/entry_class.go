@@ -30,8 +30,7 @@ var EntryClassGroupNames = map[int]string{
 // --- Query --- //
 
 func (e *EntryClass) Insert() error {
-	query := `INSERT INTO entry_classes (uid, name, "group")
-            VALUES ($1, $2, $3) RETURNING *`
+	query := `INSERT INTO entry_classes (uid, name, "group") VALUES ($1, $2, $3) RETURNING *`
 
 	queryExec := db.QueryExe{
 		QueryStr:  query,
@@ -46,9 +45,7 @@ func (e *EntryClass) Insert() error {
 }
 
 func (e *EntryClass) InsertIfNotExists() error {
-	query := `INSERT INTO entry_classes (uid, name, "group")
-						VALUES ($1, $2, $3) RETURNING *
-						ON CONFLICT (uid) DO NOTHING`
+	query := `INSERT INTO entry_classes (uid, name, "group") VALUES ($1, $2, $3) ON CONFLICT (uid) DO NOTHING RETURNING *`
 
 	queryExec := db.QueryExe{
 		QueryStr:  query,

@@ -16,9 +16,7 @@ type BudgetAccount struct {
 // --- Query --- //
 
 func (b *BudgetAccount) Insert(userID int) error {
-	query := `INSERT INTO budget_accounts (user_id)
-						VALUES ($1)
-						RETURNING *`
+	query := "INSERT INTO budget_accounts (user_id) VALUES ($1) RETURNING *"
 
 	queryExec := db.QueryExe{
 		QueryStr:  query,
@@ -39,7 +37,7 @@ func (b *BudgetAccount) Insert(userID int) error {
 }
 
 func (b *BudgetAccount) SelectByUserID(userID int) error {
-	query := `SELECT * FROM budget_accounts WHERE user_id = $1`
+	query := "SELECT * FROM budget_accounts WHERE user_id = $1"
 	queryExec := db.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{userID},

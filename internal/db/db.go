@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strings"
 	"sync"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -48,7 +49,9 @@ func GetPool() *pgxpool.Pool {
 }
 
 func (x *QueryExe) QueryRow() error {
-	fmt.Printf("BEGIN `%s`\n", x.QueryStr)
+	query := formatQueryStrs(x.QueryStr)
+
+	fmt.Printf("BEGIN `%s`\n", query)
 	ctx := context.Background()
 	pool := GetPool()
 
@@ -71,7 +74,9 @@ func (x *QueryExe) QueryRow() error {
 }
 
 func (x *QueryExe) Query() error {
-	fmt.Printf("BEGIN `%s`\n", x.QueryStr)
+	query := formatQueryStrs(x.QueryStr)
+
+	fmt.Printf("BEGIN `%s`\n", query)
 	ctx := context.Background()
 	pool := GetPool()
 
@@ -110,4 +115,8 @@ func spreadValues(model any) []any {
 	}
 
 	return values
+}
+
+func formatQueryStrs(query string) string {
+	return strings.ReplaceAll(query, "\n", " ")
 }

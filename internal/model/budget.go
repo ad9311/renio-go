@@ -110,9 +110,7 @@ func (b *Budget) Insert(budgetAccountID int) error {
 }
 
 func (b *Budget) OnIncomeInsert(incomeAmount float32) error {
-	query := `UPDATE budgets SET
-            balance = $1, total_income = $2, entry_count = $3, income_count = $4
-            WHERE ID = $5 RETURNING *`
+	query := "UPDATE budgets SET balance = $1, total_income = $2, entry_count = $3, income_count = $4 WHERE ID = $5 RETURNING *"
 
 	b.setBalance(incomeAmount, 0)
 	b.setTotalIncome(incomeAmount, 0)
@@ -144,7 +142,7 @@ func (b *Budget) OnIncomeInsert(incomeAmount float32) error {
 }
 
 func (b *Budget) OnIncomeUpdate(prevIncomeAmount float32, incomeAmount float32) error {
-	query := `UPDATE budgets SET balance = $1, total_income = $2 WHERE id = $3 RETURNING *`
+	query := "UPDATE budgets SET balance = $1, total_income = $2 WHERE id = $3 RETURNING *"
 
 	b.setBalance(incomeAmount, prevIncomeAmount)
 	b.setTotalIncome(incomeAmount, prevIncomeAmount)
@@ -171,9 +169,7 @@ func (b *Budget) OnIncomeUpdate(prevIncomeAmount float32, incomeAmount float32) 
 }
 
 func (b *Budget) OnIncomeDelete(incomeAmount float32) error {
-	query := `UPDATE budgets SET
-            balance = $1, total_income = $2, entry_count = $3, income_count = $4
-            WHERE ID = $5 RETURNING *`
+	query := "UPDATE budgets SET balance = $1, total_income = $2, entry_count = $3, income_count = $4 WHERE ID = $5 RETURNING *"
 
 	b.setBalance(0, incomeAmount)
 	b.setTotalIncome(0, incomeAmount)

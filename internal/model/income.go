@@ -50,8 +50,7 @@ func (il *IncomeList) Index(budgetID int) error {
 }
 
 func (i *Income) Insert(budgetID int, entryClassID int) error {
-	query := `INSERT INTO incomes (amount, description, budget_id, entry_class_id)
-						VALUES ($1, $2, $3, $4) RETURNING *`
+	query := "INSERT INTO incomes (amount, description, budget_id, entry_class_id) VALUES ($1, $2, $3, $4) RETURNING *"
 
 	queryExec := db.QueryExe{
 		QueryStr: query,
@@ -78,7 +77,7 @@ func (i *Income) Insert(budgetID int, entryClassID int) error {
 }
 
 func (i *Income) SelectByID() error {
-	query := `SELECT * FROM incomes WHERE id = $1`
+	query := "SELECT * FROM incomes WHERE id = $1"
 
 	queryExec := db.QueryExe{
 		QueryStr:  query,
@@ -99,11 +98,7 @@ func (i *Income) SelectByID() error {
 }
 
 func (i *Income) Update(incomeFormData IncomeFormData) error {
-	query := `UPDATE incomes SET
-						amount = $1,
-						description = $2,
-						entry_class_id = $3
-						WHERE id = $4 RETURNING *`
+	query := "UPDATE incomes SET amount = $1, description = $2, entry_class_id = $3 WHERE id = $4 RETURNING *"
 
 	queryExec := db.QueryExe{
 		QueryStr: query,
