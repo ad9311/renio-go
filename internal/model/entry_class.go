@@ -10,7 +10,7 @@ type EntryClass struct {
 	ID        int    `json:"id"`
 	UID       string `json:"uid"`
 	Name      string `json:"name"`
-	Group     int
+	Type      int
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -18,23 +18,23 @@ type EntryClass struct {
 type EntryClasses []EntryClass
 
 const (
-	IncomeGroupName  = "income"
-	ExpenseGroupName = "expense"
+	IncomeTypeName  = "income"
+	ExpenseTypeName = "expense"
 )
 
-var EntryClassGroupNames = map[int]string{
-	0: ExpenseGroupName,
-	1: IncomeGroupName,
+var EntryClassTypeNames = map[int]string{
+	0: ExpenseTypeName,
+	1: IncomeTypeName,
 }
 
 // --- Query --- //
 
 func (e *EntryClass) Insert() error {
-	query := `INSERT INTO entry_classes (uid, name, "group") VALUES ($1, $2, $3) RETURNING *`
+	query := `INSERT INTO entry_classes (uid, name, type) VALUES ($1, $2, $3) RETURNING *`
 
 	queryExec := db.QueryExe{
 		QueryStr:  query,
-		QueryArgs: []any{e.UID, e.Name, e.Group},
+		QueryArgs: []any{e.UID, e.Name, e.Type},
 		Model:     EntryClass{},
 	}
 	if err := queryExec.QueryRow(); err != nil {
@@ -45,11 +45,11 @@ func (e *EntryClass) Insert() error {
 }
 
 func (e *EntryClass) InsertIfNotExists() error {
-	query := `INSERT INTO entry_classes (uid, name, "group") VALUES ($1, $2, $3) ON CONFLICT (uid) DO NOTHING`
+	query := `INSERT INTO entry_classes (uid, name, type) VALUES ($1, $2, $3) ON CONFLICT (uid) DO NOTHING`
 
 	queryExec := db.QueryExe{
 		QueryStr:  query,
-		QueryArgs: []any{e.UID, e.Name, e.Group},
+		QueryArgs: []any{e.UID, e.Name, e.Type},
 	}
 	if err := queryExec.QueryWithoutScan(); err != nil {
 		return err
@@ -58,6 +58,6 @@ func (e *EntryClass) InsertIfNotExists() error {
 	return nil
 }
 
-func (e *EntryClass) GroupName() string {
-	return EntryClassGroupNames[e.Group]
+func (e *EntryClass) TypeName() string {
+	return EntryClassTypeNames[e.Type]
 }
