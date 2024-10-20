@@ -43,7 +43,7 @@ func (a *AllowedJWT) Insert(token JWT, userID int) error {
 		return err
 	}
 
-	if err := a.saveExpenseFromDB(queryExec); err != nil {
+	if err := a.saveAllowedJWTFromDB(queryExec); err != nil {
 		return err
 	}
 
@@ -62,7 +62,7 @@ func (a *AllowedJWT) SelectByJTI(jti string) error {
 		return err
 	}
 
-	if err := a.saveExpenseFromDB(queryExec); err != nil {
+	if err := a.saveAllowedJWTFromDB(queryExec); err != nil {
 		return err
 	}
 
@@ -71,7 +71,7 @@ func (a *AllowedJWT) SelectByJTI(jti string) error {
 
 // --- Helpers --- //
 
-func (a *AllowedJWT) saveExpenseFromDB(queryExec db.QueryExe) error {
+func (a *AllowedJWT) saveAllowedJWTFromDB(queryExec db.QueryExe) error {
 	value, ok := queryExec.Model.(*AllowedJWT)
 	if !ok {
 		return ErrIncompleteQuery{}
