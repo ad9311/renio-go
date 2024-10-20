@@ -45,14 +45,13 @@ func (e *EntryClass) Insert() error {
 }
 
 func (e *EntryClass) InsertIfNotExists() error {
-	query := `INSERT INTO entry_classes (uid, name, "group") VALUES ($1, $2, $3) ON CONFLICT (uid) DO NOTHING RETURNING *`
+	query := `INSERT INTO entry_classes (uid, name, "group") VALUES ($1, $2, $3) ON CONFLICT (uid) DO NOTHING`
 
 	queryExec := db.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{e.UID, e.Name, e.Group},
-		Model:     EntryClass{},
 	}
-	if err := queryExec.QueryRow(); err != nil {
+	if err := queryExec.QueryWithoutScan(); err != nil {
 		return err
 	}
 
