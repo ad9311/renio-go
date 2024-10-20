@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"reflect"
 	"sync"
@@ -25,22 +24,28 @@ var (
 	once sync.Once
 )
 
-func Init() {
+func Init() error {
+	var dbErr error
+
 	once.Do(func() {
 		console.Info("Connecting to database...")
 
 		var err error
 		pool, err = pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 		if err != nil {
-			console.Fatal(fmt.Sprintf("x Unable to connect to database: %s", err.Error()))
+			dbErr = err
+			return
 		}
 
 		if err = pool.Ping(context.Background()); err != nil {
-			console.Fatal(fmt.Sprintf("x Unable to ping database: %s", err.Error()))
+			dbErr = err
+			return
 		}
 
 		console.Success("Database connection established")
 	})
+
+	return dbErr
 }
 
 func GetPool() *pgxpool.Pool {

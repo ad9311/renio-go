@@ -1,32 +1,30 @@
 package main
 
 import (
+	"fmt"
+	"net/http"
 	"os"
 
+	"github.com/ad9311/renio-go/internal/app"
 	"github.com/ad9311/renio-go/internal/console"
-	"github.com/ad9311/renio-go/internal/db"
-	"github.com/ad9311/renio-go/internal/db/migration"
-	"github.com/ad9311/renio-go/internal/db/seed"
-	"github.com/ad9311/renio-go/internal/envs"
+	"github.com/ad9311/renio-go/internal/router"
 )
 
 func main() {
 	console.AppName()
 
-	envs.Init()
-
-	migrate := os.Getenv("MIGRATE")
-	seeds := os.Getenv("SEED")
-
-	db.Init()
-
-	if migrate == "on" {
-		migration.Up()
+	if err := app.Init(); err != nil {
+		panic(fmt.Sprintf("error initializing app, %s", err.Error()))
 	}
 
-	if seeds == "on" {
-		seed.RunSeeds()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
 
-	Serve()
+	portF := fmt.Sprintf(":%s", port)
+	console.Info(fmt.Sprintf("Listening on http://localhost%s", portF))
+	if err := http.ListenAndServe(portF, router.RoutesHandler()); err != nil {
+		panic(fmt.Sprintf("there's been an error, %s", err.Error()))
+	}
 }

@@ -21,7 +21,7 @@ func TestMain(m *testing.M) {
 
 	db.Init()
 	migration.Up()
-	seed.RunSeeds()
+	seed.Run()
 
 	code := m.Run()
 

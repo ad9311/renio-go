@@ -1,9 +1,6 @@
 package seed
 
 import (
-	"fmt"
-
-	"github.com/ad9311/renio-go/internal/console"
 	"github.com/ad9311/renio-go/internal/model"
 )
 
@@ -90,10 +87,12 @@ var entryClassesSeed = []model.EntryClass{
 	},
 }
 
-func seedEntryClasses() {
+func seedEntryClasses() error {
 	for _, entryClass := range entryClassesSeed {
 		if err := entryClass.InsertIfNotExists(); err != nil {
-			console.Error(fmt.Sprintf("Could not insert entry class, %s", err.Error()))
+			return err
 		}
 	}
+
+	return nil
 }

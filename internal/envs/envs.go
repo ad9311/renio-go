@@ -10,7 +10,7 @@ import (
 
 var dotfile string
 
-func Init() {
+func Init() error {
 	env := os.Getenv("ENV")
 
 	switch env {
@@ -22,15 +22,16 @@ func Init() {
 		dotfile = ".env.test"
 	default:
 		if err := os.Setenv("ENV", "development"); err != nil {
-			console.Fatal(fmt.Sprintf("failed to set env, %s", err.Error()))
+			return err
 		}
 		env = os.Getenv("ENV")
 		dotfile = ".env"
 	}
 
-	err := godotenv.Load(dotfile)
-	if err != nil {
-		console.Fatal(fmt.Sprintf("could not load .env file, %s", err.Error()))
+	if err := godotenv.Load(dotfile); err != nil {
+		return err
 	}
 	console.Success(fmt.Sprintf("Loaded .env file in %s environment", env))
+
+	return nil
 }
