@@ -22,7 +22,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user model.User
-	if err := user.Create(signUpData); err != nil {
+	if err := user.Insert(signUpData); err != nil {
 		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return
 	}

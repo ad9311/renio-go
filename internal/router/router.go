@@ -11,7 +11,7 @@ import (
 func RoutesHandler() http.Handler {
 	r := chi.NewRouter()
 
-	// --- Middlewares --- //
+	// --- Middleware --- //
 	r.Use(middleware.Logger)
 	r.Use(headerRouter)
 	r.Use(routesProtector)
@@ -33,11 +33,24 @@ func RoutesHandler() http.Handler {
 			r.Use(BudgetAccountCTX)
 			r.Route("/", func(r chi.Router) {
 				r.Get("/", action.IndexBudgets)
+				r.Get("/current", action.GetCurrentBudget)
+				r.Post("/", action.PostBudget)
 				r.Route("/{budgetUID}", func(r chi.Router) {
 					r.Use(BudgetCTX)
 					r.Get("/", action.GetBudget)
+
+					// --- Income ---
+					r.Route("/income-list", func(r chi.Router) {
+						r.Get("/", action.IndexIncomeList)
+						r.Post("/", action.PostIncome)
+						r.Route("/{incomeID}", func(r chi.Router) {
+							r.Use(IncomeCTX)
+							r.Get("/", action.GetIncome)
+							r.Patch("/", action.PatchIncome)
+							r.Delete("/", action.DeleteIncome)
+						})
+					})
 				})
-				r.Post("/", action.PostBudget)
 			})
 		})
 	})

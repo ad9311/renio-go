@@ -12,5 +12,5 @@ CREATE TABLE IF NOT EXISTS entry_classes (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS transaction_types;
+DROP TABLE IF EXISTS entry_classes;
 -- +goose StatementEnd

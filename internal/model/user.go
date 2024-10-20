@@ -1,21 +1,22 @@
 package model
 
 import (
-	"context"
 	"database/sql"
+	"time"
 
 	"github.com/ad9311/renio-go/internal/db"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID       int            `json:"id"`
-	Username string         `json:"username"`
-	Name     string         `json:"name"`
-	Email    string         `json:"email"`
-	Image    sql.NullString `json:"image"`
-
-	Password string
+	ID        int    `json:"id"`
+	Username  string `json:"username"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Password  string
+	Image     sql.NullString `json:"image"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type SignUpData struct {
@@ -31,46 +32,56 @@ type SignInData struct {
 	Password string `json:"password"`
 }
 
-// --- Query --- //
+// --- Query Functions --- //
 
-func (u *User) Create(signUpData SignUpData) error {
-	pool := db.GetPool()
-	ctx := context.Background()
-	query := `INSERT INTO users (username, name, email, password)
-						VALUES ($1, $2, $3, $4)
-						RETURNING id, username, name, email, image`
+func (u *User) Insert(signUpData SignUpData) error {
+	query := "INSERT INTO users (username, name, email, password) VALUES ($1, $2, $3, $4) RETURNING *"
 
-	username := signUpData.Username
-	name := signUpData.Name
-	email := signUpData.Email
 	password, err := hashPassword(signUpData.Password)
 	if err != nil {
 		return err
 	}
 
-	err = pool.QueryRow(ctx, query, username, name, email, password).Scan(
-		&u.ID,
-		&u.Username,
-		&u.Name,
-		&u.Email,
-		&u.Image,
-	)
-	if err != nil {
+	queryExec := db.QueryExe{
+		QueryStr: query,
+		QueryArgs: []any{
+			signUpData.Username,
+			signUpData.Name,
+			signUpData.Email,
+			password,
+		},
+		Model: User{},
+	}
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
+
+	value, ok := queryExec.Model.(*User)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*u = *value
 
 	return nil
 }
 
-func (u *User) SelectForAuth(email string) error {
-	query := `SELECT id, username, password FROM users WHERE email = $1`
-	pool := db.GetPool()
-	ctx := context.Background()
+func (u *User) SelectByEmail(email string) error {
+	query := "SELECT * FROM users WHERE email = $1"
 
-	err := pool.QueryRow(ctx, query, email).Scan(&u.ID, &u.Username, &u.Password)
-	if err != nil {
+	queryExec := db.QueryExe{
+		QueryStr:  query,
+		QueryArgs: []any{email},
+		Model:     User{},
+	}
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
+
+	value, ok := queryExec.Model.(*User)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*u = *value
 
 	return nil
 }
@@ -85,20 +96,22 @@ func (u *User) SetUpAccounts() error {
 }
 
 func (u *User) SelectByID(userID int) error {
-	query := `SELECT id, username, name, email, image FROM users WHERE id = $1`
-	pool := db.GetPool()
-	ctx := context.Background()
+	query := "SELECT * FROM users WHERE id = $1"
 
-	err := pool.QueryRow(ctx, query, userID).Scan(
-		&u.ID,
-		&u.Username,
-		&u.Name,
-		&u.Email,
-		&u.Image,
-	)
-	if err != nil {
+	queryExec := db.QueryExe{
+		QueryStr:  query,
+		QueryArgs: []any{userID},
+		Model:     User{},
+	}
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
+
+	value, ok := queryExec.Model.(*User)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*u = *value
 
 	return nil
 }

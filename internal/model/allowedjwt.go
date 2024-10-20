@@ -1,18 +1,19 @@
 package model
 
 import (
-	"context"
 	"time"
 
 	"github.com/ad9311/renio-go/internal/db"
 )
 
 type AllowedJWT struct {
-	ID     int
-	JTI    string
-	AUD    string
-	EXP    time.Time
-	UserID int
+	ID        int
+	JTI       string
+	AUD       string
+	EXP       time.Time
+	UserID    int
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type JWT struct {
@@ -25,28 +26,49 @@ type JWT struct {
 // --- Query --- //
 
 func (aJWT *AllowedJWT) Insert(token JWT, userID int) error {
-	pool := db.GetPool()
-	ctx := context.Background()
 	query := `INSERT INTO allowed_jwts (jti, aud, exp, user_id)
-						VALUES ($1, $2, $3, $4)`
+						VALUES ($1, $2, $3, $4) RETURNING *`
 
-	_, err := pool.Exec(ctx, query, token.JTI, token.AUD, token.EXP, userID)
-	if err != nil {
+	queryExec := db.QueryExe{
+		QueryStr: query,
+		QueryArgs: []any{
+			token.JTI,
+			token.AUD,
+			token.EXP,
+			userID,
+		},
+		Model: AllowedJWT{},
+	}
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
+
+	value, ok := queryExec.Model.(*AllowedJWT)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*aJWT = *value
 
 	return nil
 }
 
-func (aJWT *AllowedJWT) SelectByJTI(jit string) error {
-	pool := db.GetPool()
-	ctx := context.Background()
-	query := `SELECT user_id FROM allowed_jwts WHERE jti = $1`
+func (aJWT *AllowedJWT) SelectByJTI(jti string) error {
+	query := `SELECT * FROM allowed_jwts WHERE jti = $1`
 
-	err := pool.QueryRow(ctx, query, jit).Scan(&aJWT.UserID)
-	if err != nil {
+	queryExec := db.QueryExe{
+		QueryStr:  query,
+		QueryArgs: []any{jti},
+		Model:     AllowedJWT{},
+	}
+	if err := queryExec.QueryRow(); err != nil {
 		return err
 	}
+
+	value, ok := queryExec.Model.(*AllowedJWT)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*aJWT = *value
 
 	return nil
 }

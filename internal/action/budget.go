@@ -35,5 +35,16 @@ func PostBudget(w http.ResponseWriter, r *http.Request) {
 
 func GetBudget(w http.ResponseWriter, r *http.Request) {
 	budget := r.Context().Value(conf.BudgetContext).(model.Budget)
-	WriteOK(w, budget, http.StatusCreated)
+	WriteOK(w, budget, http.StatusOK)
+}
+
+func GetCurrentBudget(w http.ResponseWriter, r *http.Request) {
+	budgetAccount := r.Context().Value(conf.BudgetAccountContext).(model.BudgetAccount)
+
+	var budget model.Budget
+	if err := budget.SelectCurrent(budgetAccount.ID); err != nil {
+		WriteError(w, []string{""}, http.StatusNotFound)
+	}
+
+	WriteOK(w, budget, http.StatusOK)
 }
