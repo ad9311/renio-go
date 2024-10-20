@@ -106,6 +106,7 @@ func (i *Income) Update(incomeFormData IncomeFormData) error {
 			incomeFormData.Amount,
 			incomeFormData.Description,
 			incomeFormData.EntryClassID,
+			i.ID,
 		},
 		Model: Income{},
 	}
