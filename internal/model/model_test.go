@@ -1,31 +1,26 @@
 package model_test
 
 import (
+	"log"
 	"os"
 	"testing"
 
-	"github.com/ad9311/renio-go/internal/console"
-	"github.com/ad9311/renio-go/internal/db"
+	"github.com/ad9311/renio-go/internal/app"
 	"github.com/ad9311/renio-go/internal/db/migration"
-	"github.com/ad9311/renio-go/internal/db/seed"
-	"github.com/joho/godotenv"
 )
 
 func TestMain(m *testing.M) {
-	if err := godotenv.Load("../../.env.test"); err != nil {
-		console.Error(err.Error())
-		os.Exit(1)
+	if err := app.Init(); err != nil {
+		log.Fatal(err.Error())
 	}
 
-	console.ResetEnv()
-
-	db.Init()
-	migration.Up()
-	seed.Run()
-
 	code := m.Run()
-
-	migration.Reset()
-
+	cleanUp()
 	os.Exit(code)
+}
+
+func cleanUp() {
+	if err := migration.Reset(); err != nil {
+		panic(err.Error())
+	}
 }
