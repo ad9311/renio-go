@@ -9,9 +9,8 @@ import (
 	"github.com/ad9311/renio-go/internal/router"
 )
 
-var port = os.Getenv("PORT")
-
 func Serve() {
+	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}

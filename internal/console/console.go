@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var env = os.Getenv("RENIO_ENV")
+var env = os.Getenv("ENV")
 
 func AppName() {
 	fmt.Print("\n--- RENIO ---\n\n")
@@ -38,4 +38,8 @@ func Query(query string) {
 	if env != "test" {
 		fmt.Printf("BEGIN `%s`\n", query)
 	}
+}
+
+func ResetEnv() {
+	env = os.Getenv("ENV")
 }

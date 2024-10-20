@@ -1,8 +1,8 @@
 package migration
 
 import (
+	"database/sql"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/ad9311/renio-go/internal/console"
@@ -10,12 +10,51 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
-func Migrate(databaseURL string) {
+type MigExec struct {
+	DB     *sql.DB
+	MigDir string
+	Skip   bool
+}
+
+const emptyMigrations = "Migrations directory is empty, skipping migrations"
+
+func Up(databaseURL string) {
+	var migExec MigExec
+	migExec.setUp(databaseURL)
+	defer migExec.DB.Close()
+
+	if migExec.Skip {
+		console.Info(emptyMigrations)
+		return
+	}
+
+	if err := goose.Up(migExec.DB, migExec.MigDir); err != nil {
+		console.Fatal(fmt.Sprintf("could not migrate up: %s", err.Error()))
+	}
+}
+
+func Reset(databaseURL string) {
+	var migExec MigExec
+	migExec.setUp(databaseURL)
+	defer migExec.DB.Close()
+
+	if migExec.Skip {
+		console.Info(emptyMigrations)
+		return
+	}
+
+	if err := goose.Reset(migExec.DB, migExec.MigDir); err != nil {
+		console.Fatal(fmt.Sprintf("could not reset database: %s", err.Error()))
+	}
+}
+
+// --- Helpers --- //
+
+func (m *MigExec) setUp(databaseURL string) {
 	db, err := goose.OpenDBWithDriver("pgx", databaseURL)
 	if err != nil {
 		console.Fatal(fmt.Sprintf("failed to open database, %s", err.Error()))
 	}
-	defer db.Close()
 
 	migDir, err := dir.MigrationsDir()
 	if err != nil {
@@ -28,12 +67,9 @@ func Migrate(databaseURL string) {
 	}
 
 	if len(files) == 0 {
-		console.Info("Migrations directory is empty, skipping migrations")
-		return
+		m.Skip = true
 	}
 
-	if err := goose.Up(db, migDir); err != nil {
-		log.Fatalf("failed to apply migrations: %v\n", err)
-		console.Fatal(fmt.Sprintf("failed to apply migrations: %s", err.Error()))
-	}
+	m.DB = db
+	m.MigDir = migDir
 }

@@ -17,11 +17,16 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 
+	console.ResetEnv()
+
 	databaseURL := os.Getenv("TEST_DATABASE_URL")
 	db.Init(databaseURL)
-	migration.Migrate(databaseURL)
+	migration.Up(databaseURL)
 	seed.RunSeeds()
 
 	code := m.Run()
+
+	migration.Reset(databaseURL)
+
 	os.Exit(code)
 }
