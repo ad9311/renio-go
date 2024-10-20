@@ -23,9 +23,10 @@ func main() {
 		fmt.Printf("! Loaded .env file in %s mode\n", env)
 	}
 
-	db.Init()
+	databaseURL := os.Getenv("DATABASE_URL")
+	db.Init(databaseURL)
 	if os.Getenv("MIGRATE") == "on" {
-		migration.Migrate()
+		migration.Migrate(databaseURL)
 	}
 	if os.Getenv("SEED") == "on" {
 		seed.RunSeeds()

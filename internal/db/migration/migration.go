@@ -4,26 +4,24 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 
+	"github.com/ad9311/renio-go/internal/dir"
 	"github.com/pressly/goose/v3"
 )
 
-func Migrate() {
-	db, err := goose.OpenDBWithDriver("pgx", os.Getenv("DATABASE_URL"))
+func Migrate(databaseURL string) {
+	db, err := goose.OpenDBWithDriver("pgx", databaseURL)
 	if err != nil {
 		log.Fatalf("failed to open DB: %v\n", err)
 	}
 	defer db.Close()
 
-	cwd, err := os.Getwd()
+	migDir, err := dir.MigrationsDir()
 	if err != nil {
-		log.Fatalf("failed to find current working directory: %v\n", err)
+		log.Fatalf("failed to find migrations directory: %v\n", err)
 	}
 
-	dir := filepath.Join(cwd, "./db/migrations")
-
-	files, err := os.ReadDir(dir)
+	files, err := os.ReadDir(migDir)
 	if err != nil {
 		log.Fatalf("failed to read migrations directory: %v\n", err)
 	}
@@ -33,7 +31,7 @@ func Migrate() {
 		return
 	}
 
-	if err := goose.Up(db, dir); err != nil {
+	if err := goose.Up(db, migDir); err != nil {
 		log.Fatalf("failed to apply migrations: %v\n", err)
 	}
 }

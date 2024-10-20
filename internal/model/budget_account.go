@@ -13,7 +13,7 @@ type BudgetAccount struct {
 	UpdatedAt time.Time
 }
 
-// --- Query --- //
+// --- Query Functions --- //
 
 func (b *BudgetAccount) Insert(userID int) error {
 	query := "INSERT INTO budget_accounts (user_id) VALUES ($1) RETURNING *"

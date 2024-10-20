@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"reflect"
 	"sync"
 
@@ -25,12 +24,12 @@ var (
 	once sync.Once
 )
 
-func Init() {
+func Init(dabataseURL string) {
 	once.Do(func() {
 		fmt.Println("! Connecting to database...")
 
 		var err error
-		pool, err = pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
+		pool, err = pgxpool.New(context.Background(), dabataseURL)
 		if err != nil {
 			log.Fatalf("x Unable to connect to database: %v\n", err)
 		}
