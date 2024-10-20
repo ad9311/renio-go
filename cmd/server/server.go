@@ -2,23 +2,24 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
+	"github.com/ad9311/renio-go/internal/console"
 	"github.com/ad9311/renio-go/internal/router"
 )
 
+var port = os.Getenv("PORT")
+
 func Serve() {
-	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	fmt.Printf("! Listening on http://localhost:%s\n\n", port)
+	console.Info(fmt.Sprintf("Listening on http://localhost:%s", port))
 
-	err := http.ListenAndServe(fmt.Sprintf(":%s", port), router.RoutesHandler())
-	if err != nil {
-		log.Fatalf("there's been an error: %s", err.Error())
+	portF := fmt.Sprintf(":%s", port)
+	if err := http.ListenAndServe(portF, router.RoutesHandler()); err != nil {
+		console.Fatal(fmt.Sprintf("there's been an error, %s", err.Error()))
 	}
 }

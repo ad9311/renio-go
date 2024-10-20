@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/ad9311/renio-go/internal/console"
 	"github.com/ad9311/renio-go/internal/dir"
 	"github.com/pressly/goose/v3"
 )
@@ -12,26 +13,27 @@ import (
 func Migrate(databaseURL string) {
 	db, err := goose.OpenDBWithDriver("pgx", databaseURL)
 	if err != nil {
-		log.Fatalf("failed to open DB: %v\n", err)
+		console.Fatal(fmt.Sprintf("failed to open database, %s", err.Error()))
 	}
 	defer db.Close()
 
 	migDir, err := dir.MigrationsDir()
 	if err != nil {
-		log.Fatalf("failed to find migrations directory: %v\n", err)
+		console.Fatal(fmt.Sprintf("failed to find migrations directory: %s", err.Error()))
 	}
 
 	files, err := os.ReadDir(migDir)
 	if err != nil {
-		log.Fatalf("failed to read migrations directory: %v\n", err)
+		console.Fatal(fmt.Sprintf("failed to read migrations directory: %s", err.Error()))
 	}
 
 	if len(files) == 0 {
-		fmt.Print("! Migrations directory is empty, skipping migrations\n\n")
+		console.Info("Migrations directory is empty, skipping migrations")
 		return
 	}
 
 	if err := goose.Up(db, migDir); err != nil {
 		log.Fatalf("failed to apply migrations: %v\n", err)
+		console.Fatal(fmt.Sprintf("failed to apply migrations: %s", err.Error()))
 	}
 }

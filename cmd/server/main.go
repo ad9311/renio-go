@@ -2,33 +2,40 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
+	"github.com/ad9311/renio-go/internal/console"
 	"github.com/ad9311/renio-go/internal/db"
 	"github.com/ad9311/renio-go/internal/db/migration"
 	"github.com/ad9311/renio-go/internal/db/seed"
 	"github.com/joho/godotenv"
 )
 
-func main() {
-	fmt.Print("RENIO\n\n")
+var (
+	env         = os.Getenv("RENIO_ENV")
+	databaseURL = os.Getenv("DATABASE_URL")
+	migrate     = os.Getenv("MIGRATE")
+	seeds       = os.Getenv("SEED")
+)
 
-	env := os.Getenv("RENIO_ENV")
+func main() {
+	console.AppName()
+
 	if env != "production" {
-		err := godotenv.Load()
-		if err != nil {
-			log.Fatal("error loading .env file")
+		if err := godotenv.Load(); err != nil {
+			console.Fatal(fmt.Sprintf("could not load .env file, %s", err.Error()))
 		}
-		fmt.Printf("! Loaded .env file in %s mode\n", env)
+		env = os.Getenv("RENIO_ENV")
+		console.Success(fmt.Sprintf("Loaded .env file in %s environment", env))
 	}
 
-	databaseURL := os.Getenv("DATABASE_URL")
 	db.Init(databaseURL)
-	if os.Getenv("MIGRATE") == "on" {
+
+	if migrate == "on" {
 		migration.Migrate(databaseURL)
 	}
-	if os.Getenv("SEED") == "on" {
+
+	if seeds == "on" {
 		seed.RunSeeds()
 	}
 

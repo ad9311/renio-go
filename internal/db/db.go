@@ -3,10 +3,10 @@ package db
 import (
 	"context"
 	"fmt"
-	"log"
 	"reflect"
 	"sync"
 
+	"github.com/ad9311/renio-go/internal/console"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -26,19 +26,19 @@ var (
 
 func Init(dabataseURL string) {
 	once.Do(func() {
-		fmt.Println("! Connecting to database...")
+		console.Info("Connecting to database...")
 
 		var err error
 		pool, err = pgxpool.New(context.Background(), dabataseURL)
 		if err != nil {
-			log.Fatalf("x Unable to connect to database: %v\n", err)
+			console.Fatal(fmt.Sprintf("x Unable to connect to database: %s", err.Error()))
 		}
 
 		if err = pool.Ping(context.Background()); err != nil {
-			log.Fatalf("x Unable to ping database: %v\n", err)
+			console.Fatal(fmt.Sprintf("x Unable to ping database: %s", err.Error()))
 		}
 
-		fmt.Print("✓ Database connection established\n\n")
+		console.Success("Database connection established")
 	})
 }
 
@@ -47,7 +47,8 @@ func GetPool() *pgxpool.Pool {
 }
 
 func (x *QueryExe) QueryRow() error {
-	fmt.Printf("BEGIN `%s`\n", x.QueryStr)
+	console.Query(x.QueryStr)
+
 	ctx := context.Background()
 	pool := GetPool()
 
@@ -70,7 +71,8 @@ func (x *QueryExe) QueryRow() error {
 }
 
 func (x *QueryExe) Query() error {
-	fmt.Printf("BEGIN `%s`\n", x.QueryStr)
+	console.Query(x.QueryStr)
+
 	ctx := context.Background()
 	pool := GetPool()
 
@@ -95,7 +97,7 @@ func (x *QueryExe) Query() error {
 }
 
 func (x *QueryExe) QueryWithoutScan() error {
-	fmt.Printf("BEGIN `%s``\n", x.QueryStr)
+	console.Query(x.QueryStr)
 
 	ctx := context.Background()
 	pool := GetPool()

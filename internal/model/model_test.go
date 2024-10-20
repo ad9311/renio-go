@@ -1,10 +1,10 @@
 package model_test
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
+	"github.com/ad9311/renio-go/internal/console"
 	"github.com/ad9311/renio-go/internal/db"
 	"github.com/ad9311/renio-go/internal/db/migration"
 	"github.com/ad9311/renio-go/internal/db/seed"
@@ -13,7 +13,7 @@ import (
 
 func TestMain(m *testing.M) {
 	if err := godotenv.Load("../../.env"); err != nil {
-		fmt.Printf("%s", err)
+		console.Error(err.Error())
 		os.Exit(1)
 	}
 
