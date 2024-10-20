@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ad9311/renio-go/internal/model"
+	"github.com/jackc/pgx/v5"
 )
 
 func TestUserInsert(t *testing.T) {
@@ -34,11 +35,21 @@ func TestUserSelectByID(t *testing.T) {
 	if err := user.SelectByID(1); err != nil {
 		t.Fatalf("failed selecting user by id, %s", err.Error())
 	}
+
+	err := user.SelectByID(2)
+	if err != pgx.ErrNoRows {
+		t.Errorf("expected no user got %v from database", user)
+	}
 }
 
 func TestUserSelectByEmail(t *testing.T) {
 	var user model.User
 	if err := user.SelectByEmail("carlos@email.com"); err != nil {
 		t.Fatalf("failed selecting user by id, %s", err.Error())
+	}
+
+	err := user.SelectByEmail("andres@email.com")
+	if err != pgx.ErrNoRows {
+		t.Errorf("expected no user got %v from database", user)
 	}
 }
