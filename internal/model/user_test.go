@@ -6,20 +6,39 @@ import (
 	"github.com/ad9311/renio-go/internal/model"
 )
 
-func TestInserUser(t *testing.T) {
+func TestUserInsert(t *testing.T) {
 	signUpData := model.SignUpData{
 		Username:             "carlos",
 		Name:                 "carlos",
+		Email:                "carlos@email.com",
 		Password:             "123456789",
 		PasswordConfirmation: "123456789",
 	}
 
 	var user model.User
 	if err := user.Insert(signUpData); err != nil {
-		t.Fatalf("failed inserting user: %v", err)
+		t.Fatalf("failed inserting user, %s", err.Error())
 	}
 
 	if user.Username != signUpData.Username {
 		t.Errorf("expected user with username % s, got %s", signUpData.Username, user.Username)
+	}
+
+	if user.Username != signUpData.Name {
+		t.Errorf("expected user with name % s, got %s", signUpData.Name, user.Name)
+	}
+}
+
+func TestUserSelectByID(t *testing.T) {
+	var user model.User
+	if err := user.SelectByID(1); err != nil {
+		t.Fatalf("failed selecting user by id, %s", err.Error())
+	}
+}
+
+func TestUserSelectByEmail(t *testing.T) {
+	var user model.User
+	if err := user.SelectByEmail("carlos@email.com"); err != nil {
+		t.Fatalf("failed selecting user by id, %s", err.Error())
 	}
 }

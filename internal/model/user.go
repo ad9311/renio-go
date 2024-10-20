@@ -84,15 +84,6 @@ func (u *User) SelectByEmail(email string) error {
 	return nil
 }
 
-func (u *User) SetUpAccounts() error {
-	var budgetAccount BudgetAccount
-	if err := budgetAccount.Insert(u.ID); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (u *User) SelectByID(userID int) error {
 	query := "SELECT * FROM users WHERE id = $1"
 
@@ -106,6 +97,15 @@ func (u *User) SelectByID(userID int) error {
 	}
 
 	if err := u.saveUserFromDB(queryExec); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *User) SetUpAccounts() error {
+	var budgetAccount BudgetAccount
+	if err := budgetAccount.Insert(u.ID); err != nil {
 		return err
 	}
 
