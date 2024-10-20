@@ -1,11 +1,17 @@
 package conf
 
-type UserIDKey string
-type BudgetAccountKey string
-type BudgetKey string
-type IncomeKey string
+type (
+	UserIDKey        string
+	BudgetAccountKey string
+	BudgetKey        string
+	IncomeKey        string
+	ExpenseKey       string
+)
 
-const UserIDContext = UserIDKey("userID")
-const BudgetAccountContext = BudgetAccountKey("budgetAccount")
-const BudgetContext = BudgetKey("budget")
-const IncomeContext = BudgetKey("income")
+const (
+	UserIDContext        = UserIDKey("userID")
+	BudgetAccountContext = BudgetAccountKey("budgetAccount")
+	BudgetContext        = BudgetKey("budget")
+	IncomeContext        = BudgetKey("income")
+	ExpenseContext       = BudgetKey("expense")
+)

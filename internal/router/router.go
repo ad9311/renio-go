@@ -39,7 +39,7 @@ func RoutesHandler() http.Handler {
 					r.Use(BudgetCTX)
 					r.Get("/", action.GetBudget)
 
-					// --- Income ---
+					// --- Income --- //
 					r.Route("/income-list", func(r chi.Router) {
 						r.Get("/", action.IndexIncomeList)
 						r.Post("/", action.PostIncome)
@@ -48,6 +48,18 @@ func RoutesHandler() http.Handler {
 							r.Get("/", action.GetIncome)
 							r.Patch("/", action.PatchIncome)
 							r.Delete("/", action.DeleteIncome)
+						})
+					})
+
+					// --- Expense --- //
+					r.Route("/expenses", func(r chi.Router) {
+						r.Get("/", action.IndexExpenses)
+						r.Post("/", action.PostExpense)
+						r.Route("/{expenseID}", func(r chi.Router) {
+							r.Use(ExpenseCTX)
+							r.Get("/", action.GetExpense)
+							r.Patch("/", action.PatchExpense)
+							r.Delete("/", action.DeleteExpense)
 						})
 					})
 				})

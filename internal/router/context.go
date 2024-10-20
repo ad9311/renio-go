@@ -57,3 +57,20 @@ func IncomeCTX(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
+
+func ExpenseCTX(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		expenseID := chi.URLParam(r, "expenseID")
+		id, _ := strconv.Atoi(expenseID)
+		expense := model.Expense{
+			ID: id,
+		}
+		if err := expense.SelectByID(); err != nil {
+			action.WriteError(w, []string{"expense not found"}, http.StatusNotFound)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), conf.ExpenseContext, expense)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}

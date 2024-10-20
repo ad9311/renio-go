@@ -200,6 +200,97 @@ func (b *Budget) OnIncomeDelete(incomeAmount float32) error {
 	return nil
 }
 
+func (b *Budget) OnExpenseInsert(expenseAmount float32) error {
+	query := "UPDATE budgets SET balance = $1, total_expenses = $2, entry_count = $3, expense_count = $4 WHERE ID = $5 RETURNING *"
+
+	b.setBalance(0, expenseAmount)
+	b.setTotalExpenses(expenseAmount, 0)
+	b.addToEntryCount(1)
+	b.addToExpenseCount(1)
+
+	queryExec := db.QueryExe{
+		QueryStr: query,
+		QueryArgs: []any{
+			b.Balance,
+			b.TotalExpenses,
+			b.EntryCount,
+			b.ExpenseCount,
+			b.ID,
+		},
+		Model: Budget{},
+	}
+	if err := queryExec.QueryRow(); err != nil {
+		return err
+	}
+
+	value, ok := queryExec.Model.(*Budget)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*b = *value
+
+	return nil
+}
+
+func (b *Budget) OnExpenseUpdate(prevExpenseAmount float32, expenseAmount float32) error {
+	query := "UPDATE budgets SET balance = $1, total_expenses = $2 WHERE id = $3 RETURNING *"
+
+	b.setBalance(prevExpenseAmount, expenseAmount)
+	b.setTotalExpenses(expenseAmount, prevExpenseAmount)
+	queryExec := db.QueryExe{
+		QueryStr: query,
+		QueryArgs: []any{
+			b.Balance,
+			b.TotalExpenses,
+			b.ID,
+		},
+		Model: Budget{},
+	}
+	if err := queryExec.QueryRow(); err != nil {
+		return err
+	}
+
+	value, ok := queryExec.Model.(*Budget)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*b = *value
+
+	return nil
+}
+
+func (b *Budget) OnExpenseDelete(expenseAmount float32) error {
+	query := "UPDATE budgets SET balance = $1, total_expenses = $2, entry_count = $3, expense_count = $4 WHERE ID = $5 RETURNING *"
+
+	b.setBalance(expenseAmount, 0)
+	b.setTotalExpenses(0, expenseAmount)
+	b.addToEntryCount(-1)
+	b.addToExpenseCount(-1)
+
+	queryExec := db.QueryExe{
+		QueryStr: query,
+		QueryArgs: []any{
+			b.Balance,
+			b.TotalExpenses,
+			b.EntryCount,
+			b.ExpenseCount,
+			b.ID,
+		},
+		Model: Budget{},
+	}
+	if err := queryExec.QueryRow(); err != nil {
+		return err
+	}
+
+	value, ok := queryExec.Model.(*Budget)
+	if !ok {
+		return ErrIncompleteQuery{}
+	}
+	*b = *value
+
+	return nil
+}
+
 // --- Helpers --- //
 
 func (b *Budget) setCurrentUID(budgetAccountID int) {
@@ -218,10 +309,18 @@ func (b *Budget) setTotalIncome(credit float32, debit float32) {
 	b.TotalIncome = b.TotalIncome + (credit - debit)
 }
 
+func (b *Budget) setTotalExpenses(credit float32, debit float32) {
+	b.TotalExpenses = b.TotalExpenses + (credit - debit)
+}
+
 func (b *Budget) addToEntryCount(change int) {
 	b.EntryCount = b.EntryCount + change
 }
 
 func (b *Budget) addToIncomeCount(change int) {
 	b.IncomeCount = b.IncomeCount + change
+}
+
+func (b *Budget) addToExpenseCount(change int) {
+	b.ExpenseCount = b.ExpenseCount + change
 }
