@@ -31,13 +31,13 @@ func TestUserInsert(t *testing.T) {
 }
 
 func TestUserSelectByID(t *testing.T) {
-	user, err := prepareUser()
+	user, err := PrepareUser()
 	if err != nil {
 		t.Fatalf("could not prepare user for test, %s", err.Error())
 	}
 
 	if err := user.SelectByID(user.ID); err != nil {
-		t.Fatalf("failed selecting user by id, %s", err.Error())
+		t.Errorf("failed selecting user by id, %s", err.Error())
 	}
 
 	err = user.SelectByID(20)
@@ -47,13 +47,13 @@ func TestUserSelectByID(t *testing.T) {
 }
 
 func TestUserSelectByEmail(t *testing.T) {
-	user, err := prepareUser()
+	user, err := PrepareUser()
 	if err != nil {
 		t.Fatalf("could not prepare user for test, %s", err.Error())
 	}
 
 	if err := user.SelectByEmail(user.Email); err != nil {
-		t.Fatalf("failed selecting user by id, %s", err.Error())
+		t.Errorf("failed selecting user by id, %s", err.Error())
 	}
 
 	err = user.SelectByEmail("anon@email.com")
