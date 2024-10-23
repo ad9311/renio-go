@@ -6,14 +6,14 @@ import (
 	"strconv"
 
 	"github.com/ad9311/renio-go/internal/action"
-	"github.com/ad9311/renio-go/internal/conf"
 	"github.com/ad9311/renio-go/internal/model"
+	"github.com/ad9311/renio-go/internal/vars"
 	"github.com/go-chi/chi/v5"
 )
 
 func BudgetAccountCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value(conf.UserIDContext).(int)
+		userID := r.Context().Value(vars.UserIDContext).(int)
 
 		var budgetAccount model.BudgetAccount
 		if err := budgetAccount.SelectByUserID(userID); err != nil {
@@ -21,7 +21,7 @@ func BudgetAccountCTX(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), conf.BudgetAccountContext, budgetAccount)
+		ctx := context.WithValue(r.Context(), vars.BudgetAccountContext, budgetAccount)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -36,7 +36,7 @@ func BudgetCTX(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), conf.BudgetContext, budget)
+		ctx := context.WithValue(r.Context(), vars.BudgetContext, budget)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -53,7 +53,7 @@ func IncomeCTX(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), conf.IncomeContext, income)
+		ctx := context.WithValue(r.Context(), vars.IncomeContext, income)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -70,7 +70,7 @@ func ExpenseCTX(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), conf.ExpenseContext, expense)
+		ctx := context.WithValue(r.Context(), vars.ExpenseContext, expense)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

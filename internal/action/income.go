@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ad9311/renio-go/internal/conf"
 	"github.com/ad9311/renio-go/internal/model"
+	"github.com/ad9311/renio-go/internal/vars"
 )
 
 // --- Actions --- //
 
 func IndexIncomeList(w http.ResponseWriter, r *http.Request) {
-	budget := r.Context().Value(conf.BudgetContext).(model.Budget)
+	budget := r.Context().Value(vars.BudgetContext).(model.Budget)
 
 	var incomeList model.IncomeList
 	if err := incomeList.Index(budget.ID); err != nil {
@@ -24,7 +24,7 @@ func IndexIncomeList(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostIncome(w http.ResponseWriter, r *http.Request) {
-	budget := r.Context().Value(conf.BudgetContext).(model.Budget)
+	budget := r.Context().Value(vars.BudgetContext).(model.Budget)
 
 	var incomeFormData model.IncomeFormData
 	if err := json.NewDecoder(r.Body).Decode(&incomeFormData); err != nil {
@@ -50,13 +50,13 @@ func PostIncome(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetIncome(w http.ResponseWriter, r *http.Request) {
-	income := r.Context().Value(conf.IncomeContext).(model.Income)
+	income := r.Context().Value(vars.IncomeContext).(model.Income)
 	WriteOK(w, income, http.StatusOK)
 }
 
 func PatchIncome(w http.ResponseWriter, r *http.Request) {
-	income := r.Context().Value(conf.IncomeContext).(model.Income)
-	budget := r.Context().Value(conf.BudgetContext).(model.Budget)
+	income := r.Context().Value(vars.IncomeContext).(model.Income)
+	budget := r.Context().Value(vars.BudgetContext).(model.Budget)
 
 	var incomeFormData model.IncomeFormData
 	if err := json.NewDecoder(r.Body).Decode(&incomeFormData); err != nil {
@@ -79,8 +79,8 @@ func PatchIncome(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteIncome(w http.ResponseWriter, r *http.Request) {
-	income := r.Context().Value(conf.IncomeContext).(model.Income)
-	budget := r.Context().Value(conf.BudgetContext).(model.Budget)
+	income := r.Context().Value(vars.IncomeContext).(model.Income)
+	budget := r.Context().Value(vars.BudgetContext).(model.Budget)
 
 	if err := income.Delete(); err != nil {
 		WriteError(w, []string{"failed to delete income"}, http.StatusInternalServerError)

@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/ad9311/renio-go/internal/action"
-	"github.com/ad9311/renio-go/internal/conf"
 	"github.com/ad9311/renio-go/internal/envs"
 	"github.com/ad9311/renio-go/internal/model"
+	"github.com/ad9311/renio-go/internal/vars"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -72,7 +72,7 @@ func routesProtector(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), conf.UserIDContext, allowedJWT.UserID)
+		ctx := context.WithValue(r.Context(), vars.UserIDContext, allowedJWT.UserID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

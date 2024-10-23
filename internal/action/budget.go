@@ -3,14 +3,14 @@ package action
 import (
 	"net/http"
 
-	"github.com/ad9311/renio-go/internal/conf"
 	"github.com/ad9311/renio-go/internal/model"
+	"github.com/ad9311/renio-go/internal/vars"
 )
 
 // --- Actions --- //
 
 func IndexBudgets(w http.ResponseWriter, r *http.Request) {
-	budgetAccount := r.Context().Value(conf.BudgetAccountContext).(model.BudgetAccount)
+	budgetAccount := r.Context().Value(vars.BudgetAccountContext).(model.BudgetAccount)
 
 	var budgets model.Budgets
 	if err := budgets.Index(budgetAccount.ID); err != nil {
@@ -22,7 +22,7 @@ func IndexBudgets(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostBudget(w http.ResponseWriter, r *http.Request) {
-	budgetAccount := r.Context().Value(conf.BudgetAccountContext).(model.BudgetAccount)
+	budgetAccount := r.Context().Value(vars.BudgetAccountContext).(model.BudgetAccount)
 
 	var budget model.Budget
 	if err := budget.Insert(budgetAccount.ID); err != nil {
@@ -34,12 +34,12 @@ func PostBudget(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBudget(w http.ResponseWriter, r *http.Request) {
-	budget := r.Context().Value(conf.BudgetContext).(model.Budget)
+	budget := r.Context().Value(vars.BudgetContext).(model.Budget)
 	WriteOK(w, budget, http.StatusOK)
 }
 
 func GetCurrentBudget(w http.ResponseWriter, r *http.Request) {
-	budgetAccount := r.Context().Value(conf.BudgetAccountContext).(model.BudgetAccount)
+	budgetAccount := r.Context().Value(vars.BudgetAccountContext).(model.BudgetAccount)
 
 	var budget model.Budget
 	if err := budget.SelectCurrent(budgetAccount.ID); err != nil {
