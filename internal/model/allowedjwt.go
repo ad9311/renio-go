@@ -26,8 +26,7 @@ type JWT struct {
 // --- Query --- //
 
 func (a *AllowedJWT) Insert(token JWT, userID int) error {
-	query := `INSERT INTO allowed_jwts (jti, aud, exp, user_id)
-						VALUES ($1, $2, $3, $4) RETURNING *`
+	query := "INSERT INTO allowed_jwts (jti, aud, exp, user_id) VALUES ($1, $2, $3, $4) RETURNING *"
 
 	queryExec := db.QueryExe{
 		QueryStr: query,

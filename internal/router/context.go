@@ -13,7 +13,7 @@ import (
 
 func BudgetAccountCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value(vars.UserIDContext).(int)
+		userID := r.Context().Value(vars.UserIDKey).(int)
 
 		var budgetAccount model.BudgetAccount
 		if err := budgetAccount.SelectByUserID(userID); err != nil {
@@ -21,7 +21,7 @@ func BudgetAccountCTX(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), vars.BudgetAccountContext, budgetAccount)
+		ctx := context.WithValue(r.Context(), vars.BudgetAccountKey, budgetAccount)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -36,7 +36,7 @@ func BudgetCTX(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), vars.BudgetContext, budget)
+		ctx := context.WithValue(r.Context(), vars.BudgetKey, budget)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -53,7 +53,7 @@ func IncomeCTX(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), vars.IncomeContext, income)
+		ctx := context.WithValue(r.Context(), vars.IncomeKey, income)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -70,7 +70,7 @@ func ExpenseCTX(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), vars.ExpenseContext, expense)
+		ctx := context.WithValue(r.Context(), vars.ExpenseKey, expense)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

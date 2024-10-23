@@ -72,7 +72,7 @@ func routesProtector(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), vars.UserIDContext, allowedJWT.UserID)
+		ctx := context.WithValue(r.Context(), vars.UserIDKey, allowedJWT.UserID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

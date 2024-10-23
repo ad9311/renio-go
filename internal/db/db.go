@@ -98,7 +98,7 @@ func (x *QueryExe) Query() error {
 	return nil
 }
 
-func (x *QueryExe) QueryWithoutScan() error {
+func (x *QueryExe) Exec() error {
 	printQuery(x.QueryStr)
 
 	ctx := context.Background()

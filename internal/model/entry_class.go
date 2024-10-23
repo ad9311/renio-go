@@ -55,7 +55,7 @@ func (e *EntryClass) InsertIfNotExists() error {
 		QueryStr:  query,
 		QueryArgs: []any{e.UID, e.Name, e.Type},
 	}
-	if err := queryExec.QueryWithoutScan(); err != nil {
+	if err := queryExec.Exec(); err != nil {
 		return err
 	}
 

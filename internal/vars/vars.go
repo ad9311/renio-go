@@ -1,17 +1,11 @@
 package vars
 
-type (
-	UserIDKey        string
-	BudgetAccountKey string
-	BudgetKey        string
-	IncomeKey        string
-	ExpenseKey       string
+const (
+	UserIDKey        = ContextKey("userID")
+	BudgetAccountKey = ContextKey("budgetAccount")
+	BudgetKey        = ContextKey("budget")
+	IncomeKey        = ContextKey("income")
+	ExpenseKey       = ContextKey("expense")
 )
 
-const (
-	UserIDContext        = UserIDKey("userID")
-	BudgetAccountContext = BudgetAccountKey("budgetAccount")
-	BudgetContext        = BudgetKey("budget")
-	IncomeContext        = BudgetKey("income")
-	ExpenseContext       = BudgetKey("expense")
-)
+type ContextKey string
