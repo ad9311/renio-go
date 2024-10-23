@@ -3,41 +3,125 @@ package envs
 import (
 	"fmt"
 	"os"
+	"sync"
 
-	"github.com/ad9311/renio-go/internal/console"
 	"github.com/ad9311/renio-go/internal/dir"
 	"github.com/joho/godotenv"
 )
 
-var dotfile string
+type EnvVars struct {
+	ENV         string
+	PORT        string
+	DatabaseURL string
+	Seed        bool
+	JWTToken    string
+}
+
+const (
+	Development = "development"
+	Test        = "test"
+	Production  = "production"
+	defaultPort = "8080"
+	defaultENV  = Development
+)
+
+var (
+	envVars   EnvVars
+	once      sync.Once
+	validENVs = map[string]bool{
+		Development: true,
+		Test:        true,
+		Production:  true,
+	}
+)
 
 func Init() error {
-	env := os.Getenv("ENV")
+	var envErr error
 
-	rootDir, err := dir.RootDir()
-	if err != nil {
-		return err
-	}
+	once.Do(func() {
+		env := os.Getenv("APP_ENV")
 
-	switch env {
-	case "development":
-		dotfile = fmt.Sprintf("%s/.env", rootDir)
-	case "production":
-		dotfile = fmt.Sprintf("%s/.env.production", rootDir)
-	case "test":
-		dotfile = fmt.Sprintf("%s/.env.test", rootDir)
-	default:
-		if err := os.Setenv("ENV", "development"); err != nil {
-			return err
+		if !isValidENV(env) {
+			envErr = fmt.Errorf("%s is not a valid environment", env)
+			return
 		}
-		env = os.Getenv("ENV")
-		dotfile = fmt.Sprintf("%s/.env", rootDir)
+
+		rootDir, err := dir.RootDir()
+		if err != nil {
+			envErr = err
+			return
+		}
+
+		dotfile := fmt.Sprintf("%s/.env", rootDir)
+		if err := godotenv.Load(dotfile); err != nil {
+			envErr = err
+			return
+		}
+
+		envVars.setENV(env)
+		envVars.setDatabaseURL(env)
+		envVars.setSeeds()
+		envVars.setPORT()
+		if err := envVars.setJWTToken(); err != nil {
+			envErr = err
+		}
+	})
+
+	return envErr
+}
+
+func GetEnvs() EnvVars {
+	return envVars
+}
+
+// --- Helpers --- //
+
+func isValidENV(env string) bool {
+	if env == "" {
+		return true
 	}
 
-	if err := godotenv.Load(dotfile); err != nil {
-		return err
+	return validENVs[env]
+}
+
+func (e *EnvVars) setENV(env string) {
+	if env == "" {
+		e.ENV = defaultENV
+		return
 	}
-	console.Success(fmt.Sprintf("Loaded .env file in %s environment", env))
+	e.ENV = env
+}
+
+func (e *EnvVars) setDatabaseURL(env string) {
+	if env == Test {
+		e.DatabaseURL = os.Getenv("TEST_DATABASE_URL")
+	} else {
+		e.DatabaseURL = os.Getenv("DATABASE_URL")
+	}
+}
+
+func (e *EnvVars) setSeeds() {
+	if os.Getenv("SEED") == "on" {
+		e.Seed = true
+		return
+	}
+	e.Seed = false
+}
+
+func (e *EnvVars) setPORT() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		e.PORT = defaultPort
+		return
+	}
+	e.PORT = port
+}
+
+func (e *EnvVars) setJWTToken() error {
+	if os.Getenv("JWT_TOKEN") == "" {
+		return fmt.Errorf("JWT_TOKEN is not set")
+	}
+	e.JWTToken = os.Getenv("JWT_TOKEN")
 
 	return nil
 }

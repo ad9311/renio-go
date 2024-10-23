@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
+	"github.com/ad9311/renio-go/internal/envs"
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -101,7 +101,7 @@ func createJWTToken(userID int) (model.JWT, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	secret := []byte(os.Getenv("JWT_KEY"))
+	secret := []byte(envs.GetEnvs().JWTToken)
 	tokenString, err := token.SignedString(secret)
 	if err != nil {
 		return model.JWT{}, err

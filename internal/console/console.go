@@ -3,10 +3,11 @@ package console
 import (
 	"fmt"
 	"log"
-	"os"
+
+	"github.com/ad9311/renio-go/internal/envs"
 )
 
-var env = os.Getenv("ENV")
+var env = envs.GetEnvs().ENV
 
 func AppName() {
 	fmt.Print("\n--- RENIO ---\n\n")
@@ -32,14 +33,4 @@ func Error(message string) {
 
 func Fatal(message string) {
 	log.Fatalf("x %s\n", message)
-}
-
-func Query(query string) {
-	if env != "test" {
-		fmt.Printf("BEGIN `%s`\n", query)
-	}
-}
-
-func ResetEnv() {
-	env = os.Getenv("ENV")
 }

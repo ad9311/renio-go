@@ -2,11 +2,11 @@ package db
 
 import (
 	"context"
-	"os"
+	"fmt"
 	"reflect"
 	"sync"
 
-	"github.com/ad9311/renio-go/internal/console"
+	"github.com/ad9311/renio-go/internal/envs"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -28,10 +28,8 @@ func Init() error {
 	var dbErr error
 
 	once.Do(func() {
-		console.Info("Connecting to database...")
-
 		var err error
-		pool, err = pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
+		pool, err = pgxpool.New(context.Background(), envs.GetEnvs().DatabaseURL)
 		if err != nil {
 			dbErr = err
 			return
@@ -41,8 +39,6 @@ func Init() error {
 			dbErr = err
 			return
 		}
-
-		console.Success("Database connection established")
 	})
 
 	return dbErr
@@ -53,7 +49,7 @@ func GetPool() *pgxpool.Pool {
 }
 
 func (x *QueryExe) QueryRow() error {
-	console.Query(x.QueryStr)
+	printQuery(x.QueryStr)
 
 	ctx := context.Background()
 	pool := GetPool()
@@ -77,7 +73,7 @@ func (x *QueryExe) QueryRow() error {
 }
 
 func (x *QueryExe) Query() error {
-	console.Query(x.QueryStr)
+	printQuery(x.QueryStr)
 
 	ctx := context.Background()
 	pool := GetPool()
@@ -103,7 +99,7 @@ func (x *QueryExe) Query() error {
 }
 
 func (x *QueryExe) QueryWithoutScan() error {
-	console.Query(x.QueryStr)
+	printQuery(x.QueryStr)
 
 	ctx := context.Background()
 	pool := GetPool()
@@ -130,4 +126,10 @@ func spreadValues(model any) []any {
 	}
 
 	return values
+}
+
+func printQuery(query string) {
+	if envs.GetEnvs().ENV != "test" {
+		fmt.Printf("BEGIN `%s`\n", query)
+	}
 }
