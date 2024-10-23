@@ -5,7 +5,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/ad9311/renio-go/internal/dir"
 	"github.com/joho/godotenv"
 )
 
@@ -35,7 +34,7 @@ var (
 	}
 )
 
-func Init() error {
+func Init(rootDir string) error {
 	var envErr error
 
 	once.Do(func() {
@@ -43,12 +42,6 @@ func Init() error {
 
 		if !isValidENV(env) {
 			envErr = fmt.Errorf("%s is not a valid environment", env)
-			return
-		}
-
-		rootDir, err := dir.RootDir()
-		if err != nil {
-			envErr = err
 			return
 		}
 

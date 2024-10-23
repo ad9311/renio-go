@@ -2,6 +2,8 @@ package app
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/ad9311/renio-go/internal/console"
 	"github.com/ad9311/renio-go/internal/db"
@@ -10,7 +12,12 @@ import (
 )
 
 func Init() error {
-	if err := envs.Init(); err != nil {
+	rootDir, err := getRootDir()
+	if err != nil {
+		return err
+	}
+
+	if err := envs.Init(rootDir); err != nil {
 		return err
 	}
 	console.Success(fmt.Sprintf("Loading from %s environment", envs.GetEnvs().ENV))
@@ -28,4 +35,27 @@ func Init() error {
 	}
 
 	return nil
+}
+
+// --- Helpers --- //
+
+func getRootDir() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
+	}
+
+	return "", os.ErrNotExist
 }
