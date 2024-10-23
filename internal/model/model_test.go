@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/ad9311/renio-go/internal/app"
-	"github.com/ad9311/renio-go/internal/db/migration"
 	"github.com/ad9311/renio-go/internal/model"
 )
 
@@ -19,14 +18,7 @@ func TestMain(m *testing.M) {
 	}
 
 	code := m.Run()
-	cleanUp()
 	os.Exit(code)
-}
-
-func cleanUp() {
-	if err := migration.Reset(); err != nil {
-		panic(err.Error())
-	}
 }
 
 func PrepareUser() (model.User, error) {
