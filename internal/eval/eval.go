@@ -1,4 +1,4 @@
-package model
+package eval
 
 import (
 	"fmt"
@@ -10,31 +10,31 @@ import (
 	"github.com/ad9311/renio-go/internal/vars"
 )
 
-type ModelValidation struct {
-	String        StringValidation
-	Int           IntValidation
-	Float32       Float32Validation
-	Time          TimeValidation
-	errorMessages ErrorMessages
+type ModelEval struct {
+	String        StringEval
+	Int           IntEval
+	Float32       FloatEval
+	Time          TimeEval
+	errorMessages errorMessages
 }
 
 type (
-	ValidationKey     int
-	StringValidation  map[string]map[ValidationKey]int
-	IntValidation     map[string]map[ValidationKey]int
-	Float32Validation map[string]map[ValidationKey]float32
-	TimeValidation    map[string]map[ValidationKey]time.Time
-	ErrorMessages     []string
+	EvalKey       int
+	StringEval    map[string]map[EvalKey]int
+	IntEval       map[string]map[EvalKey]int
+	FloatEval     map[string]map[EvalKey]float32
+	TimeEval      map[string]map[EvalKey]time.Time
+	errorMessages []string
 )
 
 const (
-	Min ValidationKey = iota
+	Min EvalKey = iota
 	Max
 	Length
 	Fixed
 )
 
-func (mv *ModelValidation) ValidateModel(value any) {
+func (mv *ModelEval) ValidateModel(value any) error {
 	model := reflect.ValueOf(value)
 	modelName := model.Type().Name()
 	kind := reflect.TypeOf(value)
@@ -48,11 +48,19 @@ func (mv *ModelValidation) ValidateModel(value any) {
 		case reflect.TypeOf(""):
 			mv.validateString(name, value.String())
 		case reflect.TypeOf(float32(0)):
-			mv.validateFloat32(name, float32(value.Float()))
+			mv.validateFloat(name, float32(value.Float()))
 		default:
 			console.Fatal(fmt.Sprintf("wrong validation type for %s", modelName))
 		}
 	}
+
+	if len(mv.errorMessages) > 0 {
+		errMsgs := mv.errorMessages.join()
+		mv.errorMessages.flush()
+		return fmt.Errorf("%s", errMsgs)
+	}
+
+	return nil
 }
 
 // --- Helpers --- //
@@ -61,12 +69,16 @@ func fatalAtWrongTypeName(name string) {
 	console.Fatal(fmt.Sprintf("wrong validation type for %s", name))
 }
 
-func (es *ErrorMessages) appendString(errorMsg string) {
+func (es *errorMessages) appendString(errorMsg string) {
 	*es = append(*es, errorMsg)
 }
 
-func (es *ErrorMessages) join() string {
+func (es *errorMessages) join() string {
 	return strings.Join(*es, ", ")
+}
+
+func (es *errorMessages) flush() {
+	*es = errorMessages{}
 }
 
 func formatAndFilter(name string, value string) string {
@@ -79,11 +91,9 @@ func formatAndFilter(name string, value string) string {
 
 // --- String --- //
 
-func (mv *ModelValidation) validateString(name string, str string) {
+func (mv *ModelEval) validateString(name string, str string) {
 	validations := mv.String[name]
 	filtered := formatAndFilter(name, str)
-
-	fmt.Println(filtered)
 
 	for key, val := range validations {
 		switch key {
@@ -108,9 +118,9 @@ func (mv *ModelValidation) validateString(name string, str string) {
 	}
 }
 
-// --- Float32 --- //
+// --- Float --- //
 
-func (mv *ModelValidation) validateFloat32(name string, float float32) {
+func (mv *ModelEval) validateFloat(name string, float float32) {
 	validations := mv.Float32[name]
 	filtered := formatAndFilter(name, fmt.Sprintf("%f", float))
 
