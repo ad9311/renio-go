@@ -32,5 +32,5 @@ func Error(message string) {
 }
 
 func Fatal(message string) {
-	log.Fatalf("x %s\n", message)
+	log.Fatalf("FATAL: %s\n", message)
 }

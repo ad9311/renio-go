@@ -9,3 +9,8 @@ const (
 )
 
 type ContextKey string
+
+var FilteredFields = map[string]bool{
+	"Password":             true,
+	"PasswordConfirmation": true,
+}

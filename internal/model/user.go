@@ -56,11 +56,9 @@ func (u *User) Insert(signUpData SignUpData) error {
 		return err
 	}
 
-	value, ok := queryExec.Model.(*User)
-	if !ok {
-		return ErrIncompleteQuery{}
+	if err := u.saveUserFromDB(queryExec); err != nil {
+		return err
 	}
-	*u = *value
 
 	return nil
 }
