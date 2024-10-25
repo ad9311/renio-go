@@ -1,35 +1,48 @@
 package model
 
-import eval "github.com/ad9311/renio-go/internal/eval"
+import (
+	"github.com/ad9311/renio-go/internal/eval"
+	"github.com/ad9311/renio-go/internal/vars"
+)
 
-var SignUpDataValidation = eval.ModelEval{
-	String: eval.StringEval{
-		"Username": {
-			eval.Min: 4,
-			eval.Max: 20,
+func (s *SignUpData) Validate() vars.ErrorMessages {
+	dataEval := eval.ModelEval{
+		Strings: []eval.String{
+			{
+				Name:  "Username",
+				Value: s.Username,
+				Min:   4,
+				Max:   20,
+			},
+			{
+				Name:  "Name",
+				Value: s.Name,
+				Min:   2,
+				Max:   50,
+			},
+			{
+				Name:    "Email",
+				Value:   s.Email,
+				Pattern: vars.EmailPattern,
+			},
+			{
+				Name:  "Password",
+				Value: s.Password,
+				Min:   8,
+				Max:   30,
+			},
+			{
+				Name:  "Password confirmation",
+				Value: s.PasswordConfirmation,
+				Min:   8,
+				Max:   30,
+			},
 		},
-		"Name": {
-			eval.Min: 4,
-			eval.Max: 50,
-		},
-		"Email": {
-			eval.Min: 7,
-			eval.Max: 50,
-		},
-		"Password": {
-			eval.Min: 8,
-			eval.Max: 24,
-		},
-		"PasswordConfirmation": {
-			eval.Min: 8,
-			eval.Max: 24,
-		},
-	},
-}
+	}
 
-func (s SignUpData) Validate() error {
-	if err := SignUpDataValidation.ValidateModel(s); err != nil {
-		return err
+	errMsgs := dataEval.Validate()
+	if len(errMsgs) > 0 {
+		return errMsgs
 	}
 
 	return nil

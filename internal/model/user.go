@@ -35,10 +35,6 @@ type SignInData struct {
 // --- Query Functions --- //
 
 func (u *User) Insert(signUpData SignUpData) error {
-	if err := signUpData.Validate(); err != nil {
-		return err
-	}
-
 	query := "INSERT INTO users (username, name, email, password) VALUES ($1, $2, $3, $4) RETURNING *"
 
 	password, err := hashPassword(signUpData.Password)

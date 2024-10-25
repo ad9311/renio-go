@@ -2,147 +2,99 @@ package eval
 
 import (
 	"fmt"
-	"reflect"
-	"strings"
-	"time"
+	"regexp"
 
-	"github.com/ad9311/renio-go/internal/console"
 	"github.com/ad9311/renio-go/internal/vars"
 )
 
 type ModelEval struct {
-	String        StringEval
-	Int           IntEval
-	Float32       FloatEval
-	Time          TimeEval
-	errorMessages errorMessages
+	Strings []String
+	Floats  []Float
+	errMsgs vars.ErrorMessages
 }
 
-type (
-	EvalKey       int
-	StringEval    map[string]map[EvalKey]int
-	IntEval       map[string]map[EvalKey]int
-	FloatEval     map[string]map[EvalKey]float32
-	TimeEval      map[string]map[EvalKey]time.Time
-	errorMessages []string
-)
+type String struct {
+	Name    string
+	Value   string
+	Fixed   int
+	Min     int
+	Max     int
+	Pattern string
+}
 
-const (
-	Min EvalKey = iota
-	Max
-	Length
-	Fixed
-)
+type Float struct {
+	Name  string
+	Value float32
+	Fixed float32
+	Min   float32
+	Max   float32
+}
 
-func (mv *ModelEval) ValidateModel(value any) error {
-	model := reflect.ValueOf(value)
-	modelName := model.Type().Name()
-	kind := reflect.TypeOf(value)
-
-	for i := 0; i < model.NumField(); i++ {
-		value := model.Field(i)
-		kind := kind.Field(i)
-		name := kind.Name
-
-		switch kind.Type {
-		case reflect.TypeOf(""):
-			mv.validateString(name, value.String())
-		case reflect.TypeOf(float32(0)):
-			mv.validateFloat(name, float32(value.Float()))
-		default:
-			console.Fatal(fmt.Sprintf("wrong validation type for %s", modelName))
-		}
+func (m *ModelEval) Validate() vars.ErrorMessages {
+	for _, s := range m.Strings {
+		errMsgs := s.validate()
+		m.errMsgs = append(m.errMsgs, errMsgs...)
 	}
 
-	if len(mv.errorMessages) > 0 {
-		errMsgs := mv.errorMessages.join()
-		mv.errorMessages.flush()
-		return fmt.Errorf("%s", errMsgs)
+	for _, s := range m.Floats {
+		errMsgs := s.validate()
+		m.errMsgs = append(m.errMsgs, errMsgs...)
+	}
+
+	if len(m.errMsgs) > 0 {
+		return m.errMsgs
 	}
 
 	return nil
 }
 
-// --- Helpers --- //
+func (s String) validate() vars.ErrorMessages {
+	var errMsgs []string
 
-func fatalAtWrongTypeName(name string) {
-	console.Fatal(fmt.Sprintf("wrong validation type for %s", name))
-}
-
-func (es *errorMessages) appendString(errorMsg string) {
-	*es = append(*es, errorMsg)
-}
-
-func (es *errorMessages) join() string {
-	return strings.Join(*es, ", ")
-}
-
-func (es *errorMessages) flush() {
-	*es = errorMessages{}
-}
-
-func formatAndFilter(name string, value string) string {
-	if vars.FilteredFields[name] {
-		return "[FILTERED]"
-	}
-
-	return fmt.Sprintf("'%s'", value)
-}
-
-// --- String --- //
-
-func (mv *ModelEval) validateString(name string, str string) {
-	validations := mv.String[name]
-	filtered := formatAndFilter(name, str)
-
-	for key, val := range validations {
-		switch key {
-		case Length:
-			if len([]rune(str)) != val {
-				errMsg := fmt.Sprintf("%s: value of %s is not of length %d", name, filtered, val)
-				mv.errorMessages.appendString(errMsg)
-			}
-		case Min:
-			if len([]rune(str)) < val {
-				errMsg := fmt.Sprintf("%s: value of %s is less than %d", name, filtered, val)
-				mv.errorMessages.appendString(errMsg)
-			}
-		case Max:
-			if len([]rune(str)) > val {
-				errMsg := fmt.Sprintf("%s: value of %s is greater than %d", name, filtered, val)
-				mv.errorMessages.appendString(errMsg)
-			}
-		default:
-			fatalAtWrongTypeName(name)
+	if s.Pattern != "" {
+		re := regexp.MustCompile(s.Pattern)
+		if !re.MatchString(s.Value) {
+			errMsg := fmt.Sprintf("%s: is not a valid value", s.Name)
+			errMsgs = append(errMsgs, errMsg)
 		}
 	}
+
+	size := len([]rune(s.Value))
+	if s.Fixed > 0 && s.Fixed != size {
+		errMsg := fmt.Sprintf("%s: must have a fixed length of %d characters", s.Name, s.Fixed)
+		return append(errMsgs, errMsg)
+	}
+
+	if s.Min > 0 && s.Min > size {
+		errMsg := fmt.Sprintf("%s: must have a minimum length of %d characters", s.Name, s.Min)
+		errMsgs = append(errMsgs, errMsg)
+	}
+
+	if s.Max > 0 && s.Max < size {
+		errMsg := fmt.Sprintf("%s: must have a maximum length of %d characters", s.Name, s.Max)
+		errMsgs = append(errMsgs, errMsg)
+	}
+
+	return errMsgs
 }
 
-// --- Float --- //
+func (s Float) validate() vars.ErrorMessages {
+	var errMsgs []string
 
-func (mv *ModelEval) validateFloat(name string, float float32) {
-	validations := mv.Float32[name]
-	filtered := formatAndFilter(name, fmt.Sprintf("%f", float))
-
-	for key, val := range validations {
-		switch key {
-		case Fixed:
-			if float != val {
-				errMsg := fmt.Sprintf("%s: value of %s is different than %f", name, filtered, val)
-				mv.errorMessages.appendString(errMsg)
-			}
-		case Min:
-			if float < val {
-				errMsg := fmt.Sprintf("%s: value of %s is less than %f", name, filtered, val)
-				mv.errorMessages.appendString(errMsg)
-			}
-		case Max:
-			if float > val {
-				errMsg := fmt.Sprintf("%s: value of %s is greater than %f", name, filtered, val)
-				mv.errorMessages.appendString(errMsg)
-			}
-		default:
-			fatalAtWrongTypeName(name)
-		}
+	if s.Fixed > 0 && s.Fixed != s.Value {
+		errMsg := fmt.Sprintf("%s: must have a fixed value of %f", s.Name, s.Fixed)
+		return append(errMsgs, errMsg)
 	}
+
+	if s.Min > 0 && s.Min > s.Value {
+		errMsg := fmt.Sprintf("%s: must have a minimum value of %f", s.Name, s.Min)
+		errMsgs = append(errMsgs, errMsg)
+	}
+
+	if s.Max > 0 && s.Max < s.Value {
+		errMsg := fmt.Sprintf("%s: must have a maximum value of %f", s.Name, s.Max)
+		errMsgs = append(errMsgs, errMsg)
+	}
+
+	return errMsgs
 }

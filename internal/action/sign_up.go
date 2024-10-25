@@ -16,6 +16,12 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	evalErrMsgs := signUpData.Validate()
+	if len(evalErrMsgs) > 0 {
+		WriteError(w, evalErrMsgs, http.StatusBadRequest)
+		return
+	}
+
 	if signUpData.Password != signUpData.PasswordConfirmation {
 		WriteError(w, []string{"passwords don't match"}, http.StatusBadRequest)
 		return
