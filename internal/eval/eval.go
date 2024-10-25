@@ -3,15 +3,15 @@ package eval
 import (
 	"fmt"
 	"regexp"
-
-	"github.com/ad9311/renio-go/internal/vars"
 )
 
 type ModelEval struct {
 	Strings []String
 	Floats  []Float
-	errMsgs vars.ErrorMessages
+	issues  Issues
 }
+
+type Issues []string
 
 type String struct {
 	Name    string
@@ -30,71 +30,71 @@ type Float struct {
 	Max   float32
 }
 
-func (m *ModelEval) Validate() vars.ErrorMessages {
+func (m *ModelEval) Validate() Issues {
 	for _, s := range m.Strings {
-		errMsgs := s.validate()
-		m.errMsgs = append(m.errMsgs, errMsgs...)
+		issues := s.validate()
+		m.issues = append(m.issues, issues...)
 	}
 
 	for _, s := range m.Floats {
-		errMsgs := s.validate()
-		m.errMsgs = append(m.errMsgs, errMsgs...)
+		issues := s.validate()
+		m.issues = append(m.issues, issues...)
 	}
 
-	if len(m.errMsgs) > 0 {
-		return m.errMsgs
+	if len(m.issues) > 0 {
+		return m.issues
 	}
 
 	return nil
 }
 
-func (s String) validate() vars.ErrorMessages {
-	var errMsgs []string
+func (s String) validate() Issues {
+	var issues []string
 
 	if s.Pattern != "" {
 		re := regexp.MustCompile(s.Pattern)
 		if !re.MatchString(s.Value) {
-			errMsg := fmt.Sprintf("%s: is not a valid value", s.Name)
-			errMsgs = append(errMsgs, errMsg)
+			issue := fmt.Sprintf("%s: is not a valid value", s.Name)
+			issues = append(issues, issue)
 		}
 	}
 
 	size := len([]rune(s.Value))
 	if s.Fixed > 0 && s.Fixed != size {
-		errMsg := fmt.Sprintf("%s: must have a fixed length of %d characters", s.Name, s.Fixed)
-		return append(errMsgs, errMsg)
+		issue := fmt.Sprintf("%s: must have a fixed length of %d characters", s.Name, s.Fixed)
+		return append(issues, issue)
 	}
 
 	if s.Min > 0 && s.Min > size {
-		errMsg := fmt.Sprintf("%s: must have a minimum length of %d characters", s.Name, s.Min)
-		errMsgs = append(errMsgs, errMsg)
+		issue := fmt.Sprintf("%s: must have a minimum length of %d characters", s.Name, s.Min)
+		issues = append(issues, issue)
 	}
 
 	if s.Max > 0 && s.Max < size {
-		errMsg := fmt.Sprintf("%s: must have a maximum length of %d characters", s.Name, s.Max)
-		errMsgs = append(errMsgs, errMsg)
+		issue := fmt.Sprintf("%s: must have a maximum length of %d characters", s.Name, s.Max)
+		issues = append(issues, issue)
 	}
 
-	return errMsgs
+	return issues
 }
 
-func (s Float) validate() vars.ErrorMessages {
-	var errMsgs []string
+func (s Float) validate() Issues {
+	var issues []string
 
 	if s.Fixed > 0 && s.Fixed != s.Value {
-		errMsg := fmt.Sprintf("%s: must have a fixed value of %f", s.Name, s.Fixed)
-		return append(errMsgs, errMsg)
+		issue := fmt.Sprintf("%s: must have a fixed value of %f", s.Name, s.Fixed)
+		return append(issues, issue)
 	}
 
 	if s.Min > 0 && s.Min > s.Value {
-		errMsg := fmt.Sprintf("%s: must have a minimum value of %f", s.Name, s.Min)
-		errMsgs = append(errMsgs, errMsg)
+		issue := fmt.Sprintf("%s: must have a minimum value of %f", s.Name, s.Min)
+		issues = append(issues, issue)
 	}
 
 	if s.Max > 0 && s.Max < s.Value {
-		errMsg := fmt.Sprintf("%s: must have a maximum value of %f", s.Name, s.Max)
-		errMsgs = append(errMsgs, errMsg)
+		issue := fmt.Sprintf("%s: must have a maximum value of %f", s.Name, s.Max)
+		issues = append(issues, issue)
 	}
 
-	return errMsgs
+	return issues
 }

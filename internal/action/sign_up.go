@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/model"
+	"github.com/ad9311/renio-go/internal/svc"
 )
 
 // --- Actions --- //
@@ -16,27 +17,15 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	evalErrMsgs := signUpData.Validate()
-	if len(evalErrMsgs) > 0 {
-		WriteError(w, evalErrMsgs, http.StatusBadRequest)
+	issues, err := svc.UserSignUp(signUpData)
+	if issues != nil {
+		WriteError(w, issues, http.StatusBadRequest)
 		return
 	}
-
-	if signUpData.Password != signUpData.PasswordConfirmation {
-		WriteError(w, []string{"passwords don't match"}, http.StatusBadRequest)
-		return
-	}
-
-	var user model.User
-	if err := user.Insert(signUpData); err != nil {
+	if err != nil {
 		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return
 	}
 
-	if err := user.SetUpAccounts(); err != nil {
-		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
-		return
-	}
-
-	WriteOK(w, "user created successfully", http.StatusCreated)
+	WriteOK(w, "User created successfully", http.StatusCreated)
 }

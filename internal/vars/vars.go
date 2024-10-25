@@ -10,10 +10,7 @@ const (
 	EmailPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 )
 
-type (
-	ContextKey    string
-	ErrorMessages []string
-)
+type ContextKey string
 
 var FilteredFields = map[string]bool{
 	"Password":             true,

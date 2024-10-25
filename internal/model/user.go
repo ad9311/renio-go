@@ -101,15 +101,6 @@ func (u *User) SelectByID(userID int) error {
 	return nil
 }
 
-func (u *User) SetUpAccounts() error {
-	var budgetAccount BudgetAccount
-	if err := budgetAccount.Insert(u.ID); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // --- Helpers --- //
 
 func hashPassword(password string) (string, error) {
