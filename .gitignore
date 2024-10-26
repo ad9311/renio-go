@@ -7,3 +7,6 @@
 
 # Make files
 Makefile
+
+# Misc
+.DS_Store
