@@ -1,14 +1,15 @@
-package router
+package action
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
-	"github.com/ad9311/renio-go/internal/action"
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/ad9311/renio-go/internal/vars"
 	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5"
 )
 
 func BudgetAccountCTX(next http.Handler) http.Handler {
@@ -16,8 +17,14 @@ func BudgetAccountCTX(next http.Handler) http.Handler {
 		allowedJWT := r.Context().Value(vars.AllowedJWTKey).(model.AllowedJWT)
 
 		var budgetAccount model.BudgetAccount
-		if err := budgetAccount.SelectByUserID(allowedJWT.UserID); err != nil {
-			action.WriteError(w, []string{"user not signed in"}, http.StatusUnauthorized)
+		err := budgetAccount.SelectByUserID(allowedJWT.UserID)
+		if err == pgx.ErrNoRows {
+			err = fmt.Errorf("budget account not found")
+			WriteError(w, ErrorToSlice(err), http.StatusNotFound)
+			return
+		}
+		if err != nil {
+			WriteError(w, ErrorToSlice(err), http.StatusUnauthorized)
 			return
 		}
 
@@ -31,8 +38,14 @@ func BudgetCTX(next http.Handler) http.Handler {
 		budgetUID := chi.URLParam(r, "budgetUID")
 
 		var budget model.Budget
-		if err := budget.SelectByUID(budgetUID); err != nil {
-			action.WriteError(w, []string{err.Error()}, http.StatusNotFound)
+		err := budget.SelectByUID(budgetUID)
+		if err == pgx.ErrNoRows {
+			err = fmt.Errorf("budget not found")
+			WriteError(w, ErrorToSlice(err), http.StatusNotFound)
+			return
+		}
+		if err != nil {
+			WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 			return
 		}
 
@@ -44,12 +57,18 @@ func BudgetCTX(next http.Handler) http.Handler {
 func IncomeCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		incomeID := chi.URLParam(r, "incomeID")
+
 		id, _ := strconv.Atoi(incomeID)
-		income := model.Income{
-			ID: id,
+		var income model.Income
+
+		err := income.SelectByID(id)
+		if err == pgx.ErrNoRows {
+			err = fmt.Errorf("income not found")
+			WriteError(w, ErrorToSlice(err), http.StatusNotFound)
+			return
 		}
-		if err := income.SelectByID(); err != nil {
-			action.WriteError(w, []string{"income not found"}, http.StatusNotFound)
+		if err != nil {
+			WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 			return
 		}
 
@@ -61,12 +80,18 @@ func IncomeCTX(next http.Handler) http.Handler {
 func ExpenseCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		expenseID := chi.URLParam(r, "expenseID")
+
 		id, _ := strconv.Atoi(expenseID)
-		expense := model.Expense{
-			ID: id,
+		var expense model.Expense
+
+		err := expense.SelectByID(id)
+		if err == pgx.ErrNoRows {
+			err = fmt.Errorf("expense not found")
+			WriteError(w, ErrorToSlice(err), http.StatusNotFound)
+			return
 		}
-		if err := expense.SelectByID(); err != nil {
-			action.WriteError(w, []string{"expense not found"}, http.StatusNotFound)
+		if err != nil {
+			WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 			return
 		}
 

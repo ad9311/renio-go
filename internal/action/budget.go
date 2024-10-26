@@ -1,10 +1,12 @@
 package action
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/ad9311/renio-go/internal/vars"
+	"github.com/jackc/pgx/v5"
 )
 
 // --- Actions --- //
@@ -12,9 +14,9 @@ import (
 func IndexBudgets(w http.ResponseWriter, r *http.Request) {
 	budgetAccount := r.Context().Value(vars.BudgetAccountKey).(model.BudgetAccount)
 
-	var budgets model.Budgets
+	budgets := model.Budgets{}
 	if err := budgets.Index(budgetAccount.ID); err != nil {
-		WriteError(w, []string{err.Error()}, http.StatusNotFound)
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 		return
 	}
 
@@ -42,8 +44,15 @@ func GetCurrentBudget(w http.ResponseWriter, r *http.Request) {
 	budgetAccount := r.Context().Value(vars.BudgetAccountKey).(model.BudgetAccount)
 
 	var budget model.Budget
-	if err := budget.SelectCurrent(budgetAccount.ID); err != nil {
-		WriteError(w, []string{""}, http.StatusNotFound)
+	err := budget.SelectCurrent(budgetAccount.ID)
+	if err == pgx.ErrNoRows {
+		err = fmt.Errorf("budget not found")
+		WriteError(w, ErrorToSlice(err), http.StatusNotFound)
+		return
+	}
+	if err != nil {
+		WriteError(w, []string{""}, http.StatusBadRequest)
+		return
 	}
 
 	WriteOK(w, budget, http.StatusOK)

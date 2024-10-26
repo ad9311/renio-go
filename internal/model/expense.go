@@ -74,12 +74,12 @@ func (e *Expense) Insert(budgetID int, entryClassID int) error {
 	return nil
 }
 
-func (e *Expense) SelectByID() error {
+func (e *Expense) SelectByID(expenseID int) error {
 	query := "SELECT * FROM expenses WHERE id = $1"
 
 	queryExec := db.QueryExe{
 		QueryStr:  query,
-		QueryArgs: []any{e.ID},
+		QueryArgs: []any{expenseID},
 		Model:     Expense{},
 	}
 	if err := queryExec.QueryRow(); err != nil {
