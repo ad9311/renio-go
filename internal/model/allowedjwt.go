@@ -50,7 +50,7 @@ func (a *AllowedJWT) Insert(token JWT, userID int) error {
 }
 
 func (a *AllowedJWT) SelectByJTI(jti string) error {
-	query := `SELECT * FROM allowed_jwts WHERE jti = $1`
+	query := "SELECT * FROM allowed_jwts WHERE jti = $1"
 
 	queryExec := db.QueryExe{
 		QueryStr:  query,
@@ -73,7 +73,7 @@ func (a *AllowedJWT) Delete() error {
 
 	queryExec := db.QueryExe{
 		QueryStr:  query,
-		QueryArgs: []any{a.ID},
+		QueryArgs: []any{a.UserID},
 	}
 	if err := queryExec.Exec(); err != nil {
 		return err

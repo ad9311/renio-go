@@ -56,3 +56,6 @@ func TestAllowJWTSelectByJTI(t *testing.T) {
 		t.Errorf("could not select allowed jwt by jti, %s", err.Error())
 	}
 }
+
+func TestAllowJWTDelete(t *testing.T) {
+}

@@ -8,6 +8,7 @@ import (
 	"github.com/ad9311/renio-go/internal/svc"
 	"github.com/ad9311/renio-go/internal/vars"
 	"github.com/jackc/pgx/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // --- Actions --- //
@@ -22,13 +23,13 @@ func PostSession(w http.ResponseWriter, r *http.Request) {
 
 	session, err := svc.SignInUser(signInData)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if err == pgx.ErrNoRows || err == bcrypt.ErrMismatchedHashAndPassword {
 			err = fmt.Errorf("incorrect email or password")
 			WriteError(w, ErrorToSlice(err), http.StatusNotFound)
 			return
 		}
 
-		WriteError(w, ErrorToSlice(err), http.StatusNotFound)
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 		return
 	}
 
@@ -40,7 +41,7 @@ func DeleteSession(w http.ResponseWriter, r *http.Request) {
 	allowedJWT := r.Context().Value(vars.AllowedJWTKey).(model.AllowedJWT)
 
 	if err := svc.SignOutUser(allowedJWT); err != nil {
-		WriteError(w, ErrorToSlice(err), http.StatusInternalServerError)
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 		return
 	}
 

@@ -1,8 +1,6 @@
 package svc
 
 import (
-	"fmt"
-
 	"github.com/ad9311/renio-go/internal/model"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -19,9 +17,6 @@ func SignInUser(signInData model.SignInData) (Session, error) {
 		[]byte(user.Password),
 		[]byte(signInData.Password),
 	); err != nil {
-		if err == bcrypt.ErrMismatchedHashAndPassword {
-			return Session{}, fmt.Errorf("incorrect email or password")
-		}
 		return Session{}, err
 	}
 
