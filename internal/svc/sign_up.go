@@ -7,7 +7,7 @@ import (
 	"github.com/ad9311/renio-go/internal/model"
 )
 
-func UserSignUp(signUpData model.SignUpData) (eval.Issues, error) {
+func SignUpUser(signUpData model.SignUpData) (eval.Issues, error) {
 	if signUpData.Password != signUpData.PasswordConfirmation {
 		return nil, fmt.Errorf("Passwords do not match")
 	}

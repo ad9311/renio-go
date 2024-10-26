@@ -68,6 +68,20 @@ func (a *AllowedJWT) SelectByJTI(jti string) error {
 	return nil
 }
 
+func (a *AllowedJWT) Delete() error {
+	query := "DELETE FROM allowed_jwts WHERE id = $1"
+
+	queryExec := db.QueryExe{
+		QueryStr:  query,
+		QueryArgs: []any{a.ID},
+	}
+	if err := queryExec.Exec(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // --- Helpers --- //
 
 func (a *AllowedJWT) saveAllowedJWTFromDB(queryExec db.QueryExe) error {

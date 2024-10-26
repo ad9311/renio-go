@@ -16,7 +16,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	issues, err := svc.UserSignUp(signUpData)
+	issues, err := svc.SignUpUser(signUpData)
 	if issues != nil {
 		WriteError(w, issues, http.StatusBadRequest)
 		return
