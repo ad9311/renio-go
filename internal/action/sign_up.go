@@ -1,7 +1,6 @@
 package action
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/model"
@@ -12,8 +11,8 @@ import (
 
 func PostUser(w http.ResponseWriter, r *http.Request) {
 	var signUpData model.SignUpData
-	if err := json.NewDecoder(r.Body).Decode(&signUpData); err != nil {
-		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
+	if err := DecodeJSON(r.Body, &signUpData); err != nil {
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 		return
 	}
 
@@ -23,7 +22,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 		return
 	}
 

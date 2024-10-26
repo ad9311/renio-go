@@ -41,7 +41,7 @@ func (s *SignUpData) Validate() eval.Issues {
 	}
 
 	issues := data.Validate()
-	if len(issues) > 0 {
+	if issues != nil {
 		return issues
 	}
 

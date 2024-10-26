@@ -3,6 +3,7 @@ package action
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/console"
@@ -20,4 +21,16 @@ func WriteOK(w http.ResponseWriter, data any, httpStatus int) {
 	if err := json.NewEncoder(w).Encode(map[string]any{"data": data}); err != nil {
 		console.Error(fmt.Sprintf("could not write response, %s", err.Error()))
 	}
+}
+
+func DecodeJSON(body io.ReadCloser, data any) error {
+	if err := json.NewDecoder(body).Decode(data); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ErrorToSlice(err error) []string {
+	return []string{err.Error()}
 }
