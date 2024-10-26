@@ -1,0 +1,24 @@
+migrate_dir=file://./db/migrations
+database_url=REPLACE_ME
+test_database_url=REPLACE_ME
+
+migration:
+	migrate create -ext sql -dir ./db/migrations $(FILE)
+migrate_up:
+	migrate -source $(migrate_dir) -database $(database_url) up
+
+migrate_drop:
+	migrate -source $(migrate_dir) -database $(database_url) drop -f
+
+migrate_test_up:
+	migrate -source $(migrate_dir) -database $(test_database_url) up
+
+migrate_test_drop:
+	migrate -source $(migrate_dir) -database $(test_database_url) drop -f
+
+test: migrate_test_drop migrate_test_up
+	APP_ENV=test go test -v -cover -count=1 ./...
+
+dev:
+	go run ./cmd/server/main.go
+

@@ -1,5 +1,3 @@
--- +goose Up
--- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS incomes (
     id SERIAL PRIMARY KEY,
     amount NUMERIC(11,2) NOT NULL DEFAULT 0,
@@ -17,9 +15,3 @@ CREATE TABLE IF NOT EXISTS incomes (
       REFERENCES entry_classes(id)
       ON DELETE CASCADE
 );
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-DROP TABLE IF EXISTS incomes
--- +goose StatementEnd
