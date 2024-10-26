@@ -6,6 +6,7 @@ import (
 
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/ad9311/renio-go/internal/svc"
+	"github.com/ad9311/renio-go/internal/vars"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -33,4 +34,15 @@ func PostSession(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Authorization", fmt.Sprintf("Bearer %s", session.Token))
 	WriteOK(w, "user signed in successfully", http.StatusCreated)
+}
+
+func DeleteSession(w http.ResponseWriter, r *http.Request) {
+	allowedJWT := r.Context().Value(vars.AllowedJWTKey).(model.AllowedJWT)
+
+	if err := svc.SignOutUser(allowedJWT); err != nil {
+		WriteError(w, ErrorToSlice(err), http.StatusInternalServerError)
+		return
+	}
+
+	WriteOK(w, "user signed out successfully", http.StatusOK)
 }

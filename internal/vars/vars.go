@@ -1,6 +1,7 @@
 package vars
 
 const (
+	AllowedJWTKey    = ContextKey("allowedJWTID")
 	UserIDKey        = ContextKey("userID")
 	BudgetAccountKey = ContextKey("budgetAccount")
 	BudgetKey        = ContextKey("budget")

@@ -13,10 +13,10 @@ import (
 
 func BudgetAccountCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value(vars.UserIDKey).(int)
+		allowedJWT := r.Context().Value(vars.AllowedJWTKey).(model.AllowedJWT)
 
 		var budgetAccount model.BudgetAccount
-		if err := budgetAccount.SelectByUserID(userID); err != nil {
+		if err := budgetAccount.SelectByUserID(allowedJWT.UserID); err != nil {
 			action.WriteError(w, []string{"user not signed in"}, http.StatusUnauthorized)
 			return
 		}

@@ -61,8 +61,7 @@ func routesProtector(next http.Handler) http.Handler {
 		}
 
 		var allowedJWT model.AllowedJWT
-		err = allowedJWT.SelectByJTI(claims.JTI)
-		if err != nil {
+		if err := allowedJWT.SelectByJTI(claims.JTI); err != nil {
 			action.WriteError(w, []string{err.Error()}, http.StatusUnauthorized)
 			return
 		}
@@ -72,7 +71,7 @@ func routesProtector(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), vars.UserIDKey, allowedJWT.UserID)
+		ctx := context.WithValue(r.Context(), vars.AllowedJWTKey, allowedJWT)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
