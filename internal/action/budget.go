@@ -28,7 +28,8 @@ func PostBudget(w http.ResponseWriter, r *http.Request) {
 
 	var budget model.Budget
 	if err := budget.Insert(budgetAccount.ID); err != nil {
-		WriteError(w, []string{err.Error()}, http.StatusNotFound)
+		err = fmt.Errorf("budget already exists")
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 		return
 	}
 
@@ -51,7 +52,7 @@ func GetCurrentBudget(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		WriteError(w, []string{""}, http.StatusBadRequest)
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 		return
 	}
 

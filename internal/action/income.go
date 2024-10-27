@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/model"
+	"github.com/ad9311/renio-go/internal/svc"
 	"github.com/ad9311/renio-go/internal/vars"
 )
 
@@ -13,36 +14,27 @@ import (
 func IndexIncomeList(w http.ResponseWriter, r *http.Request) {
 	budget := r.Context().Value(vars.BudgetKey).(model.Budget)
 
-	var incomeList model.IncomeList
+	incomeList := model.IncomeList{}
 	if err := incomeList.Index(budget.ID); err != nil {
-		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 		return
-
 	}
 
-	WriteOK(w, incomeList, http.StatusCreated)
+	WriteOK(w, incomeList, http.StatusOK)
 }
 
 func PostIncome(w http.ResponseWriter, r *http.Request) {
 	budget := r.Context().Value(vars.BudgetKey).(model.Budget)
 
 	var incomeFormData model.IncomeFormData
-	if err := json.NewDecoder(r.Body).Decode(&incomeFormData); err != nil {
+	if err := DecodeJSON(r.Body, &incomeFormData); err != nil {
 		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return
 	}
 
-	income := model.Income{
-		Amount:      incomeFormData.Amount,
-		Description: incomeFormData.Description,
-	}
-	if err := income.Insert(budget.ID, incomeFormData.EntryClassID); err != nil {
-		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
-		return
-	}
-
-	if err := budget.OnIncomeInsert(income.Amount); err != nil {
-		WriteError(w, []string{err.Error()}, http.StatusInternalServerError)
+	income, err := svc.CreateIncome(incomeFormData, budget)
+	if err != nil {
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 		return
 	}
 
@@ -56,7 +48,7 @@ func GetIncome(w http.ResponseWriter, r *http.Request) {
 
 func PatchIncome(w http.ResponseWriter, r *http.Request) {
 	income := r.Context().Value(vars.IncomeKey).(model.Income)
-	budget := r.Context().Value(vars.BudgetKey).(model.Budget)
+	// budget := r.Context().Value(vars.BudgetKey).(model.Budget)
 
 	var incomeFormData model.IncomeFormData
 	if err := json.NewDecoder(r.Body).Decode(&incomeFormData); err != nil {
@@ -64,33 +56,33 @@ func PatchIncome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prevIncomeAmount := income.Amount
-	if err := income.Update(incomeFormData); err != nil {
-		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
-		return
-	}
+	// prevIncomeAmount := income.Amount
+	// if err := income.Update(incomeFormData); err != nil {
+	// 	WriteError(w, []string{err.Error()}, http.StatusBadRequest)
+	// 	return
+	// }
 
-	if err := budget.OnIncomeUpdate(prevIncomeAmount, income.Amount); err != nil {
-		WriteError(w, []string{"failed to updated budget"}, http.StatusInternalServerError)
-		return
-	}
+	// if err := budget.OnIncomeUpdate(prevIncomeAmount, income.Amount); err != nil {
+	// 	WriteError(w, []string{"failed to updated budget"}, http.StatusInternalServerError)
+	// 	return
+	// }
 
 	WriteOK(w, income, http.StatusOK)
 }
 
 func DeleteIncome(w http.ResponseWriter, r *http.Request) {
 	income := r.Context().Value(vars.IncomeKey).(model.Income)
-	budget := r.Context().Value(vars.BudgetKey).(model.Budget)
+	// budget := r.Context().Value(vars.BudgetKey).(model.Budget)
 
 	if err := income.Delete(); err != nil {
 		WriteError(w, []string{"failed to delete income"}, http.StatusInternalServerError)
 		return
 	}
 
-	if err := budget.OnIncomeDelete(income.Amount); err != nil {
-		WriteError(w, []string{"failed to update budget"}, http.StatusInternalServerError)
-		return
-	}
+	// if err := budget.OnIncomeDelete(income.Amount); err != nil {
+	// 	WriteError(w, []string{"failed to update budget"}, http.StatusInternalServerError)
+	// 	return
+	// }
 
 	WriteOK(w, income, http.StatusOK)
 }

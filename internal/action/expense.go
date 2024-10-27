@@ -41,10 +41,10 @@ func PostExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := budget.OnExpenseInsert(expense.Amount); err != nil {
-		WriteError(w, []string{err.Error()}, http.StatusInternalServerError)
-		return
-	}
+	// if err := budget.OnExpenseInsert(expense.Amount); err != nil {
+	// 	WriteError(w, []string{err.Error()}, http.StatusInternalServerError)
+	// 	return
+	// }
 
 	WriteOK(w, expense, http.StatusCreated)
 }
@@ -56,7 +56,7 @@ func GetExpense(w http.ResponseWriter, r *http.Request) {
 
 func PatchExpense(w http.ResponseWriter, r *http.Request) {
 	expense := r.Context().Value(vars.ExpenseKey).(model.Expense)
-	budget := r.Context().Value(vars.BudgetKey).(model.Budget)
+	// budget := r.Context().Value(vars.BudgetKey).(model.Budget)
 
 	var expenseFormData model.ExpenseFormData
 	if err := json.NewDecoder(r.Body).Decode(&expenseFormData); err != nil {
@@ -64,33 +64,33 @@ func PatchExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prevExpenseAmount := expense.Amount
-	if err := expense.Update(expenseFormData); err != nil {
-		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
-		return
-	}
+	// prevExpenseAmount := expense.Amount
+	// if err := expense.Update(expenseFormData); err != nil {
+	// 	WriteError(w, []string{err.Error()}, http.StatusBadRequest)
+	// 	return
+	// }
 
-	if err := budget.OnExpenseUpdate(prevExpenseAmount, expense.Amount); err != nil {
-		WriteError(w, []string{"failed to updated budget"}, http.StatusInternalServerError)
-		return
-	}
+	// if err := budget.OnExpenseUpdate(prevExpenseAmount, expense.Amount); err != nil {
+	// 	WriteError(w, []string{"failed to updated budget"}, http.StatusInternalServerError)
+	// 	return
+	// }
 
 	WriteOK(w, expense, http.StatusOK)
 }
 
 func DeleteExpense(w http.ResponseWriter, r *http.Request) {
 	expense := r.Context().Value(vars.ExpenseKey).(model.Expense)
-	budget := r.Context().Value(vars.BudgetKey).(model.Budget)
+	// budget := r.Context().Value(vars.BudgetKey).(model.Budget)
 
 	if err := expense.Delete(); err != nil {
 		WriteError(w, []string{"failed to delete expense"}, http.StatusInternalServerError)
 		return
 	}
 
-	if err := budget.OnExpenseDelete(expense.Amount); err != nil {
-		WriteError(w, []string{"failed to update budget"}, http.StatusInternalServerError)
-		return
-	}
+	// if err := budget.OnExpenseDelete(expense.Amount); err != nil {
+	// 	WriteError(w, []string{"failed to update budget"}, http.StatusInternalServerError)
+	// 	return
+	// }
 
 	WriteOK(w, expense, http.StatusOK)
 }
