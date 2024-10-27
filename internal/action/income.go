@@ -32,13 +32,17 @@ func PostIncome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	income, err := svc.CreateIncome(incomeFormData, budget)
+	incomeData, err := svc.CreateIncome(incomeFormData, budget)
+	if incomeData.Issues != nil {
+		WriteError(w, incomeData.Issues, http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 		return
 	}
 
-	WriteOK(w, income, http.StatusCreated)
+	WriteOK(w, incomeData.Income, http.StatusCreated)
 }
 
 func GetIncome(w http.ResponseWriter, r *http.Request) {

@@ -12,7 +12,7 @@ type Income struct {
 	Description  string    `json:"description"`
 	BudgetID     int       `json:"budgetId"`
 	EntryClassID int       `json:"entryClassId"`
-	CreatedAt    time.Time `json:"createAt"`
+	CreatedAt    time.Time `json:"createdAt"`
 	UpdatedAt    time.Time `json:"updatedAt"`
 }
 
