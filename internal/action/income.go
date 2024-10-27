@@ -52,7 +52,7 @@ func GetIncome(w http.ResponseWriter, r *http.Request) {
 
 func PatchIncome(w http.ResponseWriter, r *http.Request) {
 	income := r.Context().Value(vars.IncomeKey).(model.Income)
-	// budget := r.Context().Value(vars.BudgetKey).(model.Budget)
+	budget := r.Context().Value(vars.BudgetKey).(model.Budget)
 
 	var incomeFormData model.IncomeFormData
 	if err := json.NewDecoder(r.Body).Decode(&incomeFormData); err != nil {
@@ -60,16 +60,15 @@ func PatchIncome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// prevIncomeAmount := income.Amount
-	// if err := income.Update(incomeFormData); err != nil {
-	// 	WriteError(w, []string{err.Error()}, http.StatusBadRequest)
-	// 	return
-	// }
-
-	// if err := budget.OnIncomeUpdate(prevIncomeAmount, income.Amount); err != nil {
-	// 	WriteError(w, []string{"failed to updated budget"}, http.StatusInternalServerError)
-	// 	return
-	// }
+	issues, err := svc.UpdateIncome(&income, incomeFormData, budget)
+	if issues != nil {
+		WriteError(w, issues, http.StatusBadRequest)
+		return
+	}
+	if err != nil {
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
+		return
+	}
 
 	WriteOK(w, income, http.StatusOK)
 }

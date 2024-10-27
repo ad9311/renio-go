@@ -11,27 +11,27 @@ type IncomeData struct {
 }
 
 func CreateIncome(incomeFormData model.IncomeFormData, budget model.Budget) (IncomeData, error) {
-	var createdIncome IncomeData
+	var incomeData IncomeData
 
-	issues := incomeFormData.Validate()
-	if issues != nil {
-		createdIncome.Issues = issues
-		return createdIncome, nil
+	if issues := incomeFormData.Validate(); issues != nil {
+		incomeData.Issues = issues
+		return incomeData, nil
 	}
+
 	var income model.Income
 	if err := income.Insert(incomeFormData, budget.ID); err != nil {
-		return createdIncome, err
+		return incomeData, err
 	}
 
 	if err := budget.UpdateOnEntry(income.Amount, 0, 1); err != nil {
-		return createdIncome, err
+		return incomeData, err
 	}
 
 	if err := budget.UpdateOnIncome(income.Amount, 0, 1); err != nil {
-		return createdIncome, err
+		return incomeData, err
 	}
 
-	createdIncome.Income = income
+	incomeData.Income = income
 
-	return createdIncome, nil
+	return incomeData, nil
 }
