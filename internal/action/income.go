@@ -11,7 +11,7 @@ import (
 
 // --- Actions --- //
 
-func IndexIncomeList(w http.ResponseWriter, r *http.Request) {
+func GetIncomeList(w http.ResponseWriter, r *http.Request) {
 	budget := r.Context().Value(vars.BudgetKey).(model.Budget)
 
 	incomeList := model.IncomeList{}
@@ -75,17 +75,12 @@ func PatchIncome(w http.ResponseWriter, r *http.Request) {
 
 func DeleteIncome(w http.ResponseWriter, r *http.Request) {
 	income := r.Context().Value(vars.IncomeKey).(model.Income)
-	// budget := r.Context().Value(vars.BudgetKey).(model.Budget)
+	budget := r.Context().Value(vars.BudgetKey).(model.Budget)
 
-	if err := income.Delete(); err != nil {
-		WriteError(w, []string{"failed to delete income"}, http.StatusInternalServerError)
+	if err := svc.DeleteIncome(income, budget); err != nil {
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 		return
 	}
-
-	// if err := budget.OnIncomeDelete(income.Amount); err != nil {
-	// 	WriteError(w, []string{"failed to update budget"}, http.StatusInternalServerError)
-	// 	return
-	// }
 
 	WriteOK(w, income, http.StatusOK)
 }

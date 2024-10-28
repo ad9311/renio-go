@@ -155,175 +155,31 @@ func (b *Budget) UpdateOnIncome(credit float32, debit float32, count int) error 
 	return nil
 }
 
-// func (b *Budget) OnIncomeInsert(incomeAmount float32) error {
-// 	query := "UPDATE budgets SET balance = $1, total_income = $2, entry_count = $3, income_count = $4 WHERE ID = $5 RETURNING *"
-//
-// 	b.setBalance(incomeAmount, 0)
-// 	b.setTotalIncome(incomeAmount, 0)
-// 	b.addToEntryCount(1)
-// 	b.addToIncomeCount(1)
-//
-// 	queryExec := db.QueryExe{
-// 		QueryStr: query,
-// 		QueryArgs: []any{
-// 			b.Balance,
-// 			b.TotalIncome,
-// 			b.EntryCount,
-// 			b.IncomeCount,
-// 			b.ID,
-// 		},
-// 		Model: Budget{},
-// 	}
-// 	if err := queryExec.QueryRow(); err != nil {
-// 		return err
-// 	}
-//
-// 	if err := b.saveBudgetFromDB(queryExec); err != nil {
-// 		return err
-// 	}
-//
-// 	return nil
-// }
+func (b *Budget) UpdateOnExpense(credit float32, debit float32, count int) error {
+	query := "UPDATE budgets SET total_expenses = $1, expense_count = $2 WHERE ID = $3 RETURNING *"
 
-// func (b *Budget) OnIncomeUpdate(prevIncomeAmount float32, incomeAmount float32) error {
-// 	query := "UPDATE budgets SET balance = $1, total_income = $2 WHERE id = $3 RETURNING *"
-//
-// 	b.setBalance(incomeAmount, prevIncomeAmount)
-// 	b.setTotalIncome(incomeAmount, prevIncomeAmount)
-// 	queryExec := db.QueryExe{
-// 		QueryStr: query,
-// 		QueryArgs: []any{
-// 			b.Balance,
-// 			b.TotalIncome,
-// 			b.ID,
-// 		},
-// 		Model: Budget{},
-// 	}
-// 	if err := queryExec.QueryRow(); err != nil {
-// 		return err
-// 	}
-//
-// 	if err := b.saveBudgetFromDB(queryExec); err != nil {
-// 		return err
-// 	}
-//
-// 	return nil
-// }
-//
-// func (b *Budget) OnIncomeDelete(incomeAmount float32) error {
-// 	query := "UPDATE budgets SET balance = $1, total_income = $2, entry_count = $3, income_count = $4 WHERE ID = $5 RETURNING *"
-//
-// 	b.setBalance(0, incomeAmount)
-// 	b.setTotalIncome(0, incomeAmount)
-// 	b.addToEntryCount(-1)
-// 	b.addToIncomeCount(-1)
-//
-// 	queryExec := db.QueryExe{
-// 		QueryStr: query,
-// 		QueryArgs: []any{
-// 			b.Balance,
-// 			b.TotalIncome,
-// 			b.EntryCount,
-// 			b.IncomeCount,
-// 			b.ID,
-// 		},
-// 		Model: Budget{},
-// 	}
-// 	if err := queryExec.QueryRow(); err != nil {
-// 		return err
-// 	}
-//
-// 	if err := b.saveBudgetFromDB(queryExec); err != nil {
-// 		return err
-// 	}
-//
-// 	return nil
-// }
-//
-// func (b *Budget) OnExpenseInsert(expenseAmount float32) error {
-// 	query := "UPDATE budgets SET balance = $1, total_expenses = $2, entry_count = $3, expense_count = $4 WHERE ID = $5 RETURNING *"
-//
-// 	b.setBalance(0, expenseAmount)
-// 	b.setTotalExpenses(expenseAmount, 0)
-// 	b.addToEntryCount(1)
-// 	b.addToExpenseCount(1)
-//
-// 	queryExec := db.QueryExe{
-// 		QueryStr: query,
-// 		QueryArgs: []any{
-// 			b.Balance,
-// 			b.TotalExpenses,
-// 			b.EntryCount,
-// 			b.ExpenseCount,
-// 			b.ID,
-// 		},
-// 		Model: Budget{},
-// 	}
-// 	if err := queryExec.QueryRow(); err != nil {
-// 		return err
-// 	}
-//
-// 	if err := b.saveBudgetFromDB(queryExec); err != nil {
-// 		return err
-// 	}
-//
-// 	return nil
-// }
-//
-// func (b *Budget) OnExpenseUpdate(prevExpenseAmount float32, expenseAmount float32) error {
-// 	query := "UPDATE budgets SET balance = $1, total_expenses = $2 WHERE id = $3 RETURNING *"
-//
-// 	b.setBalance(prevExpenseAmount, expenseAmount)
-// 	b.setTotalExpenses(expenseAmount, prevExpenseAmount)
-// 	queryExec := db.QueryExe{
-// 		QueryStr: query,
-// 		QueryArgs: []any{
-// 			b.Balance,
-// 			b.TotalExpenses,
-// 			b.ID,
-// 		},
-// 		Model: Budget{},
-// 	}
-// 	if err := queryExec.QueryRow(); err != nil {
-// 		return err
-// 	}
-//
-// 	if err := b.saveBudgetFromDB(queryExec); err != nil {
-// 		return err
-// 	}
-//
-// 	return nil
-// }
-//
-// func (b *Budget) OnExpenseDelete(expenseAmount float32) error {
-// 	query := "UPDATE budgets SET balance = $1, total_expenses = $2, entry_count = $3, expense_count = $4 WHERE ID = $5 RETURNING *"
-//
-// 	b.setBalance(expenseAmount, 0)
-// 	b.setTotalExpenses(0, expenseAmount)
-// 	b.addToEntryCount(-1)
-// 	b.addToExpenseCount(-1)
-//
-// 	queryExec := db.QueryExe{
-// 		QueryStr: query,
-// 		QueryArgs: []any{
-// 			b.Balance,
-// 			b.TotalExpenses,
-// 			b.EntryCount,
-// 			b.ExpenseCount,
-// 			b.ID,
-// 		},
-// 		Model: Budget{},
-// 	}
-// 	if err := queryExec.QueryRow(); err != nil {
-// 		return err
-// 	}
-//
-// 	if err := b.saveBudgetFromDB(queryExec); err != nil {
-// 		return err
-// 	}
-//
-// 	return nil
-// }
+	b.setTotalExpenses(credit, debit)
+	b.addToExpenseCount(count)
+
+	queryExec := db.QueryExe{
+		QueryStr: query,
+		QueryArgs: []any{
+			b.TotalExpenses,
+			b.IncomeCount,
+			b.ID,
+		},
+		Model: Budget{},
+	}
+	if err := queryExec.QueryRow(); err != nil {
+		return err
+	}
+
+	if err := b.saveBudgetFromDB(queryExec); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // --- Helpers --- //
 
