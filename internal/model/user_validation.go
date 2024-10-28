@@ -5,7 +5,7 @@ import (
 	"github.com/ad9311/renio-go/internal/vars"
 )
 
-func (s *SignUpData) Validate() eval.Issues {
+func (s *SignUpData) Validate() error {
 	data := eval.ModelEval{
 		Strings: []eval.String{
 			{
@@ -40,9 +40,8 @@ func (s *SignUpData) Validate() eval.Issues {
 		},
 	}
 
-	issues := data.Validate()
-	if issues != nil {
-		return issues
+	if err := data.Validate(); err != nil {
+		return err
 	}
 
 	return nil

@@ -4,7 +4,7 @@ import (
 	"github.com/ad9311/renio-go/internal/eval"
 )
 
-func (i IncomeFormData) Validate() eval.Issues {
+func (i IncomeFormData) Validate() error {
 	data := eval.ModelEval{
 		Floats: []eval.Float{
 			{
@@ -30,9 +30,9 @@ func (i IncomeFormData) Validate() eval.Issues {
 		},
 	}
 
-	issues := data.Validate()
-	if issues != nil {
-		return issues
+	err := data.Validate()
+	if err != nil {
+		return err
 	}
 
 	return nil

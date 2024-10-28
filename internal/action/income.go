@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/ad9311/renio-go/internal/eval"
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/ad9311/renio-go/internal/svc"
 	"github.com/ad9311/renio-go/internal/vars"
@@ -32,9 +33,10 @@ func PostIncome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	incomeData, err := svc.CreateIncome(incomeFormData, budget)
-	if incomeData.Issues != nil {
-		WriteError(w, incomeData.Issues, http.StatusBadRequest)
+	income, err := svc.CreateIncome(incomeFormData, budget)
+	errEval, ok := err.(*eval.ErrEval)
+	if ok {
+		WriteError(w, errEval.Issues, http.StatusBadRequest)
 		return
 	}
 	if err != nil {
@@ -42,7 +44,7 @@ func PostIncome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	WriteOK(w, incomeData.Income, http.StatusCreated)
+	WriteOK(w, income, http.StatusCreated)
 }
 
 func GetIncome(w http.ResponseWriter, r *http.Request) {
@@ -60,9 +62,10 @@ func PatchIncome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	issues, err := svc.UpdateIncome(&income, incomeFormData, budget)
-	if issues != nil {
-		WriteError(w, issues, http.StatusBadRequest)
+	err := svc.UpdateIncome(&income, incomeFormData, budget)
+	errEval, ok := err.(*eval.ErrEval)
+	if ok {
+		WriteError(w, errEval.Issues, http.StatusBadRequest)
 		return
 	}
 	if err != nil {

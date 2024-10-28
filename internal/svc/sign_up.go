@@ -3,30 +3,28 @@ package svc
 import (
 	"fmt"
 
-	"github.com/ad9311/renio-go/internal/eval"
 	"github.com/ad9311/renio-go/internal/model"
 )
 
-func SignUpUser(signUpData model.SignUpData) (eval.Issues, error) {
+func SignUpUser(signUpData model.SignUpData) error {
 	if signUpData.Password != signUpData.PasswordConfirmation {
-		return nil, fmt.Errorf("Passwords do not match")
+		return fmt.Errorf("Passwords do not match")
 	}
 
-	issues := signUpData.Validate()
-	if issues != nil {
-		return issues, nil
+	if err := signUpData.Validate(); err != nil {
+		return err
 	}
 
 	var user model.User
 	if err := user.Insert(signUpData); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := setUpUserAccounts(user); err != nil {
-		return nil, err
+		return err
 	}
 
-	return nil, nil
+	return nil
 }
 
 // --- Helpers --- //

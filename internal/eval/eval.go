@@ -3,7 +3,14 @@ package eval
 import (
 	"fmt"
 	"regexp"
+	"strings"
 )
+
+type Issues []string
+
+type ErrEval struct {
+	Issues Issues
+}
 
 type ModelEval struct {
 	Strings []String
@@ -11,8 +18,6 @@ type ModelEval struct {
 	Ints    []Int
 	issues  Issues
 }
-
-type Issues []string
 
 type String struct {
 	Name    string
@@ -43,7 +48,11 @@ type Int struct {
 	Max      int
 }
 
-func (m *ModelEval) Validate() Issues {
+func (e *ErrEval) Error() string {
+	return strings.Join(e.Issues, ", ")
+}
+
+func (m *ModelEval) Validate() error {
 	for _, s := range m.Strings {
 		issues := s.validate()
 		m.issues = append(m.issues, issues...)
@@ -60,7 +69,10 @@ func (m *ModelEval) Validate() Issues {
 	}
 
 	if len(m.issues) > 0 {
-		return m.issues
+		err := ErrEval{
+			Issues: m.issues,
+		}
+		return &err
 	}
 
 	return nil
