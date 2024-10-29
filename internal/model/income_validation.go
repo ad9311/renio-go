@@ -30,8 +30,7 @@ func (i IncomeFormData) Validate() error {
 		},
 	}
 
-	err := data.Validate()
-	if err != nil {
+	if err := data.Validate(); err != nil {
 		return err
 	}
 

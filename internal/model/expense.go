@@ -49,16 +49,16 @@ func (es *Expenses) Index(budgetID int) error {
 	return nil
 }
 
-func (e *Expense) Insert(budgetID int, entryClassID int) error {
-	query := "INSERT INTO expenses (amount, description, budget_id, entry_class_id) VALUES ($1, $2, $3, $4) RETURNING *"
+func (e *Expense) Insert(expenseFormData ExpenseFormData, budgetID int) error {
+	query := "INSERT INTO expenses (amount, description, entry_class_id, budget_id) VALUES ($1, $2, $3, $4) RETURNING *"
 
 	queryExec := db.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
-			e.Amount,
-			e.Description,
+			expenseFormData.Amount,
+			expenseFormData.Description,
+			expenseFormData.EntryClassID,
 			budgetID,
-			entryClassID,
 		},
 		Model: Expense{},
 	}

@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/ad9311/renio-go/internal/eval"
 	"github.com/ad9311/renio-go/internal/model"
+	"github.com/ad9311/renio-go/internal/svc"
 	"github.com/ad9311/renio-go/internal/vars"
 )
 
@@ -32,19 +34,16 @@ func PostExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expense := model.Expense{
-		Amount:      expenseFormData.Amount,
-		Description: expenseFormData.Description,
+	expense, err := svc.CreateExpense(expenseFormData, budget)
+	errEval, ok := err.(*eval.ErrEval)
+	if ok {
+		WriteError(w, errEval.Issues, http.StatusBadRequest)
+		return
 	}
-	if err := expense.Insert(budget.ID, expenseFormData.EntryClassID); err != nil {
+	if err != nil {
 		WriteError(w, []string{err.Error()}, http.StatusBadRequest)
 		return
 	}
-
-	// if err := budget.OnExpenseInsert(expense.Amount); err != nil {
-	// 	WriteError(w, []string{err.Error()}, http.StatusInternalServerError)
-	// 	return
-	// }
 
 	WriteOK(w, expense, http.StatusCreated)
 }
