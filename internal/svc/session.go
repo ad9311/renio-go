@@ -8,6 +8,7 @@ import (
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Session struct {
@@ -15,6 +16,37 @@ type Session struct {
 	JTI     string
 	Token   string
 	Expires time.Time
+}
+
+type CreatedSession struct{}
+
+func SignInUser(signInData model.SignInData) (Session, error) {
+	var user model.User
+	if err := user.SelectByEmail(signInData.Email); err != nil {
+		return Session{}, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword(
+		[]byte(user.Password),
+		[]byte(signInData.Password),
+	); err != nil {
+		return Session{}, err
+	}
+
+	session, err := CreateSession(user.ID)
+	if err != nil {
+		return Session{}, err
+	}
+
+	return session, nil
+}
+
+func SignOutUser(allowedJWT model.AllowedJWT) error {
+	if err := allowedJWT.Delete(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func CreateSession(userID int) (Session, error) {
