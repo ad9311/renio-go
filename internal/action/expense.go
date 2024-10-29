@@ -55,7 +55,7 @@ func GetExpense(w http.ResponseWriter, r *http.Request) {
 
 func PatchExpense(w http.ResponseWriter, r *http.Request) {
 	expense := r.Context().Value(vars.ExpenseKey).(model.Expense)
-	// budget := r.Context().Value(vars.BudgetKey).(model.Budget)
+	budget := r.Context().Value(vars.BudgetKey).(model.Budget)
 
 	var expenseFormData model.ExpenseFormData
 	if err := json.NewDecoder(r.Body).Decode(&expenseFormData); err != nil {
@@ -63,33 +63,28 @@ func PatchExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// prevExpenseAmount := expense.Amount
-	// if err := expense.Update(expenseFormData); err != nil {
-	// 	WriteError(w, []string{err.Error()}, http.StatusBadRequest)
-	// 	return
-	// }
-
-	// if err := budget.OnExpenseUpdate(prevExpenseAmount, expense.Amount); err != nil {
-	// 	WriteError(w, []string{"failed to updated budget"}, http.StatusInternalServerError)
-	// 	return
-	// }
+	err := svc.UpdateExpense(&expense, expenseFormData, budget)
+	errEval, ok := err.(*eval.ErrEval)
+	if ok {
+		WriteError(w, errEval.Issues, http.StatusBadRequest)
+		return
+	}
+	if err != nil {
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
+		return
+	}
 
 	WriteOK(w, expense, http.StatusOK)
 }
 
 func DeleteExpense(w http.ResponseWriter, r *http.Request) {
 	expense := r.Context().Value(vars.ExpenseKey).(model.Expense)
-	// budget := r.Context().Value(vars.BudgetKey).(model.Budget)
+	budget := r.Context().Value(vars.BudgetKey).(model.Budget)
 
-	if err := expense.Delete(); err != nil {
-		WriteError(w, []string{"failed to delete expense"}, http.StatusInternalServerError)
+	if err := svc.DeleteExpense(expense, budget); err != nil {
+		WriteError(w, ErrorToSlice(err), http.StatusBadRequest)
 		return
 	}
-
-	// if err := budget.OnExpenseDelete(expense.Amount); err != nil {
-	// 	WriteError(w, []string{"failed to update budget"}, http.StatusInternalServerError)
-	// 	return
-	// }
 
 	WriteOK(w, expense, http.StatusOK)
 }
