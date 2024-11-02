@@ -26,7 +26,7 @@ func RoutesHandler() http.Handler {
 		r.Route("/auth", func(r chi.Router) {
 			r.Post("/sign-up", action.PostUser)
 			r.Post("/sign-in", action.PostSession)
-			r.Post("/sign-out", action.DeleteSession)
+			r.Delete("/sign-out", action.DeleteSession)
 		})
 
 		// --- Budget --- //
