@@ -1,0 +1,12 @@
+# .env files
+.env
+.env.test
+
+# bin directory
+/bin
+
+# Make files
+Makefile
+
+# Misc
+.DS_Store
