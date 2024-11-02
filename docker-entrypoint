@@ -1,8 +1,0 @@
-#!/bin/bash -e
-
-# If running the go app then migrate existing database
-if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
-  ./bin/rails db:prepare
-fi
-
-exec "${@}"
