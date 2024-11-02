@@ -8,10 +8,6 @@ import (
 	"github.com/ad9311/renio-go/internal/conf"
 )
 
-func Root(w http.ResponseWriter, r *http.Request) {
-	writeTemplate(w, "sign-in.tmpl.html")
-}
-
 func writeTemplate(w http.ResponseWriter, name string) {
 	cache := conf.GetTemplates(template.FuncMap{})
 

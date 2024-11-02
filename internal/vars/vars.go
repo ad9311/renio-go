@@ -1,8 +1,7 @@
 package vars
 
 const (
-	AllowedJWTKey        = ContextKey("allowedJWTID")
-	UserIDKey            = ContextKey("userID")
+	CurrentUserKey       = ContextKey("currentUser")
 	BudgetAccountKey     = ContextKey("budgetAccount")
 	BudgetKey            = ContextKey("budget")
 	BudgetWithEntriesKey = ContextKey("budgetWithEntries")
@@ -13,8 +12,3 @@ const (
 )
 
 type ContextKey string
-
-var FilteredFields = map[string]bool{
-	"Password":             true,
-	"PasswordConfirmation": true,
-}

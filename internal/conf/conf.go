@@ -18,11 +18,14 @@ func Init() error {
 			return
 		}
 
-		InitSessionManager()
+		if GetEnv().AppEnv != Test {
+			InitSessionManager()
 
-		_, err = BuildTemplateCache(template.FuncMap{})
-		if err != nil {
-			return
+			_, err = BuildTemplateCache(template.FuncMap{})
+			if err != nil {
+				return
+			}
+
 		}
 	})
 

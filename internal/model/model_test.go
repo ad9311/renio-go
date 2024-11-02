@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/ad9311/renio-go/internal/app"
 	"github.com/ad9311/renio-go/internal/model"
@@ -37,24 +36,6 @@ func PrepareUser(t *testing.T) model.User {
 	}
 
 	return user
-}
-
-func PrepareAllowedJWT(t *testing.T) model.AllowedJWT {
-	user := PrepareUser(t)
-
-	str := fmt.Sprintf("%d", rand.Int())
-	jwt := model.JWT{
-		Token: str,
-		JTI:   str,
-		AUD:   "http://localhost:3000",
-		EXP:   time.Now(),
-	}
-	var aJWT model.AllowedJWT
-	if err := aJWT.Insert(jwt, user.ID); err != nil {
-		t.Fatalf("could not prepare allowed jwt for test, %s", err.Error())
-	}
-
-	return aJWT
 }
 
 func PrepareBudgetAccount(t *testing.T) (model.BudgetAccount, model.User) {

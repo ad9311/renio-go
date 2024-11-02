@@ -12,7 +12,6 @@ type Env struct {
 	Port        string
 	DatabaseURL string
 	Seed        bool
-	JWTToken    string
 }
 
 const (
@@ -57,9 +56,6 @@ func InitEnv() error {
 	env.setDatabaseURL(appEnv)
 	env.setSeeds()
 	env.setPORT()
-	if err := env.setJWTToken(); err != nil {
-		return err
-	}
 
 	return nil
 }
@@ -110,13 +106,4 @@ func (e *Env) setPORT() {
 		return
 	}
 	e.Port = port
-}
-
-func (e *Env) setJWTToken() error {
-	if os.Getenv("JWT_TOKEN") == "" {
-		return fmt.Errorf("JWT_TOKEN is not set")
-	}
-	e.JWTToken = os.Getenv("JWT_TOKEN")
-
-	return nil
 }
