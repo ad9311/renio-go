@@ -13,6 +13,8 @@ func Init() error {
 		if err = InitEnv(); err != nil {
 			return
 		}
+
+		InitSessionManager()
 	})
 
 	return err
