@@ -2,23 +2,20 @@ migrate_dir=file://./db/migrations
 database_url=REPLACE_ME
 test_database_url=REPLACE_ME
 
-migration:
-	migrate create -ext sql -dir ./db/migrations $(FILE)
 migrate_up:
-	migrate -source $(migrate_dir) -database $(database_url) up
+	goose -dir $(migrate_dir) postgres $(database_url) up 
 
-migrate_drop:
-	migrate -source $(migrate_dir) -database $(database_url) drop -f
+migrate_reset:
+	goose -dir $(migrate_dir) postgres '$(database_url)' reset
 
 migrate_test_up:
-	migrate -source $(migrate_dir) -database $(test_database_url) up
+	goose -dir $(migrate_dir) postgres '$(test_database_url)' up
 
-migrate_test_drop:
-	migrate -source $(migrate_dir) -database $(test_database_url) drop -f
+migrate_test_reset:
+	goose -dir $(migrate_dir) postgres '$(test_database_url)' reset
 
-test: migrate_test_drop migrate_test_up
+test: migrate_test_reset migrate_test_up
 	APP_ENV=test go test -v -cover -count=1 ./...
 
 dev:
 	go run ./cmd/server/main.go
-
