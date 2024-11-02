@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"github.com/ad9311/renio-go/internal/action"
+	"github.com/ad9311/renio-go/internal/handler"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -16,28 +16,29 @@ func RoutesHandler() http.Handler {
 	r.Use(routesProtector)
 
 	r.Route("/", func(r chi.Router) {
+		r.Get("/home", handler.Root)
 		// --- Auth --- //
 		r.Route("/auth", func(r chi.Router) {
 		})
 
 		// --- Budget --- //
 		r.Route("/budgets", func(r chi.Router) {
-			r.Use(action.BudgetAccountCTX)
+			r.Use(handler.BudgetAccountCTX)
 			r.Route("/", func(r chi.Router) {
 				r.Route("/{budgetUID}", func(r chi.Router) {
-					r.Use(action.BudgetCTX)
+					r.Use(handler.BudgetCTX)
 
 					// --- Income --- //
 					r.Route("/income-list", func(r chi.Router) {
 						r.Route("/{incomeID}", func(r chi.Router) {
-							r.Use(action.IncomeCTX)
+							r.Use(handler.IncomeCTX)
 						})
 					})
 
 					// --- Expense --- //
 					r.Route("/expenses", func(r chi.Router) {
 						r.Route("/{expenseID}", func(r chi.Router) {
-							r.Use(action.ExpenseCTX)
+							r.Use(handler.ExpenseCTX)
 						})
 					})
 				})

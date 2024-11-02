@@ -42,8 +42,12 @@ func InitEnv() error {
 	}
 
 	if appEnv != Production {
-		dir, _ := os.Getwd()
-		dotfile := fmt.Sprintf("%s/.env", dir)
+		rootDir, err := GetRootDir()
+		if err != nil {
+			return err
+		}
+
+		dotfile := fmt.Sprintf("%s/.env", rootDir)
 		if err := godotenv.Load(dotfile); err != nil {
 			return fmt.Errorf("dofile: %s", err.Error())
 		}
