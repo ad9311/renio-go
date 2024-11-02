@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/ad9311/renio-go/internal/console"
+	"github.com/ad9311/renio-go/internal/cnsl"
 )
 
 type (
@@ -36,7 +36,7 @@ func WriteError(w http.ResponseWriter, errResponse ErrorResponse) {
 	}
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
-		console.Error(fmt.Sprintf("could not write response, %s", err.Error()))
+		cnsl.Error(fmt.Sprintf("could not write response, %s", err.Error()))
 	}
 }
 
@@ -52,7 +52,7 @@ func WriteOK(w http.ResponseWriter, dataResponse DataResponse) {
 	}
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
-		console.Error(fmt.Sprintf("could not write response, %s", err.Error()))
+		cnsl.Error(fmt.Sprintf("could not write response, %s", err.Error()))
 	}
 }
 

@@ -1,10 +1,10 @@
-package console
+package cnsl
 
 import (
 	"fmt"
 	"log"
 
-	"github.com/ad9311/renio-go/internal/envs"
+	"github.com/ad9311/renio-go/internal/conf"
 )
 
 func AppName() {
@@ -12,19 +12,19 @@ func AppName() {
 }
 
 func Success(message string) {
-	if envs.GetEnvs().ENV != "test" {
+	if conf.GetEnv().AppEnv != "test" {
 		fmt.Printf("✓ %s\n", message)
 	}
 }
 
 func Info(message string) {
-	if envs.GetEnvs().ENV != "test" {
+	if conf.GetEnv().AppEnv != "test" {
 		fmt.Printf("✓ %s\n", message)
 	}
 }
 
 func Error(message string) {
-	if envs.GetEnvs().ENV != "test" {
+	if conf.GetEnv().AppEnv != "test" {
 		fmt.Printf("x %s\n", message)
 	}
 }

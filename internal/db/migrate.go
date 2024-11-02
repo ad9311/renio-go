@@ -4,12 +4,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ad9311/renio-go/internal/envs"
+	"github.com/ad9311/renio-go/internal/conf"
 	"github.com/pressly/goose/v3"
 )
 
 func Migrate() error {
-	db, err := goose.OpenDBWithDriver("pgx", envs.GetEnvs().DatabaseURL)
+	db, err := goose.OpenDBWithDriver("pgx", conf.GetEnv().DatabaseURL)
 	if err != nil {
 		return err
 	}

@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/ad9311/renio-go/internal/action"
-	"github.com/ad9311/renio-go/internal/envs"
+	"github.com/ad9311/renio-go/internal/conf"
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/ad9311/renio-go/internal/vars"
 	"github.com/golang-jwt/jwt/v5"
@@ -101,7 +101,7 @@ func decodeJWT(tokenStr string) (jwtClaims, error) {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(envs.GetEnvs().JWTToken), nil
+		return []byte(conf.GetEnv().JWTToken), nil
 	})
 
 	claims, ok := token.Claims.(jwt.MapClaims)
