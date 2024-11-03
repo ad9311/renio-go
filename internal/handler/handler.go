@@ -16,6 +16,7 @@ func writeTemplate(w http.ResponseWriter, name string) {
 		fmt.Println("template does not exist")
 	}
 
+	fmt.Printf("RENDER %s.tmpl.html\n", name)
 	err := tmpl.Execute(w, map[string]string{})
 	if err != nil {
 		fmt.Println(err)
