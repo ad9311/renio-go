@@ -6,25 +6,26 @@ import (
 	"github.com/ad9311/renio-go/internal/model"
 )
 
-func SignUpUser(signUpData model.SignUpData) error {
+func SignUpUser(signUpData model.SignUpData) (model.User, error) {
+	var user model.User
+
 	if signUpData.Password != signUpData.PasswordConfirmation {
-		return fmt.Errorf("Passwords do not match")
+		return user, fmt.Errorf("passwords do not match")
 	}
 
 	if err := signUpData.Validate(); err != nil {
-		return err
+		return user, err
 	}
 
-	var user model.User
 	if err := user.Insert(signUpData); err != nil {
-		return err
+		return user, err
 	}
 
 	if err := setUpUserAccounts(user); err != nil {
-		return err
+		return user, err
 	}
 
-	return nil
+	return user, nil
 }
 
 // --- Helpers --- //

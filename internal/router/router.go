@@ -13,7 +13,9 @@ func RoutesHandler() http.Handler {
 
 	// --- Middleware --- //
 	r.Use(middleware.Logger)
-	r.Use(routesProtector)
+	r.Use(session)
+	// r.Use(csrf)
+	r.Use(authenticate)
 
 	r.Route("/", func(r chi.Router) {
 		r.Get("/home", handler.GetHome)
@@ -21,6 +23,9 @@ func RoutesHandler() http.Handler {
 		r.Route("/auth", func(r chi.Router) {
 			r.Get("/sign-in", handler.GetSignIn)
 			r.Post("/sign-in", handler.PostSignIn)
+			r.Get("/sign-up", handler.GetSignUp)
+			r.Post("/sign-up", handler.PostSignUp)
+			r.Post("/sign-out", handler.PostSignOut)
 		})
 
 		// --- Budget --- //

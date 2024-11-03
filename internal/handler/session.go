@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/conf"
@@ -21,15 +20,20 @@ func PostSignIn(w http.ResponseWriter, r *http.Request) {
 
 	signInData := model.SignInData{
 		Email:    r.FormValue("email"),
-		Password: r.FormValue("Password"),
+		Password: r.FormValue("password"),
 	}
 
-	user, err := svc.SignInUser(signInData)
+	_, err := svc.SignInUser(signInData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	conf.GetSession().Put(r.Context(), string(vars.CurrentUserKey), user)
+	conf.GetSession().Put(r.Context(), string(vars.UserSignedInKey), true)
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
+}
 
-	fmt.Fprintf(w, "%v", user)
+func PostSignOut(w http.ResponseWriter, r *http.Request) {
+	_ = conf.GetSession().Destroy(r.Context())
+	_ = conf.GetSession().RenewToken(r.Context())
+	http.Redirect(w, r, "/auth/sign-in", http.StatusSeeOther)
 }
