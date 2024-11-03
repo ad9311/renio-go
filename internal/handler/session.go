@@ -25,12 +25,13 @@ func PostSignIn(w http.ResponseWriter, r *http.Request) {
 		Password: r.FormValue("password"),
 	}
 
-	_, err := svc.SignInUser(signInData)
+	user, err := svc.SignInUser(signInData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	conf.GetSession().Put(r.Context(), string(vars.UserSignedInKey), true)
+	conf.GetSession().Put(r.Context(), string(vars.CurrentUserKey), user)
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 

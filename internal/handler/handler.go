@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/conf"
+	"github.com/ad9311/renio-go/internal/model"
+	"github.com/ad9311/renio-go/internal/vars"
 	"github.com/justinas/nosurf"
 )
 
@@ -30,4 +32,10 @@ func writeTemplate(w http.ResponseWriter, name string, data TmplData) {
 
 func (td TmplData) SetCSRFToken(r *http.Request) {
 	td["CSRFToken"] = nosurf.Token(r)
+}
+
+func (td TmplData) SetCurrentUser(r *http.Request) {
+	key := string(vars.CurrentUserKey)
+	user := conf.GetSession().Get(r.Context(), key).(model.SafeUser)
+	td["currentUser"] = user
 }

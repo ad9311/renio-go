@@ -5,21 +5,23 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func SignInUser(signInData model.SignInData) (model.User, error) {
+func SignInUser(signInData model.SignInData) (model.SafeUser, error) {
 	var user model.User
 
 	if err := user.SelectByEmail(signInData.Email); err != nil {
-		return user, err
+		return model.SafeUser{}, err
 	}
 
 	if err := bcrypt.CompareHashAndPassword(
 		[]byte(user.Password),
 		[]byte(signInData.Password),
 	); err != nil {
-		return user, err
+		return model.SafeUser{}, err
 	}
 
-	return user, nil
+	safeUser := user.GetSafeUser()
+
+	return safeUser, nil
 }
 
 func SignOutUser() error {

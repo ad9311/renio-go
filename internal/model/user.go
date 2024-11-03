@@ -9,27 +9,34 @@ import (
 )
 
 type User struct {
-	ID        int    `json:"id"`
-	Username  string `json:"username"`
-	Name      string `json:"name"`
-	Email     string `json:"email"`
+	ID        int
+	Username  string
+	Name      string
+	Email     string
 	Password  string
-	Image     sql.NullString `json:"image"`
+	Image     sql.NullString
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
+type SafeUser struct {
+	Username string
+	Name     string
+	Email    string
+	Image    sql.NullString
+}
+
 type SignUpData struct {
-	Username             string `json:"username"`
-	Name                 string `json:"name"`
-	Email                string `json:"email"`
-	Password             string `json:"password"`
-	PasswordConfirmation string `json:"passwordConfirmation"`
+	Username             string
+	Name                 string
+	Email                string
+	Password             string
+	PasswordConfirmation string
 }
 
 type SignInData struct {
-	Email    string `schema:"email"`
-	Password string `schema:"password"`
+	Email    string
+	Password string
 }
 
 // --- Query Functions --- //
@@ -99,6 +106,15 @@ func (u *User) SelectByID(userID int) error {
 	}
 
 	return nil
+}
+
+func (u *User) GetSafeUser() SafeUser {
+	return SafeUser{
+		Username: u.Username,
+		Name:     u.Name,
+		Email:    u.Email,
+		Image:    u.Image,
+	}
 }
 
 // --- Helpers --- //
