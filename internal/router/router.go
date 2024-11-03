@@ -20,6 +20,7 @@ func RoutesHandler() http.Handler {
 		// --- Auth --- //
 		r.Route("/auth", func(r chi.Router) {
 			r.Get("/sign-in", handler.GetSignIn)
+			r.Post("/sign-in", handler.PostSignIn)
 		})
 
 		// --- Budget --- //

@@ -13,12 +13,15 @@ func writeTemplate(w http.ResponseWriter, name string) {
 
 	tmpl, ok := cache[name]
 	if !ok {
-		fmt.Println("template does not exist")
+		msg := fmt.Sprintf("template %s.tmpl.html not found", name)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
 	}
 
 	fmt.Printf("RENDER %s.tmpl.html\n", name)
 	err := tmpl.Execute(w, map[string]string{})
 	if err != nil {
-		fmt.Println(err)
+		msg := fmt.Sprintf("error while rendering template, %v", err)
+		http.Error(w, msg, http.StatusInternalServerError)
 	}
 }

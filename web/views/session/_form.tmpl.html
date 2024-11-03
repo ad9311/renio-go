@@ -1,0 +1,21 @@
+{{ define "session_form" }}
+<form action="/auth/sign-in" method="post">
+  <input type="hidden" name="csrf_token" value="" />
+  <label for="username">
+    Email
+    <input type="email" id="email" name="email" placeholder="Email" />
+  </label>
+  <label for="password">
+    Password
+    <input
+      type="password"
+      id="password"
+      name="password"
+      placeholder="Password"
+    />
+  </label>
+  <label for="submit">
+    <input type="submit" id="submit" value="Sign In" />
+  </label>
+</form>
+{{ end }}
