@@ -16,10 +16,8 @@ func main() {
 	}
 
 	port := fmt.Sprintf(":%s", conf.GetEnv().Port)
-	session := conf.GetSession()
-	routesHandler := router.RoutesHandler()
 
-	err := http.ListenAndServe(port, session.LoadAndSave(routesHandler))
+	err := http.ListenAndServe(port, router.RoutesHandler())
 	if err != nil {
 		log.Fatalf("there's been an error, %v", err)
 	}
