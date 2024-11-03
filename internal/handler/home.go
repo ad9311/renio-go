@@ -1,7 +1,11 @@
 package handler
 
-import "net/http"
+import (
+	"net/http"
+)
 
 func GetHome(w http.ResponseWriter, r *http.Request) {
-	writeTemplate(w, "home/index")
+	data := TmplData{}
+	data.SetCurrentUser(r)
+	writeTemplate(w, "home/index", data)
 }

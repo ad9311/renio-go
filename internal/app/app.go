@@ -4,6 +4,7 @@ import (
 	"github.com/ad9311/renio-go/internal/conf"
 	"github.com/ad9311/renio-go/internal/db"
 	"github.com/ad9311/renio-go/internal/db/seed"
+	"github.com/ad9311/renio-go/internal/model"
 )
 
 func Init() error {
@@ -26,6 +27,8 @@ func Init() error {
 			return err
 		}
 	}
+
+	model.RegisterModels()
 
 	return nil
 }

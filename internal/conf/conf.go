@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync"
-	"text/template"
 )
 
 var once sync.Once
@@ -21,7 +20,7 @@ func Init() error {
 		if GetEnv().AppEnv != Test {
 			InitSessionManager()
 
-			_, err = BuildTemplateCache(template.FuncMap{})
+			_, err = BuildTemplateCache()
 			if err != nil {
 				return
 			}

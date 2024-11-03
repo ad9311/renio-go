@@ -1,6 +1,6 @@
 {{ define "session_form" }}
 <form action="/auth/sign-in" method="post">
-  <input type="hidden" name="csrf_token" value="" />
+  <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
   <label for="username">
     Email
     <input type="email" id="email" name="email" placeholder="Email" />
