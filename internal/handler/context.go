@@ -13,10 +13,8 @@ import (
 
 func BudgetAccountCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		allowedJWT := r.Context().Value(vars.AllowedJWTKey).(model.AllowedJWT)
-
 		var budgetAccount model.BudgetAccount
-		err := budgetAccount.SelectByUserID(allowedJWT.UserID)
+		err := budgetAccount.SelectByUserID(0)
 		if err == pgx.ErrNoRows {
 			return
 		}

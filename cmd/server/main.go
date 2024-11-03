@@ -2,24 +2,25 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/app"
-	"github.com/ad9311/renio-go/internal/cnsl"
 	"github.com/ad9311/renio-go/internal/conf"
 	"github.com/ad9311/renio-go/internal/router"
 )
 
 func main() {
-	cnsl.AppName()
-
 	if err := app.Init(); err != nil {
-		panic(fmt.Sprintf("error initializing app, %s", err.Error()))
+		log.Fatalf("error initializing app, %v", err)
 	}
 
-	portF := fmt.Sprintf(":%s", conf.GetEnv().Port)
-	cnsl.Info(fmt.Sprintf("Listening on http://localhost%s", portF))
-	if err := http.ListenAndServe(portF, router.RoutesHandler()); err != nil {
-		panic(fmt.Sprintf("there's been an error, %s", err.Error()))
+	port := fmt.Sprintf(":%s", conf.GetEnv().Port)
+	session := conf.GetSession()
+	routesHandler := router.RoutesHandler()
+
+	err := http.ListenAndServe(port, session.LoadAndSave(routesHandler))
+	if err != nil {
+		log.Fatalf("there's been an error, %v", err)
 	}
 }

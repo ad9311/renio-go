@@ -4,11 +4,14 @@ import (
 	"html/template"
 	"log"
 	"path/filepath"
+	"strings"
 )
 
 const (
 	layoutPattern   = "./web/views/index.layout.html"
 	templatePattern = "./web/views/**/*.tmpl.html"
+	partialPattern  = "./web/views/**/_*.tmpl.html"
+	viewsRootDir    = "./web/views"
 )
 
 var cache map[string]*template.Template
@@ -27,7 +30,10 @@ func BuildTemplateCache(funcs template.FuncMap) (map[string]*template.Template, 
 	}
 
 	for _, page := range pages {
-		name := filepath.Base(page)
+		name, err := nameTemplate(page)
+		if err != nil {
+			return nil, err
+		}
 
 		tmpl, err := baseTemplate.Clone()
 		if err != nil {
@@ -65,5 +71,26 @@ func parseLayouts(funcs template.FuncMap) (*template.Template, error) {
 		return nil, err
 	}
 
+	partials, err := filepath.Glob(partialPattern)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(partials) > 0 {
+		_, err = base.ParseGlob(partialPattern)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return base, nil
+}
+
+func nameTemplate(path string) (string, error) {
+	relPath, err := filepath.Rel(viewsRootDir, path)
+	if err != nil {
+		return "", err
+	}
+
+	key := strings.TrimSuffix(relPath, ".tmpl.html")
+	return key, err
 }

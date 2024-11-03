@@ -15,13 +15,12 @@ func RoutesHandler() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(routesProtector)
 
-	fileServer := http.FileServer(http.Dir("./web/static/"))
-	r.Handle("/static/*", http.StripPrefix("/static/", fileServer))
-
 	r.Route("/", func(r chi.Router) {
-		r.Get("/home", handler.Root)
+		r.Get("/home", handler.GetHome)
 		// --- Auth --- //
 		r.Route("/auth", func(r chi.Router) {
+			r.Get("/sign-in", handler.GetSignIn)
+			r.Post("/sign-in", handler.PostSignIn)
 		})
 
 		// --- Budget --- //
@@ -48,6 +47,9 @@ func RoutesHandler() http.Handler {
 			})
 		})
 	})
+
+	fileServer := http.FileServer(http.Dir("./web/static/"))
+	r.Handle("/static/*", http.StripPrefix("/static/", fileServer))
 
 	return r
 }

@@ -28,8 +28,8 @@ type SignUpData struct {
 }
 
 type SignInData struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `schema:"email"`
+	Password string `schema:"password"`
 }
 
 // --- Query Functions --- //
