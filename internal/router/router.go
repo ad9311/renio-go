@@ -14,7 +14,7 @@ func RoutesHandler() http.Handler {
 	// --- Middleware --- //
 	r.Use(middleware.Logger)
 	r.Use(session)
-	// r.Use(csrf)
+	r.Use(csrf)
 	r.Use(authenticate)
 
 	r.Route("/", func(r chi.Router) {

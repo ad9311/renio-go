@@ -1,5 +1,6 @@
 {{ define "registration_form" }}
 <form action="/auth/sign-up" method="post">
+  <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
   <label for="username">
     Username
     <input type="text" id="username" name="username" placeholder="Username" />

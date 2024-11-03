@@ -14,12 +14,16 @@ const (
 	viewsRootDir    = "./web/views"
 )
 
-var cache map[string]*template.Template
+var (
+	cache     map[string]*template.Template
+	tmplFuncs template.FuncMap
+)
 
-func BuildTemplateCache(funcs template.FuncMap) (map[string]*template.Template, error) {
+func BuildTemplateCache() (map[string]*template.Template, error) {
 	cache = map[string]*template.Template{}
+	tmplFuncs = template.FuncMap{}
 
-	baseTemplate, err := parseLayouts(funcs)
+	baseTemplate, err := parseLayouts(tmplFuncs)
 	if err != nil {
 		return nil, err
 	}
@@ -50,18 +54,20 @@ func BuildTemplateCache(funcs template.FuncMap) (map[string]*template.Template, 
 	return cache, nil
 }
 
-func GetTemplates(funcs template.FuncMap) map[string]*template.Template {
+func GetTemplates() map[string]*template.Template {
 	if GetEnv().AppEnv == Production {
 		return cache
 	}
 
-	cache, err := BuildTemplateCache(funcs)
+	cache, err := BuildTemplateCache()
 	if err != nil {
 		log.Fatalf("could not build template cache, %s", err.Error())
 	}
 
 	return cache
 }
+
+// --- Helpers --- //
 
 func parseLayouts(funcs template.FuncMap) (*template.Template, error) {
 	base := template.New("index.layout.html").Funcs(funcs)
