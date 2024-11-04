@@ -1,4 +1,9 @@
 {{ define "registration_form" }}
+<ul>
+  {{ range .errors }}
+  <li>{{ . }}</li>
+  {{ end}}
+</ul>
 <form action="/auth/sign-up" method="post">
   <input type="hidden" name="csrf_token" value="{{.csrfToken}}" />
   <label for="username">

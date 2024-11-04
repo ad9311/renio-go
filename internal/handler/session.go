@@ -25,7 +25,10 @@ func PostSignIn(w http.ResponseWriter, r *http.Request) {
 
 	user, err := svc.SignInUser(signInData)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		GetAppData(r)["errors"] = []string{err.Error()}
+		w.WriteHeader(http.StatusBadRequest)
+		writeTemplate(w, r, "session/index")
+		return
 	}
 
 	conf.GetSession().Put(r.Context(), string(vars.UserSignedInKey), true)
