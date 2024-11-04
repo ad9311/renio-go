@@ -1,14 +1,20 @@
-# flyctl launch added from .gitignore
 # .env files
-**/.env
-**/.env.test
+.env
+.env.test
 
-# bin directory
-bin
+# bin
+bin/
+
+# build assests
+build/
+build.css
+bundle.js
+
+# node modules
+node_modules/
 
 # Make files
-**/Makefile
+Makefile
 
 # Misc
-**/.DS_Store
-fly.toml
+.DS_Store
