@@ -8,9 +8,7 @@ import (
 )
 
 func GetSignUp(w http.ResponseWriter, r *http.Request) {
-	data := TmplData{}
-	data.SetCSRFToken(r)
-	writeTemplate(w, "registration/index", data)
+	writeTemplate(w, r, "registration/index")
 }
 
 func PostSignUp(w http.ResponseWriter, r *http.Request) {

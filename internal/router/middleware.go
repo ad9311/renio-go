@@ -1,10 +1,12 @@
 package router
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
 	"github.com/ad9311/renio-go/internal/conf"
+	"github.com/ad9311/renio-go/internal/handler"
 	"github.com/ad9311/renio-go/internal/vars"
 	"github.com/justinas/nosurf"
 )
@@ -56,6 +58,28 @@ func authenticate(next http.Handler) http.Handler {
 		}
 
 		next.ServeHTTP(w, r)
+	})
+}
+
+func appData(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userKey := string(vars.CurrentUserKey)
+		isUserSignedInKey := string(vars.UserSignedInKey)
+
+		user := conf.GetSession().Get(r.Context(), userKey)
+		isUserSignedIn := conf.GetSession().GetBool(r.Context(), isUserSignedInKey)
+
+		data := handler.TmplData{
+			"errors":         []string{},
+			"notice":         "",
+			"info":           "",
+			"currentUser":    user,
+			"isUserSignedIn": isUserSignedIn,
+			"csrfToken":      nosurf.Token(r),
+		}
+
+		ctx := context.WithValue(r.Context(), vars.AppDataKey, data)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 

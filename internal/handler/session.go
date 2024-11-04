@@ -10,9 +10,7 @@ import (
 )
 
 func GetSignIn(w http.ResponseWriter, r *http.Request) {
-	data := TmplData{}
-	data.SetCSRFToken(r)
-	writeTemplate(w, "session/index", data)
+	writeTemplate(w, r, "session/index")
 }
 
 func PostSignIn(w http.ResponseWriter, r *http.Request) {
