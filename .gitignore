@@ -2,8 +2,15 @@
 .env
 .env.test
 
-# bin directory
-/bin
+# bin
+bin/
+
+# build assests
+build/
+build.css
+
+# node modules
+node_modules/
 
 # Make files
 Makefile

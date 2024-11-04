@@ -76,6 +76,7 @@ func appData(next http.Handler) http.Handler {
 			"currentUser":    user,
 			"isUserSignedIn": isUserSignedIn,
 			"csrfToken":      nosurf.Token(r),
+			"appEnv":         conf.GetEnv().AppEnv,
 		}
 
 		ctx := context.WithValue(r.Context(), vars.AppDataKey, data)
