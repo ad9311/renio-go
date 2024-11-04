@@ -10,9 +10,7 @@ import (
 )
 
 func GetSignIn(w http.ResponseWriter, r *http.Request) {
-	data := TmplData{}
-	data.SetCSRFToken(r)
-	writeTemplate(w, "session/index", data)
+	writeTemplate(w, r, "session/index")
 }
 
 func PostSignIn(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +25,10 @@ func PostSignIn(w http.ResponseWriter, r *http.Request) {
 
 	user, err := svc.SignInUser(signInData)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		GetAppData(r)["errors"] = []string{err.Error()}
+		w.WriteHeader(http.StatusBadRequest)
+		writeTemplate(w, r, "session/index")
+		return
 	}
 
 	conf.GetSession().Put(r.Context(), string(vars.UserSignedInKey), true)

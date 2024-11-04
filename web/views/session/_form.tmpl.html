@@ -1,6 +1,11 @@
 {{ define "session_form" }}
+<ul>
+  {{ range .errors }}
+  <li>{{ . }}</li>
+  {{ end}}
+</ul>
 <form action="/auth/sign-in" method="post">
-  <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
+  <input type="hidden" name="csrf_token" value="{{.csrfToken}}" />
   <label for="username">
     Email
     <input type="email" id="email" name="email" placeholder="Email" />

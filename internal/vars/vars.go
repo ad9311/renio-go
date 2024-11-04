@@ -8,6 +8,7 @@ const (
 	BudgetWithEntriesKey = ContextKey("budgetWithEntries")
 	IncomeKey            = ContextKey("income")
 	ExpenseKey           = ContextKey("expense")
+	AppDataKey           = ContextKey("appData")
 
 	EmailPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 )

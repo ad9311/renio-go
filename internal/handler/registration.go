@@ -3,14 +3,13 @@ package handler
 import (
 	"net/http"
 
+	"github.com/ad9311/renio-go/internal/eval"
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/ad9311/renio-go/internal/svc"
 )
 
 func GetSignUp(w http.ResponseWriter, r *http.Request) {
-	data := TmplData{}
-	data.SetCSRFToken(r)
-	writeTemplate(w, "registration/index", data)
+	writeTemplate(w, r, "registration/index")
 }
 
 func PostSignUp(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +28,14 @@ func PostSignUp(w http.ResponseWriter, r *http.Request) {
 
 	_, err := svc.SignUpUser(signUnData)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		errEval, ok := err.(*eval.ErrEval)
+		if ok {
+			GetAppData(r)["errors"] = errEval.Issues
+		} else {
+			GetAppData(r)["errors"] = []string{err.Error()}
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		writeTemplate(w, r, "registration/index")
 		return
 	}
 

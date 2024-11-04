@@ -2,19 +2,17 @@ package handler
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/conf"
-	"github.com/ad9311/renio-go/internal/model"
 	"github.com/ad9311/renio-go/internal/vars"
-	"github.com/justinas/nosurf"
 )
 
 type TmplData map[string]any
 
-func writeTemplate(w http.ResponseWriter, name string, data TmplData) {
+func writeTemplate(w http.ResponseWriter, r *http.Request, name string) {
 	cache := conf.GetTemplates()
-
 	tmpl, ok := cache[name]
 	if !ok {
 		msg := fmt.Sprintf("template %s.tmpl.html not found", name)
@@ -22,20 +20,22 @@ func writeTemplate(w http.ResponseWriter, name string, data TmplData) {
 		return
 	}
 
+	data := GetAppData(r)
+	executeTemplate(w, tmpl, name, data)
+}
+
+func GetAppData(r *http.Request) TmplData {
+	return r.Context().Value(vars.AppDataKey).(TmplData)
+}
+
+// --- Helpers --- //
+
+func executeTemplate(w http.ResponseWriter, tmpl *template.Template, name string, data TmplData) {
 	fmt.Printf("RENDER %s.tmpl.html\n", name)
+
 	err := tmpl.Execute(w, data)
 	if err != nil {
 		msg := fmt.Sprintf("error while rendering template, %v", err)
 		http.Error(w, msg, http.StatusInternalServerError)
 	}
-}
-
-func (td TmplData) SetCSRFToken(r *http.Request) {
-	td["CSRFToken"] = nosurf.Token(r)
-}
-
-func (td TmplData) SetCurrentUser(r *http.Request) {
-	key := string(vars.CurrentUserKey)
-	user := conf.GetSession().Get(r.Context(), key).(model.SafeUser)
-	td["currentUser"] = user
 }

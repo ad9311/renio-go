@@ -16,6 +16,7 @@ func RoutesHandler() http.Handler {
 	r.Use(session)
 	r.Use(csrf)
 	r.Use(authenticate)
+	r.Use(appData)
 
 	r.Get("/", handler.GetRoot)
 	r.Route("/", func(r chi.Router) {
