@@ -3,10 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/static/css/build.css" />
+    <meta name="turbo-cache-control" content="no-cache" />
+    <meta name="view-transition" content="same-origin" />
+    <link rel="stylesheet" href="/static/css/build/bundle.css" />
     <title>RENIO</title>
   </head>
   <body>
     <main>{{ block "content" . }}{{ end }}</main>
   </body>
+  <script type="module" src="/static/js/build/bundle.js"></script>
 </html>

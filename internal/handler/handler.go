@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -20,12 +21,17 @@ func writeTemplate(w http.ResponseWriter, r *http.Request, name string) {
 		return
 	}
 
-	data := GetAppData(r)
+	data := GetAppData(r.Context())
 	executeTemplate(w, tmpl, name, data)
 }
 
-func GetAppData(r *http.Request) TmplData {
-	return r.Context().Value(vars.AppDataKey).(TmplData)
+func GetAppData(ctx context.Context) TmplData {
+	return ctx.Value(vars.AppDataKey).(TmplData)
+}
+
+func GetCurrentUserId(ctx context.Context) int {
+	userIDkey := string(vars.UserIDKey)
+	return conf.GetSession().GetInt(ctx, userIDkey)
 }
 
 // --- Helpers --- //

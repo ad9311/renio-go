@@ -26,13 +26,14 @@ func PostSignUp(w http.ResponseWriter, r *http.Request) {
 		PasswordConfirmation: r.FormValue("password_confirmation"),
 	}
 
+	ctx := r.Context()
 	_, err := svc.SignUpUser(signUnData)
 	if err != nil {
 		errEval, ok := err.(*eval.ErrEval)
 		if ok {
-			GetAppData(r)["errors"] = errEval.Issues
+			GetAppData(ctx)["errors"] = errEval.Issues
 		} else {
-			GetAppData(r)["errors"] = []string{err.Error()}
+			GetAppData(ctx)["errors"] = []string{err.Error()}
 		}
 		w.WriteHeader(http.StatusBadRequest)
 		writeTemplate(w, r, "registration/index")

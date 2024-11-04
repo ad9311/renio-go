@@ -3,6 +3,7 @@ package vars
 const (
 	CurrentUserKey       = ContextKey("currentUser")
 	UserSignedInKey      = ContextKey("userSignedIn")
+	UserIDKey            = ContextKey("userIDKey")
 	BudgetAccountKey     = ContextKey("budgetAccount")
 	BudgetKey            = ContextKey("budget")
 	BudgetWithEntriesKey = ContextKey("budgetWithEntries")
