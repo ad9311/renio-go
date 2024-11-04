@@ -6,17 +6,16 @@ import (
 
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/ad9311/renio-go/internal/vars"
-	"github.com/jackc/pgx/v5"
 )
 
 func BudgetAccountCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var budgetAccount model.BudgetAccount
-		err := budgetAccount.SelectByUserID(0)
-		if err == pgx.ErrNoRows {
-			return
-		}
+		userID := GetCurrentUserId(r.Context())
+		err := budgetAccount.SelectByUserID(userID)
 		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			writeTemplate(w, r, "error/index")
 			return
 		}
 

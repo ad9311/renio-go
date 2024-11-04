@@ -23,16 +23,18 @@ func PostSignIn(w http.ResponseWriter, r *http.Request) {
 		Password: r.FormValue("password"),
 	}
 
+	ctx := r.Context()
 	user, err := svc.SignInUser(signInData)
 	if err != nil {
-		GetAppData(r)["errors"] = []string{err.Error()}
+		GetAppData(ctx)["errors"] = []string{err.Error()}
 		w.WriteHeader(http.StatusBadRequest)
 		writeTemplate(w, r, "session/index")
 		return
 	}
 
 	conf.GetSession().Put(r.Context(), string(vars.UserSignedInKey), true)
-	conf.GetSession().Put(r.Context(), string(vars.CurrentUserKey), user)
+	conf.GetSession().Put(r.Context(), string(vars.CurrentUserKey), user.GetSafeUser())
+	conf.GetSession().Put(r.Context(), string(vars.UserIDKey), user.ID)
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 

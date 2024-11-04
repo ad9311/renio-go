@@ -18,8 +18,8 @@ func RoutesHandler() http.Handler {
 	r.Use(authenticate)
 	r.Use(appData)
 
-	r.Get("/", handler.GetRoot)
 	r.Route("/", func(r chi.Router) {
+		r.Get("/", handler.GetRoot)
 		// --- Home --- //
 		r.Get("/home", handler.GetHome)
 
@@ -36,6 +36,7 @@ func RoutesHandler() http.Handler {
 		r.Route("/budgets", func(r chi.Router) {
 			r.Use(handler.BudgetAccountCTX)
 			r.Route("/", func(r chi.Router) {
+				r.Get("/", handler.GetBudgets)
 				r.Route("/{budgetUID}", func(r chi.Router) {
 					r.Use(handler.BudgetCTX)
 

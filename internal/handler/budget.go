@@ -27,3 +27,7 @@ func BudgetCTX(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
+
+func GetBudgets(w http.ResponseWriter, r *http.Request) {
+	writeTemplate(w, r, "budgets/index")
+}
