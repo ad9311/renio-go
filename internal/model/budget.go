@@ -5,20 +5,21 @@ import (
 	"time"
 
 	"github.com/ad9311/renio-go/internal/db"
+	"github.com/ad9311/renio-go/internal/eval"
 )
 
 type Budget struct {
-	ID              int       `json:"id"`
-	UID             string    `json:"uid"`
-	Balance         float32   `json:"balance"`
-	TotalIncome     float32   `json:"totalIncome"`
-	TotalExpenses   float32   `json:"totalExpenses"`
-	EntryCount      int       `json:"entryCount"`
-	IncomeCount     int       `json:"incomeCount"`
-	ExpenseCount    int       `json:"expenseCount"`
-	BudgetAccountID int       `json:"budgetAccountId"`
-	CreatedAt       time.Time `json:"createAt"`
-	UpdatedAt       time.Time `json:"updatedAt"`
+	ID              int
+	UID             string
+	Balance         float32
+	TotalIncome     float32
+	TotalExpenses   float32
+	EntryCount      int
+	IncomeCount     int
+	ExpenseCount    int
+	BudgetAccountID int
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
 }
 
 type Budgets []Budget
@@ -175,6 +176,32 @@ func (b *Budget) UpdateOnExpense(credit float32, debit float32, count int) error
 	}
 
 	if err := b.saveBudgetFromDB(queryExec); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// --- Validations --- //
+
+func (b *Budget) Validate() error {
+	data := eval.ModelEval{
+		Strings: []eval.String{
+			{
+				Name:    "Budget UID",
+				Value:   b.UID,
+				Pattern: `^\d-\d{4}-\d{2}$`,
+			},
+		},
+		Ints: []eval.Int{
+			{
+				Name:     "Budget ID",
+				Value:    b.ID,
+				Positive: true,
+			},
+		},
+	}
+	if err := data.Validate(); err != nil {
 		return err
 	}
 

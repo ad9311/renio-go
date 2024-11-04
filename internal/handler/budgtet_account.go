@@ -12,8 +12,8 @@ func BudgetAccountCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var budgetAccount model.BudgetAccount
 		userID := GetCurrentUserId(r.Context())
-		err := budgetAccount.SelectByUserID(userID)
-		if err != nil {
+
+		if err := budgetAccount.SelectByUserID(userID); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			writeTemplate(w, r, "error/index")
 			return

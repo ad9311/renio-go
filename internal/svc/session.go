@@ -21,11 +21,3 @@ func SignInUser(signInData model.SignInData) (model.User, error) {
 
 	return user, nil
 }
-
-func SignOutUser() error {
-	return nil
-}
-
-func CreateSession(userID int) error {
-	return nil
-}
