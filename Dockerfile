@@ -11,4 +11,6 @@ FROM alpine:latest
 
 COPY --from=builder /usr/src/app/bin/server /usr/local/bin/
 COPY --from=builder /usr/src/app/db/migrations/ /db/migrations/
+COPY --from=builder /usr/src/app/web/ /web/
+
 CMD ["/usr/local/bin/server"]
