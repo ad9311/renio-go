@@ -1,6 +1,10 @@
 {{ define "content" }}
 <h1>Error</h1>
 <div>
-  <ul></ul>
+  <ul>
+    {{ range .errors }}
+    <li>{{ . }}</li>
+    {{ end }}
+  </ul>
 </div>
 {{ end }}

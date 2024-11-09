@@ -1,0 +1,7 @@
+{{ define "expense_amount" }}
+  {{ if eq . 0.0 }}
+    <span class="zero-amount">{{ formatCurrency . }}</span>
+  {{ else }}
+    <span class="expense-amount">{{ formatCurrency . }}</span>
+  {{ end }}
+{{ end }}

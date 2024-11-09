@@ -10,8 +10,9 @@ import (
 
 func BudgetAccountCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
 		var budgetAccount model.BudgetAccount
-		userID := GetCurrentUserId(r.Context())
+		userID := GetCurrentUserId(ctx)
 
 		if err := budgetAccount.SelectByUserID(userID); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -19,7 +20,7 @@ func BudgetAccountCTX(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), vars.BudgetAccountKey, budgetAccount)
+		ctx = context.WithValue(ctx, vars.BudgetAccountKey, budgetAccount)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

@@ -190,7 +190,7 @@ func (b *Budget) Validate() error {
 			{
 				Name:    "Budget UID",
 				Value:   b.UID,
-				Pattern: `^\d-\d{4}-\d{2}$`,
+				Pattern: `^\d+-\d{4}-\d{2}$`,
 			},
 		},
 		Ints: []eval.Int{
