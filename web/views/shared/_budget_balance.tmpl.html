@@ -1,0 +1,9 @@
+{{ define "budget_balance" }}
+  {{ if eq . 0.0 }}
+    <span class="zero-amount">{{ formatCurrency . }}</span>
+  {{ else if gt . 0.0 }}
+    <span class="income-amount">{{ formatCurrency . }}</span>
+  {{ else }}
+    <span class="expense-amount">{{ formatCurrency . }}</span>
+  {{ end }}
+{{ end }}

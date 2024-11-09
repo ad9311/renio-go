@@ -1,0 +1,24 @@
+{{ define "budget_summary" }}
+<section class="card">
+  <div class="mb-4">
+    <h2 class="title !m-0">Budget account</h2>
+    <div class="flex items-center gap-2 text-sm">
+      <a href="/budgets/{{ .budget.UID }}" class="link">Current budget</a>
+      <span>|</span>
+      <a href="/budgets" class="link">Budgets</a>
+    </div>
+  </div>
+  <h3 class="subtitle">{{ .budget.UID }}</h3>
+  <div class="text-slate-600">
+    <div class="grid grid-cols-2">
+      <p>Balance:</p>{{ template "budget_balance" .budget.Balance }}
+    </div>
+    <div class="grid grid-cols-2">
+      <p>Last income:</p>{{ template "income_amount" .budget.LastIncome.Amount }}
+    </div>
+    <div class="grid grid-cols-2">
+      <p>Last expense:</p>{{ template "expense_amount" .budget.LastExpense.Amount }}
+    </div>
+  </div>
+</section>
+{{ end }}

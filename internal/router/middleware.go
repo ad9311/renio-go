@@ -71,7 +71,7 @@ func appData(next http.Handler) http.Handler {
 
 		data := handler.TmplData{
 			"errors":         []string{},
-			"notice":         "",
+			"alert":          "",
 			"info":           "",
 			"currentUser":    user,
 			"isUserSignedIn": isUserSignedIn,

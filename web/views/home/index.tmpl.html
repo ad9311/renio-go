@@ -1,8 +1,3 @@
 {{ define "content" }}
-<h1>Home</h1>
-<div>{{.info}}</div>
-<div>
-  <h2>{{.currentUser.Username}}</h2>
-</div>
-<a href="/budgets" data-turbo-action="replace">Budgets</a>
-{{ template "sign_out_button" . }} {{ end }}
+{{ template "budget_summary" . }}
+{{ end }}

@@ -1,0 +1,7 @@
+{{ define "income_amount" }}
+  {{ if eq . 0.0 }}
+    <span class="zero-amount">{{ formatCurrency . }}</span>
+  {{ else }}
+    <span class="income-amount">{{ formatCurrency . }}</span>
+  {{ end }}
+{{ end }}

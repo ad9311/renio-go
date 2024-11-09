@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"path/filepath"
@@ -21,7 +22,7 @@ var (
 
 func BuildTemplateCache() (map[string]*template.Template, error) {
 	cache = map[string]*template.Template{}
-	tmplFuncs = template.FuncMap{}
+	tmplFuncs = generateTmplFunctions()
 
 	baseTemplate, err := parseLayouts(tmplFuncs)
 	if err != nil {
@@ -99,4 +100,14 @@ func nameTemplate(path string) (string, error) {
 
 	key := strings.TrimSuffix(relPath, ".tmpl.html")
 	return key, err
+}
+
+func generateTmplFunctions() template.FuncMap {
+	funcs := template.FuncMap{}
+
+	funcs["formatCurrency"] = func(value float32) string {
+		return fmt.Sprintf("$%.2f", value)
+	}
+
+	return funcs
 }

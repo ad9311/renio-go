@@ -2,6 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply text-slate-700 bg-gray-200;
+@layer base {
+  body {
+    @apply text-slate-700 bg-white;
+  }
+}
+
+@layer utilities {
+  main {
+    @apply px-4;
+  }
+
+  .income-amount {
+    @apply text-green-600;
+  }
+
+  .expense-amount {
+    @apply text-red-600;
+  }
+
+  .zero-amount {
+    @apply text-gray-400;
+  }
+}
+
+@layer components {
+  .title {
+    @apply mb-4 text-xl text-slate-600 font-bold;
+  }
+
+  .subtitle {
+    @apply mb-2 text-lg text-slate-500 font-semibold;
+  }
+
+  .link {
+    @apply text-teal-600 cursor-pointer hover:underline;
+  }
+
+  .card {
+    @apply p-4 bg-gray-100 border border-gray-300 rounded;
+  }
 }

@@ -136,6 +136,25 @@ func (i *Income) Delete() error {
 	return nil
 }
 
+func (i *Income) FindLast(budgetID int) error {
+	query := "SELECT * FROM incomes WHERE budget_id = $1 ORDER BY id DESC LIMIT 1"
+
+	queryExec := db.QueryExe{
+		QueryStr:  query,
+		QueryArgs: []any{budgetID},
+		Model:     Income{},
+	}
+	if err := queryExec.QueryRow(); err != nil {
+		return err
+	}
+
+	if err := i.saveIncomeFromDB(queryExec); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // --- Helpers --- //
 
 func (i *Income) saveIncomeFromDB(queryExec db.QueryExe) error {
