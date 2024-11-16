@@ -14,10 +14,11 @@ import (
 func BudgetCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
+		budgetAccount := ctx.Value(vars.BudgetAccountKey).(model.BudgetAccount)
 		budgetUID := chi.URLParam(r, "budgetUID")
 
 		var budget model.Budget
-		err := budget.SelectByUID(budgetUID)
+		err := budget.SelectByUID(budgetUID, budgetAccount.ID)
 		if err == pgx.ErrNoRows {
 			writeTemplate(w, r, "not-found/index")
 			return

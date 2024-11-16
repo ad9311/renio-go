@@ -29,6 +29,29 @@ var EntryClassTypeNames = map[int]string{
 
 // --- Query --- //
 
+func (es *EntryClasses) Index() error {
+	query := "SELECT * FROM entry_classes"
+
+	var entryClasses []any
+	queryExec := db.QueryExe{
+		QueryStr:   query,
+		QueryArgs:  []any{},
+		Model:      EntryClass{},
+		ModelSlice: &entryClasses,
+	}
+
+	if err := queryExec.Query(); err != nil {
+		return err
+	}
+
+	for _, b := range entryClasses {
+		entryClass := b.(*EntryClass)
+		*es = append(*es, *entryClass)
+	}
+
+	return nil
+}
+
 func (e *EntryClass) Insert() error {
 	query := `INSERT INTO entry_classes (uid, name, type) VALUES ($1, $2, $3) RETURNING *`
 

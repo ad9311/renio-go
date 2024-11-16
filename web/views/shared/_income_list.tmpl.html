@@ -4,8 +4,13 @@
   <div class="title-links mb-4">
     <a href="/budgets/{{ .budget.UID }}/income-list/new" class="link">New income</a>
   </div>
-  {{ range .budget.IncomeList}}
-  {{ . }}
-  {{ end }}
+  <ul>
+    {{ range .budget.IncomeList}}
+    <li>
+      <span>{{ .Description }}</span>
+      <span>{{ template "income_amount" .Amount }}</span>
+    </li>
+    {{ end }}
+  </ul>
 </section>
 {{ end }}
