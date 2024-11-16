@@ -39,6 +39,7 @@ func RoutesHandler() http.Handler {
 				r.Get("/", handler.GetBudgets)
 				r.Route("/{budgetUID}", func(r chi.Router) {
 					r.Use(handler.BudgetCTX)
+					r.Get("/", handler.GetBudget)
 
 					// --- Income --- //
 					r.Route("/income-list", func(r chi.Router) {
