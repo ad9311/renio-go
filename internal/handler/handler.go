@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/conf"
@@ -32,6 +33,15 @@ func GetAppData(ctx context.Context) TmplData {
 func GetCurrentUserId(ctx context.Context) int {
 	userIDkey := string(vars.UserIDKey)
 	return conf.GetSession().GetInt(ctx, userIDkey)
+}
+
+func (t TmplData) AppendError(ctx context.Context, err error) {
+	errors, ok := GetAppData(ctx)["errors"].([]string)
+	if !ok {
+		log.Fatal("incorrect type for data template errors")
+	}
+	errors = append(errors, err.Error())
+	GetAppData(ctx)["errors"] = errors
 }
 
 // --- Helpers --- //

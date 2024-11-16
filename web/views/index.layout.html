@@ -10,6 +10,7 @@
     <title>RENIO</title>
   </head>
   <body>
+    {{ template "navbar" . }}
     <main>{{ block "content" . }}{{ end }}</main>
   </body>
   <script type="module" src="/static/js/build/bundle.js"></script>

@@ -1,0 +1,11 @@
+{{ define "income_list" }}
+<section class="card">
+  <h2 class="title !m-0">Income list</h2>
+  <div class="title-links mb-4">
+    <a href="/budgets/{{ .budget.UID }}/income-list/new" class="link">New income</a>
+  </div>
+  {{ range .budget.IncomeList}}
+  {{ . }}
+  {{ end }}
+</section>
+{{ end }}

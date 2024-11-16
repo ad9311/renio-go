@@ -10,7 +10,7 @@
 
 @layer utilities {
   main {
-    @apply px-4;
+    @apply px-4 mt-6;
   }
 
   .income-amount {
@@ -29,6 +29,10 @@
 @layer components {
   .title {
     @apply mb-4 text-xl text-slate-600 font-bold;
+  }
+
+  .title-links {
+    @apply flex items-center gap-2 text-sm;
   }
 
   .subtitle {
