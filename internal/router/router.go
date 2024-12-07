@@ -48,6 +48,7 @@ func RoutesHandler() http.Handler {
 						r.Route("/{incomeID}", func(r chi.Router) {
 							r.Use(handler.IncomeCTX)
 							r.Get("/", handler.GetIncome)
+							r.Get("/edit", handler.GetEditIncome)
 						})
 					})
 

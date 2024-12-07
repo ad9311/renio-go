@@ -1,11 +1,19 @@
 {{ define "expenses" }}
+{{ $budgetUID := .budget.UID }}
 <section class="card">
   <h2 class="title !m-0">Expenses</h2>
   <div class="title-links mb-4">
     <a href="/budgets/{{ .budget.UID }}/expenses/new" class="link">New expense</a>
   </div>
-  {{ range .budget.Expenses}}
-  {{ . }}
-  {{ end }}
+  <ul>
+    {{ range .budget.Expenses}}
+    <li>
+      <a href="/budgets/{{ $budgetUID }}/expenses/{{ .ID }}">
+        <span>{{ .Description }}</span>
+        <span>{{ template "income_amount" .Amount }}</span>
+      </a>
+    </li>
+    {{ end }}
+  </ul>
 </section>
 {{ end }}

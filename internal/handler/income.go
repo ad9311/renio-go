@@ -90,8 +90,27 @@ func PostIncome(w http.ResponseWriter, r *http.Request) {
 
 func GetIncome(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	budget := ctx.Value(vars.BudgetKey).(model.Budget)
 	income := ctx.Value(vars.IncomeKey).(model.Income)
 
+	getAppData(ctx)["budget"] = budget
 	getAppData(ctx)["income"] = income
-	writeTemplate(w, ctx, "income-list/index")
+	writeTemplate(w, ctx, "income-list/show")
+}
+
+func GetEditIncome(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	budget := ctx.Value(vars.BudgetKey).(model.Budget)
+	income := ctx.Value(vars.IncomeKey).(model.Income)
+
+	var entryClasses model.EntryClasses
+	if err := entryClasses.Index(); err != nil {
+		writeInternalError(w, ctx, []string{err.Error()})
+		return
+	}
+
+	getAppData(ctx)["budget"] = budget
+	getAppData(ctx)["entryClasses"] = entryClasses
+	getAppData(ctx)["income"] = income
+	writeTemplate(w, ctx, "income-list/edit")
 }
