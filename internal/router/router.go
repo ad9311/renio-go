@@ -43,13 +43,18 @@ func RoutesHandler() http.Handler {
 
 					// --- Income --- //
 					r.Route("/income-list", func(r chi.Router) {
+						r.Get("/new", handler.GetNewIncome)
+						r.Post("/", handler.PostIncome)
 						r.Route("/{incomeID}", func(r chi.Router) {
 							r.Use(handler.IncomeCTX)
+							r.Get("/", handler.GetIncome)
 						})
 					})
 
 					// --- Expense --- //
 					r.Route("/expenses", func(r chi.Router) {
+						r.Get("/new", handler.GetNewExpense)
+						r.Post("/", handler.PostExpense)
 						r.Route("/{expenseID}", func(r chi.Router) {
 							r.Use(handler.ExpenseCTX)
 						})

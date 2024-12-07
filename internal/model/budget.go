@@ -49,10 +49,10 @@ func (bs *Budgets) Index(budgetAccountID int) error {
 	return nil
 }
 
-func (b *Budget) SelectByUID(uid string) error {
+func (b *Budget) SelectByUID(uid string, budgetAccountID int) error {
 	queryExec := db.QueryExe{
-		QueryStr:  "SELECT * FROM budgets WHERE uid = $1",
-		QueryArgs: []any{uid},
+		QueryStr:  "SELECT * FROM budgets WHERE uid = $1 AND budget_account_id = $2",
+		QueryArgs: []any{uid, budgetAccountID},
 		Model:     Budget{},
 	}
 	if err := queryExec.QueryRow(); err != nil {

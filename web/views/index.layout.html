@@ -1,3 +1,6 @@
+{{ if .turboTemplate }}
+{{ block "content" . }}{{ end }}
+{{ else }}
 <!doctype html>
 <html lang="en">
   <head>
@@ -11,7 +14,11 @@
   </head>
   <body>
     {{ template "navbar" . }}
+    <turbo-frame id="info">
+      <div class="info">{{ .info }}</div>
+    </turbo-frame>
     <main>{{ block "content" . }}{{ end }}</main>
   </body>
   <script type="module" src="/static/js/build/bundle.js"></script>
 </html>
+{{ end }}

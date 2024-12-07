@@ -14,17 +14,18 @@ import (
 func BudgetCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
+		budgetAccount := ctx.Value(vars.BudgetAccountKey).(model.BudgetAccount)
 		budgetUID := chi.URLParam(r, "budgetUID")
 
 		var budget model.Budget
-		err := budget.SelectByUID(budgetUID)
+		err := budget.SelectByUID(budgetUID, budgetAccount.ID)
 		if err == pgx.ErrNoRows {
-			writeTemplate(w, r, "not-found/index")
+			writeNotFound(w, ctx)
 			return
 		}
 		if err != nil {
-			GetAppData(ctx).AppendError(ctx, err)
-			writeTemplate(w, r, "error/index")
+			errStr := []string{err.Error()}
+			writeInternalError(w, ctx, errStr)
 			return
 		}
 
@@ -39,13 +40,13 @@ func GetBudgets(w http.ResponseWriter, r *http.Request) {
 
 	budgets, err := svc.FindBudgets(budgetAccount.ID)
 	if err != nil {
-		GetAppData(ctx).AppendError(ctx, err)
-		writeTemplate(w, r, "error/index")
+		errStr := []string{err.Error()}
+		writeInternalError(w, ctx, errStr)
 		return
 	}
 
-	GetAppData(ctx)["budgets"] = budgets
-	writeTemplate(w, r, "budgets/index")
+	getAppData(ctx)["budgets"] = budgets
+	writeTemplate(w, ctx, "budgets/index")
 }
 
 func GetBudget(w http.ResponseWriter, r *http.Request) {
@@ -54,15 +55,15 @@ func GetBudget(w http.ResponseWriter, r *http.Request) {
 
 	budgetWithEntries, err := svc.FindBudget(budget)
 	if err == pgx.ErrNoRows {
-		writeTemplate(w, r, "not-found/index")
+		writeNotFound(w, ctx)
 		return
 	}
 	if err != nil {
-		GetAppData(ctx).AppendError(ctx, err)
-		writeTemplate(w, r, "error/index")
+		errStr := []string{err.Error()}
+		writeInternalError(w, ctx, errStr)
 		return
 	}
 
-	GetAppData(ctx)["budget"] = budgetWithEntries
-	writeTemplate(w, r, "budgets/show")
+	getAppData(ctx)["budget"] = budgetWithEntries
+	writeTemplate(w, ctx, "budgets/show")
 }
