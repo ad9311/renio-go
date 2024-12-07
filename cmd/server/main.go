@@ -11,6 +11,8 @@ import (
 )
 
 func main() {
+	fmt.Print("RENIO\n\n")
+
 	if err := app.Init(); err != nil {
 		log.Fatalf("error initializing app, %v", err)
 	}
