@@ -80,12 +80,12 @@ func PostIncome(w http.ResponseWriter, r *http.Request) {
 	getAppData(ctx)["turboTemplate"] = true
 
 	if _, err := svc.CreateIncome(incomeFormData, budget); err != nil {
-		handleFormErrorAsTurboTemplate(w, ctx, err, "income-list/new-turbo")
+		handleFormErrorAsTurboTemplate(w, ctx, err, "income-list/new_turbo")
 		return
 	}
 
 	getAppData(ctx)["info"] = "Income created successfully"
-	writeTurboTemplate(w, ctx, "income-list/new-turbo", http.StatusCreated)
+	writeTurboTemplate(w, ctx, "income-list/new_turbo", http.StatusCreated)
 }
 
 func GetIncome(w http.ResponseWriter, r *http.Request) {
