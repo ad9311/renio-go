@@ -10,12 +10,16 @@ import (
 )
 
 func GetSignIn(w http.ResponseWriter, r *http.Request) {
-	writeTemplate(w, r, "session/index")
+	ctx := r.Context()
+	writeTemplate(w, ctx, "session/index")
 }
 
 func PostSignIn(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writeErrorPage(w, ctx, []string{err.Error()})
+		return
 	}
 
 	signInData := model.SignInData{
@@ -23,18 +27,16 @@ func PostSignIn(w http.ResponseWriter, r *http.Request) {
 		Password: r.FormValue("password"),
 	}
 
-	ctx := r.Context()
 	user, err := svc.SignInUser(signInData)
 	if err != nil {
-		GetAppData(ctx)["errors"] = []string{err.Error()}
-		w.WriteHeader(http.StatusBadRequest)
-		writeTemplate(w, r, "session/index")
+		errStr := []string{"invalid email or password"}
+		writeAsBadRequest(w, ctx, errStr, "session/index")
 		return
 	}
 
-	conf.GetSession().Put(r.Context(), string(vars.UserSignedInKey), true)
-	conf.GetSession().Put(r.Context(), string(vars.CurrentUserKey), user.GetSafeUser())
-	conf.GetSession().Put(r.Context(), string(vars.UserIDKey), user.ID)
+	conf.GetSession().Put(ctx, string(vars.UserSignedInKey), true)
+	conf.GetSession().Put(ctx, string(vars.CurrentUserKey), user.GetSafeUser())
+	conf.GetSession().Put(ctx, string(vars.UserIDKey), user.ID)
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 

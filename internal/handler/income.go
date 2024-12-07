@@ -33,30 +33,34 @@ func IncomeCTX(next http.Handler) http.Handler {
 	})
 }
 
-func GetIncomeForm(w http.ResponseWriter, r *http.Request) {
+func GetNewIncome(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	budget := ctx.Value(vars.BudgetKey).(model.Budget)
 
 	var entryClasses model.EntryClasses
 	if err := entryClasses.Index(); err != nil {
-		GetAppData(ctx).AppendError(ctx, err)
-		writeTemplate(w, r, "error/index")
+		writeInternalError(w, ctx, []string{err.Error()})
 		return
 	}
 
-	GetAppData(ctx)["budget"] = budget
-	GetAppData(ctx)["entryClasses"] = entryClasses
-	writeTemplate(w, r, "income-list/new")
+	getAppData(ctx)["budget"] = budget
+	getAppData(ctx)["entryClasses"] = entryClasses
+	writeTemplate(w, ctx, "income-list/new")
 }
 
 func PostIncome(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	budget := ctx.Value(vars.BudgetKey).(model.Budget)
 
+	var entryClasses model.EntryClasses
+	if err := entryClasses.Index(); err != nil {
+		writeInternalError(w, ctx, []string{err.Error()})
+		return
+	}
+
 	if err := r.ParseForm(); err != nil {
-		GetAppData(ctx).AppendError(ctx, err)
-		w.WriteHeader(http.StatusBadRequest)
-		writeTemplate(w, r, "error/index")
+		errStr := []string{err.Error()}
+		writeAsBadRequest(w, ctx, errStr, "income-list/new")
 		return
 	}
 
@@ -72,14 +76,18 @@ func PostIncome(w http.ResponseWriter, r *http.Request) {
 	if _, err := svc.CreateIncome(incomeFormData, budget); err != nil {
 		errEval, ok := err.(*eval.ErrEval)
 		if ok {
-			GetAppData(ctx)["errors"] = errEval.Issues
+			getAppData(ctx)["errors"] = errEval.Issues
 		} else {
-			GetAppData(ctx).AppendError(ctx, err)
+			errStr := []string{err.Error()}
+			writeInternalError(w, ctx, errStr)
+			return
 		}
-		w.WriteHeader(http.StatusBadRequest)
 	} else {
 		w.WriteHeader(http.StatusCreated)
+		getAppData(ctx)["info"] = "Income created successfully"
 	}
 
-	writeTemplate(w, r, "income-list/new")
+	getAppData(ctx)["budget"] = budget
+	getAppData(ctx)["entryClasses"] = entryClasses
+	writeTemplate(w, ctx, "income-list/new")
 }

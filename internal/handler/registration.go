@@ -9,12 +9,14 @@ import (
 )
 
 func GetSignUp(w http.ResponseWriter, r *http.Request) {
-	writeTemplate(w, r, "registration/index")
+	ctx := r.Context()
+	writeTemplate(w, ctx, "registration/index")
 }
 
 func PostSignUp(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writeErrorPage(w, ctx, []string{err.Error()})
 		return
 	}
 
@@ -26,17 +28,16 @@ func PostSignUp(w http.ResponseWriter, r *http.Request) {
 		PasswordConfirmation: r.FormValue("password_confirmation"),
 	}
 
-	ctx := r.Context()
 	_, err := svc.SignUpUser(signUnData)
+	errEval, ok := err.(*eval.ErrEval)
+	if ok {
+		writeAsBadRequest(w, ctx, errEval.Issues, "registration/index")
+		return
+	}
+
 	if err != nil {
-		errEval, ok := err.(*eval.ErrEval)
-		if ok {
-			GetAppData(ctx)["errors"] = errEval.Issues
-		} else {
-			GetAppData(ctx)["errors"] = []string{err.Error()}
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		writeTemplate(w, r, "registration/index")
+		errStr := []string{err.Error()}
+		writeInternalError(w, ctx, errStr)
 		return
 	}
 

@@ -11,7 +11,10 @@
   </head>
   <body>
     {{ template "navbar" . }}
+    {{ if .info }}
+    <div class="info">{{ .info }}</div>
+    {{ end }}
     <main>{{ block "content" . }}{{ end }}</main>
   </body>
-  <script type="module" src="/static/js/build/bundle.js"></script>
+  <!-- <script type="module" src="/static/js/build/bundle.js"></script> -->
 </html>
