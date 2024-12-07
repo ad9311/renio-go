@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ad9311/renio-go/internal/eval"
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/ad9311/renio-go/internal/svc"
 	"github.com/ad9311/renio-go/internal/vars"
@@ -81,16 +80,8 @@ func PostIncome(w http.ResponseWriter, r *http.Request) {
 	getAppData(ctx)["turboTemplate"] = true
 
 	if _, err := svc.CreateIncome(incomeFormData, budget); err != nil {
-		errEval, ok := err.(*eval.ErrEval)
-		if ok {
-			getAppData(ctx)["errors"] = errEval.Issues
-			writeTurboTemplate(w, ctx, "income-list/new-turbo", http.StatusBadRequest)
-			return
-		} else {
-			errStr := []string{err.Error()}
-			writeInternalError(w, ctx, errStr)
-			return
-		}
+		handleFormErrorAsTurboTemplate(w, ctx, err, "income-list/new-turbo")
+		return
 	}
 
 	getAppData(ctx)["info"] = "Income created successfully"

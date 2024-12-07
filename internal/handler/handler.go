@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/conf"
+	"github.com/ad9311/renio-go/internal/eval"
 	"github.com/ad9311/renio-go/internal/vars"
 )
 
@@ -33,22 +34,6 @@ func writeTurboTemplate(w http.ResponseWriter, ctx context.Context, name string,
 	writeTemplate(w, ctx, name)
 }
 
-// --- Helpers --- //
-
-func getAppData(ctx context.Context) TmplData {
-	return ctx.Value(vars.AppDataKey).(TmplData)
-}
-
-func getCurrentUserId(ctx context.Context) int {
-	userIDkey := string(vars.UserIDKey)
-	return conf.GetSession().GetInt(ctx, userIDkey)
-}
-
-func saveAppDataErrors(ctx context.Context, errors []string) {
-	data := getAppData(ctx)
-	data["errors"] = errors
-}
-
 func writeErrorPage(w http.ResponseWriter, ctx context.Context, errors []string) {
 	w.WriteHeader(http.StatusBadRequest)
 	saveAppDataErrors(ctx, errors)
@@ -71,6 +56,36 @@ func writeAsBadRequest(w http.ResponseWriter, ctx context.Context, errors []stri
 	w.WriteHeader(http.StatusBadRequest)
 	saveAppDataErrors(ctx, errors)
 	writeTemplate(w, ctx, page)
+}
+
+// --- Helpers --- //
+
+func getAppData(ctx context.Context) TmplData {
+	return ctx.Value(vars.AppDataKey).(TmplData)
+}
+
+func getCurrentUserId(ctx context.Context) int {
+	userIDkey := string(vars.UserIDKey)
+	return conf.GetSession().GetInt(ctx, userIDkey)
+}
+
+func saveAppDataErrors(ctx context.Context, errStrs []string) {
+	data := getAppData(ctx)
+	data["errors"] = errStrs
+}
+
+func handleFormErrorAsTurboTemplate(w http.ResponseWriter, ctx context.Context, err error, turboTemplate string) {
+	errEval, ok := err.(*eval.ErrEval)
+	if ok {
+		getAppData(ctx)["errors"] = errEval.Issues
+		writeTurboTemplate(w, ctx, turboTemplate, http.StatusBadRequest)
+		return
+	} else {
+		errStr := []string{err.Error()}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		writeInternalError(w, ctx, errStr)
+		return
+	}
 }
 
 func executeTemplate(w http.ResponseWriter, tmpl *template.Template, name string, data TmplData) {

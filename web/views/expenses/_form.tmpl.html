@@ -1,0 +1,31 @@
+{{ define "expense_form" }}
+<turbo-frame id="new-expense">
+  <ul>
+    {{ range .errors }}
+    <li>{{ . }}</li>
+    {{ end}}
+  </ul>
+  <form action="/budgets/{{ .budget.UID }}/expenses" method="post" class="form">
+  <input type="hidden" name="csrf_token" value="{{.csrfToken}}" />
+  <label for="entry_class_id">
+    Category
+    <select name="entry_class_id" id="entry_class_id">
+      {{ range .entryClasses }}
+      <option value="{{ .ID }}">{{ .Name }}</option>
+      {{ end }}
+    </select>
+  </label>
+  <label for="description">
+    Description
+    <textarea name="description" id="description"></textarea>
+  </label>
+  <label for="amount">
+    Amount
+    <input type="number" name="amount" id="amount" step="0.01" min="1" placeholder="100">
+  </label>
+  <label for="submit">
+  <button type="submit" id="submit">Submit</button>
+    </label>
+  </form>
+</turbo-frame>
+{{ end }}

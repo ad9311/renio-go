@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/ad9311/renio-go/internal/model"
+	"github.com/ad9311/renio-go/internal/svc"
 	"github.com/ad9311/renio-go/internal/vars"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5"
@@ -29,4 +30,57 @@ func ExpenseCTX(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), vars.ExpenseKey, expense)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func GetNewExpense(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	budget := ctx.Value(vars.BudgetKey).(model.Budget)
+
+	var entryClasses model.EntryClasses
+	if err := entryClasses.Index(); err != nil {
+		writeInternalError(w, ctx, []string{err.Error()})
+		return
+	}
+
+	getAppData(ctx)["budget"] = budget
+	getAppData(ctx)["entryClasses"] = entryClasses
+	writeTemplate(w, ctx, "expenses/new")
+}
+
+func PostExpense(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	budget := ctx.Value(vars.BudgetKey).(model.Budget)
+
+	var entryClasses model.EntryClasses
+	if err := entryClasses.Index(); err != nil {
+		writeInternalError(w, ctx, []string{err.Error()})
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		errStr := []string{err.Error()}
+		writeAsBadRequest(w, ctx, errStr, "expenses/new")
+		return
+	}
+
+	entryClasID, _ := strconv.Atoi(r.FormValue("entry_class_id"))
+	amount, _ := strconv.ParseFloat(r.FormValue("amount"), 32)
+
+	expenseFormData := model.ExpenseFormData{
+		EntryClassID: entryClasID,
+		Description:  r.FormValue("description"),
+		Amount:       float32(amount),
+	}
+
+	getAppData(ctx)["budget"] = budget
+	getAppData(ctx)["entryClasses"] = entryClasses
+	getAppData(ctx)["turboTemplate"] = true
+
+	if _, err := svc.CreateExpense(expenseFormData, budget); err != nil {
+		handleFormErrorAsTurboTemplate(w, ctx, err, "expenses/new-turbo")
+		return
+	}
+
+	getAppData(ctx)["info"] = "Expense created successfully"
+	writeTurboTemplate(w, ctx, "expenses/new-turbo", http.StatusCreated)
 }
