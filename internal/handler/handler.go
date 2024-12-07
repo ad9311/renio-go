@@ -25,6 +25,14 @@ func writeTemplate(w http.ResponseWriter, ctx context.Context, name string) {
 	executeTemplate(w, tmpl, name, data)
 }
 
+func writeTurboTemplate(w http.ResponseWriter, ctx context.Context, name string, status int) {
+	data := getAppData(ctx)
+	data["turboTemplate"] = true
+	w.Header().Set("Content-Type", "text/vnd.turbo-stream.html; charset=utf-8")
+	w.WriteHeader(status)
+	writeTemplate(w, ctx, name)
+}
+
 // --- Helpers --- //
 
 func getAppData(ctx context.Context) TmplData {

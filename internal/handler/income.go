@@ -15,6 +15,7 @@ import (
 
 func IncomeCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
 		incomeID := chi.URLParam(r, "incomeID")
 
 		id, _ := strconv.Atoi(incomeID)
@@ -22,13 +23,15 @@ func IncomeCTX(next http.Handler) http.Handler {
 
 		err := income.SelectByID(id)
 		if err == pgx.ErrNoRows {
+			writeNotFound(w, ctx)
 			return
 		}
 		if err != nil {
+			writeInternalError(w, ctx, []string{err.Error()})
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), vars.IncomeKey, income)
+		ctx = context.WithValue(ctx, vars.IncomeKey, income)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -73,21 +76,31 @@ func PostIncome(w http.ResponseWriter, r *http.Request) {
 		Amount:       float32(amount),
 	}
 
+	getAppData(ctx)["budget"] = budget
+	getAppData(ctx)["entryClasses"] = entryClasses
+	getAppData(ctx)["turboTemplate"] = true
+
 	if _, err := svc.CreateIncome(incomeFormData, budget); err != nil {
 		errEval, ok := err.(*eval.ErrEval)
 		if ok {
 			getAppData(ctx)["errors"] = errEval.Issues
+			writeTurboTemplate(w, ctx, "income-list/new-turbo", http.StatusBadRequest)
+			return
 		} else {
 			errStr := []string{err.Error()}
 			writeInternalError(w, ctx, errStr)
 			return
 		}
-	} else {
-		w.WriteHeader(http.StatusCreated)
-		getAppData(ctx)["info"] = "Income created successfully"
 	}
 
-	getAppData(ctx)["budget"] = budget
-	getAppData(ctx)["entryClasses"] = entryClasses
-	writeTemplate(w, ctx, "income-list/new")
+	getAppData(ctx)["info"] = "Income created successfully"
+	writeTurboTemplate(w, ctx, "income-list/new-turbo", http.StatusCreated)
+}
+
+func GetIncome(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	income := ctx.Value(vars.IncomeKey).(model.Income)
+
+	getAppData(ctx)["income"] = income
+	writeTemplate(w, ctx, "income-list/index")
 }

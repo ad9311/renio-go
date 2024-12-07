@@ -9,8 +9,8 @@ require (
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/joho/godotenv v1.5.1
 	github.com/justinas/nosurf v1.1.1
-	github.com/pressly/goose/v3 v3.22.1
-	golang.org/x/crypto v0.28.0
+	github.com/pressly/goose/v3 v3.23.0
+	golang.org/x/crypto v0.30.0
 )
 
 require (
@@ -22,8 +22,8 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
-	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 )

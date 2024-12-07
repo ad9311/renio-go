@@ -1,10 +1,11 @@
 {{ define "income_form" }}
-<ul>
-  {{ range .errors }}
-  <li>{{ . }}</li>
-  {{ end}}
-</ul>
-<form action="/budgets/{{ .budget.UID }}/income-list" method="post" class="form">
+<turbo-frame id="new-income">
+  <ul>
+    {{ range .errors }}
+    <li>{{ . }}</li>
+    {{ end}}
+  </ul>
+  <form action="/budgets/{{ .budget.UID }}/income-list" method="post" class="form">
   <input type="hidden" name="csrf_token" value="{{.csrfToken}}" />
   <label for="entry_class_id">
     Category
@@ -23,7 +24,8 @@
     <input type="number" name="amount" id="amount" step="0.01" min="1" placeholder="100">
   </label>
   <label for="submit">
-    <button type="submit" id="submit">Submit</button>
-  </label>
-</form>
+  <button type="submit" id="submit">Submit</button>
+    </label>
+  </form>
+</turbo-frame>
 {{ end }}
