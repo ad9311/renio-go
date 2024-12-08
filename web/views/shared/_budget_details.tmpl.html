@@ -1,0 +1,17 @@
+{{ define "budget_details" }}
+<section class="card">
+  <h2 class="title">Budget</h2>
+  <h3 class="subtitle">{{ .budget.UID }}</h3>
+  <div class="text-slate-600">
+    <div class="grid grid-cols-2">
+      <p>Total income:</p>{{ template "income_amount" .budget.TotalIncome }}
+    </div>
+    <div class="grid grid-cols-2">
+      <p>Total expenses:</p>{{ template "expense_amount" .budget.TotalExpenses }}
+    </div>
+    <div class="grid grid-cols-2">
+      <p>Balance:</p>{{ template "budget_balance" .budget.Balance }}
+    </div>
+  </div>
+</section>
+{{ end }}
