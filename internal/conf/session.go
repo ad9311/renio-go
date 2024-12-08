@@ -11,7 +11,7 @@ var sessMgr *scs.SessionManager
 func InitSessionManager() {
 	sessMgr = scs.New()
 	// if GetEnv().AppEnv == Development {
-	// 	// sessMgr.Store = postgresstore.New(db)
+	// 	sessMgr.Store = postgresstore.New(db)
 	// }
 
 	sessMgr.Lifetime = 24 * 7 * time.Hour

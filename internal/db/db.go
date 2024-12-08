@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"reflect"
 	"sync"
@@ -10,7 +11,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jackc/pgx/v5/stdlib"
 )
 
 type QueryExe struct {
@@ -22,8 +23,9 @@ type QueryExe struct {
 }
 
 var (
-	pool *pgxpool.Pool
-	once sync.Once
+	pool  *pgxpool.Pool
+	sqlDB *sql.DB
+	once  sync.Once
 )
 
 func Init() error {
@@ -41,6 +43,14 @@ func Init() error {
 			dbErr = err
 			return
 		}
+
+		pgxConfig, parseErr := pgxpool.ParseConfig(conf.GetEnv().DatabaseURL)
+		if parseErr != nil {
+			dbErr = parseErr
+			return
+		}
+
+		sqlDB = stdlib.OpenDB(*pgxConfig.ConnConfig)
 	})
 
 	return dbErr
@@ -48,6 +58,10 @@ func Init() error {
 
 func GetPool() *pgxpool.Pool {
 	return pool
+}
+
+func GetSQLDB() *sql.DB {
+	return sqlDB
 }
 
 func (x *QueryExe) QueryRow() error {

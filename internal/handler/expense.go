@@ -82,7 +82,7 @@ func PostExpense(w http.ResponseWriter, r *http.Request) {
 
 	getAppData(ctx)["info"] = "Expense created successfully"
 	w.WriteHeader(http.StatusCreated)
-	writeTemplate(w, ctx, "expenses/new_turbo")
+	writeTemplate(w, ctx, "expenses/new")
 }
 
 func GetExpense(w http.ResponseWriter, r *http.Request) {

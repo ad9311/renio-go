@@ -14,6 +14,11 @@ require (
 )
 
 require (
+	github.com/jackc/pgx v3.6.2+incompatible // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+)
+
+require (
 	github.com/alexedwards/scs/postgresstore v0.0.0-20240316134038-7e11d57e8885
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
