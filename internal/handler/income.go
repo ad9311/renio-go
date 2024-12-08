@@ -114,3 +114,43 @@ func GetEditIncome(w http.ResponseWriter, r *http.Request) {
 	getAppData(ctx)["income"] = income
 	writeTemplate(w, ctx, "income-list/edit")
 }
+
+func PatchIncome(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	budget := ctx.Value(vars.BudgetKey).(model.Budget)
+	income := ctx.Value(vars.IncomeKey).(model.Income)
+
+	var entryClasses model.EntryClasses
+	if err := entryClasses.Index(); err != nil {
+		writeInternalError(w, ctx, []string{err.Error()})
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		saveAppDataErrors(ctx, []string{err.Error()})
+		writeTurboTemplate(w, ctx, "income-list/edit_turbo", http.StatusBadRequest)
+		return
+	}
+
+	entryClassID, _ := strconv.Atoi(r.FormValue("entry_class_id"))
+	amount, _ := strconv.ParseFloat(r.FormValue("amount"), 32)
+
+	incomeFormData := model.IncomeFormData{
+		EntryClassID: entryClassID,
+		Description:  r.FormValue("description"),
+		Amount:       float32(amount),
+	}
+
+	getAppData(ctx)["budget"] = budget
+	getAppData(ctx)["entryClasses"] = entryClasses
+	getAppData(ctx)["income"] = income
+
+	_, err := svc.UpdateIncome(income, incomeFormData, budget)
+	if err != nil {
+		handleFormErrorAsTurboTemplate(w, ctx, err, "income-list/edit_turbo")
+		return
+	}
+
+	getAppData(ctx)["info"] = "Income updated successfully"
+	writeTurboTemplate(w, ctx, "income-list/edit_turbo", http.StatusOK)
+}

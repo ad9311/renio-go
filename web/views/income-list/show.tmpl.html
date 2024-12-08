@@ -1,10 +1,5 @@
 {{ define "content" }}
-<section class="card">
-  <h2 class="title">Income</h2>
-  <div class="title-links mb-4">
-    <a href="/budgets/{{ .budget.UID }}/income-list/{{ .income.ID }}/edit" class="link">Edit</a>
-  </div>
-  <p>{{ .income.Description }}</p>
-  <p>{{ .income.Amount }}</p>
-</section>
+<turbo-frame id="income_details">
+  {{ template "income_details" . }}
+</turbo-frame>
 {{ end }}

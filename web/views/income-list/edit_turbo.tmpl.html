@@ -1,0 +1,8 @@
+{{ define "content" }}
+{{ template "info_turbo" . }}
+<turbo-stream action="update" target="income_details">
+  <template>
+    {{ template "income_details" . }}
+  </template>
+</turbo-stream>
+{{ end}}
