@@ -13,7 +13,7 @@ declare global {
 window.htmx = htmx;
 
 $(() => {
-  $('#closeModal').on('click', function() {
+  $('#closeModal').on('click', function () {
     $('#modal').addClass('hidden').removeClass('modal');
   });
 

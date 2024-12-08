@@ -1,9 +1,9 @@
 {{ define "content" }}
-<h1>Budgets</h1>
-<a href="/home" data-turbo-action="replace">Home</a>
-<ul>
-  {{ range .budgets }}
-  <li>{{ .UID }}</li>
-  {{ end }}
-</ul>
+  <h1>Budgets</h1>
+  <a href="/home" data-turbo-action="replace">Home</a>
+  <ul>
+    {{ range .budgets }}
+      <li>{{ .UID }}</li>
+    {{ end }}
+  </ul>
 {{ end }}

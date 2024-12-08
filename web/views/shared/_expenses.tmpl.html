@@ -1,21 +1,21 @@
 {{ define "expenses" }}
-{{ $budgetUID := .budget.UID }}
-<section class="card">
-  <h2 class="title !m-0">Expenses</h2>
-  <div class="title-links mb-4">
-    <a href="/budgets/{{ .budget.UID }}/expenses/new" class="link">New expense</a>
-  </div>
-  <ul>
-    {{ range .budget.Expenses}}
-    <li>
-      <a href="/budgets/{{ $budgetUID }}/expenses/{{ .ID }}">
-        <div class="grid grid-cols-2">
-          <span>{{ .Description }}</span>
-          <span>{{ template "income_amount" .Amount }}</span>
-        </div>
-      </a>
-    </li>
-    {{ end }}
-  </ul>
-</section>
+  {{ $budgetUID := .budget.UID }}
+  <section class="card">
+    <h2 class="title !m-0">Expenses</h2>
+    <div class="title-links mb-4">
+      <a href="/budgets/{{ .budget.UID }}/expenses/new" class="link">New expense</a>
+    </div>
+    <ul>
+      {{ range .budget.Expenses }}
+        <li>
+          <a href="/budgets/{{ $budgetUID }}/expenses/{{ .ID }}">
+            <div class="grid grid-cols-2">
+              <span>{{ .Description }}</span>
+              <span>{{ template "income_amount" .Amount }}</span>
+            </div>
+          </a>
+        </li>
+      {{ end }}
+    </ul>
+  </section>
 {{ end }}

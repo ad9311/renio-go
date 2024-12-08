@@ -1,13 +1,13 @@
 {{ define "content" }}
-<section class="card">
-  <h2 class="title">Income</h2>
-  <div class="title-links mb-4">
-    <a href="/budgets/{{ .budget.UID }}/income-list/{{ .income.ID }}/edit" class="link">Edit</a>
-    |
-    <button type="button" class="link" id="deleteIncome">Delete</button>
-  </div>
-  <p>{{ .income.Description }}</p>
-  <p>{{ .income.Amount }}</p>
-</section>
-{{ template "confirmation_modal" . }}
+  <section class="card">
+    <h2 class="title">Income</h2>
+    <div class="title-links mb-4">
+      <a href="/budgets/{{ .budget.UID }}/income-list/{{ .income.ID }}/edit" class="link">Edit</a>
+      |
+      <button type="button" class="link" id="deleteIncome">Delete</button>
+    </div>
+    <p>{{ .income.Description }}</p>
+    <p>{{ .income.Amount }}</p>
+  </section>
+  {{ template "confirmation_modal" . }}
 {{ end }}

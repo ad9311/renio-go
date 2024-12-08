@@ -1,10 +1,8 @@
 {{ define "navbar" }}
-<div class="py-2 px-4 flex justify-between items-center bg-gray-100 border-b border-gray-300">
-  <a href="/home" class="block w-fit">
-    <h1 class="title !m-0">RENIO</h1>
-  </a>
-  {{ if .isUserSignedIn }}
-  {{ template "sign_out_button" . }}
-  {{ end }}
-</div>
+  <div class="py-2 px-4 flex justify-between items-center bg-gray-100 border-b border-gray-300">
+    <a href="/home" class="block w-fit">
+      <h1 class="title !m-0">RENIO</h1>
+    </a>
+    {{ if .isUserSignedIn }}{{ template "sign_out_button" . }}{{ end }}
+  </div>
 {{ end }}

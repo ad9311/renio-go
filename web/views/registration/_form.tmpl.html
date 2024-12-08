@@ -1,45 +1,39 @@
 {{ define "registration_form" }}
-<ul>
-  {{ range .errors }}
-  <li>{{ . }}</li>
-  {{ end}}
-</ul>
-<form action="/auth/sign-up" method="post" class="form">
-  {{ template "csrf_token" . }}
-  <label for="username">
-    Username
-    <input type="text" id="username" name="username" placeholder="Username" />
-  </label>
-  <label for="name">
-    Name
-    <input type="text" id="name" name="name" placeholder="Name" />
-  </label>
-  <label for="email">
-    Email
-    <input type="email" id="email" name="email" placeholder="Email" />
-  </label>
-  <label for="password">
-    Password
-    <input
-      type="password"
-      id="password"
-      name="password"
-      placeholder="Password"
-    />
-  </label>
-  <label for="password_confirmation">
-    Password
-    <input
-      type="password"
-      id="password_confirmation"
-      name="password_confirmation"
-      placeholder="Password confirmation"
-    />
-  </label>
-  <div class="form-actions">
-    <label for="sign_up">
-      <button type="submit" id="sign_up">Sign up</button>
+  <ul>
+    {{ range .errors }}
+      <li>{{ . }}</li>
+    {{ end }}
+  </ul>
+  <form action="/auth/sign-up" method="post" class="form">
+    {{ template "csrf_token" . }}
+    <label for="username">
+      Username
+      <input type="text" id="username" name="username" placeholder="Username" />
     </label>
-  </div>
-</form>
+    <label for="name">
+      Name
+      <input type="text" id="name" name="name" placeholder="Name" />
+    </label>
+    <label for="email">
+      Email
+      <input type="email" id="email" name="email" placeholder="Email" />
+    </label>
+    <label for="password">
+      Password
+      <input type="password" id="password" name="password" placeholder="Password" />
+    </label>
+    <label for="password_confirmation">
+      Password
+      <input
+        type="password"
+        id="password_confirmation"
+        name="password_confirmation"
+        placeholder="Password confirmation" />
+    </label>
+    <div class="form-actions">
+      <label for="sign_up">
+        <button type="submit" id="sign_up">Sign up</button>
+      </label>
+    </div>
+  </form>
 {{ end }}

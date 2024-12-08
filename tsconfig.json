@@ -16,11 +16,6 @@
       "@/*": ["./web/static/js/*"]
     }
   },
-  "include": [
-    "web/static/js/**/*"
-  ],
-  "exclude": [
-    "web/static/js/build/**/*",
-    "node_modules"
-  ]
+  "include": ["web/static/js/**/*"],
+  "exclude": ["web/static/js/build/**/*", "node_modules"]
 }

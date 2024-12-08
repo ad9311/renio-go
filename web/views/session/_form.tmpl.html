@@ -1,28 +1,23 @@
 {{ define "session_form" }}
-<ul>
-  {{ range .errors }}
-  <li>{{ . }}</li>
-  {{ end}}
-</ul>
-<form action="/auth/sign-in" method="post" class="form">
-  {{ template "csrf_token" . }}
-  <label for="username">
-    Email
-    <input type="email" id="email" name="email" placeholder="Email" />
-  </label>
-  <label for="password">
-    Password
-    <input
-      type="password"
-      id="password"
-      name="password"
-      placeholder="Password"
-    />
-  </label>
-  <div class="form-actions">
-    <label for="sign_in">
-      <button type="submit" id="sign_in">Sign in</button>
+  <ul>
+    {{ range .errors }}
+      <li>{{ . }}</li>
+    {{ end }}
+  </ul>
+  <form action="/auth/sign-in" method="post" class="form">
+    {{ template "csrf_token" . }}
+    <label for="username">
+      Email
+      <input type="email" id="email" name="email" placeholder="Email" />
     </label>
-  </div>
-</form>
+    <label for="password">
+      Password
+      <input type="password" id="password" name="password" placeholder="Password" />
+    </label>
+    <div class="form-actions">
+      <label for="sign_in">
+        <button type="submit" id="sign_in">Sign in</button>
+      </label>
+    </div>
+  </form>
 {{ end }}
