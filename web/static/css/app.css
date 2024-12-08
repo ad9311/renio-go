@@ -48,6 +48,14 @@
   .form-actions button[type="submit"] {
     @apply bg-teal-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-teal-700;
   }
+
+  .modal {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center;
+  }
+
+  .modal-content {
+    @apply card;
+  }
 }
 
 @layer components {

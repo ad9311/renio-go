@@ -20,13 +20,13 @@ test: migrate_test_reset migrate_test_up
 server:
 	go run ./cmd/server/main.go
 
-watch-server:
-	air
-
 postcss:
-	bunx postcss-cli web/static/css/app.css -o web/static/css/build/bundle.css --watch & disown
+	bunx postcss-cli web/static/css/app.css -o web/static/css/build/bundle.css
 
 rollup:
 	bunx rollup --config
 
-dev: postcss rollup watch-server
+dev: postcss rollup server
+
+dev-watch:
+	watchexec -r -e go,js,css -- make dev

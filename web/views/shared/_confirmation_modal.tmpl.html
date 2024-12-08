@@ -1,0 +1,15 @@
+{{ define "confirmation_modal" }}
+<div class="hidden" id="modal">
+  <div class="modal-content">
+    <h3 class="title">{{ .modalTitle }}</h3>
+    <p>{{ .confirmationMessage }}</p>
+    <div class="flex justify-end gap-2 items-center">
+      <button type="button" id="closeModal">Cancel</button>
+      <form action="{{ .formAction }}" method="post">
+        {{ template "csrf_token" . }}
+        <button type="submit">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+{{ end }}

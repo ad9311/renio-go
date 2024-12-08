@@ -4,12 +4,10 @@
   <div class="title-links mb-4">
     <a href="/budgets/{{ .budget.UID }}/income-list/{{ .income.ID }}/edit" class="link">Edit</a>
     |
-    <form action="/budgets/{{ .budget.UID }}/income-list/{{ .income.ID }}/delete" method="post">
-      <input type="hidden" name="csrf_token" value="{{ .csrfToken }}">
-      <button type="submit" class="link">Delete</button>
-    </form>
+    <button type="button" class="link" id="deleteIncome">Delete</button>
   </div>
   <p>{{ .income.Description }}</p>
   <p>{{ .income.Amount }}</p>
 </section>
+{{ template "confirmation_modal" . }}
 {{ end }}

@@ -95,6 +95,9 @@ func GetIncome(w http.ResponseWriter, r *http.Request) {
 
 	getAppData(ctx)["budget"] = budget
 	getAppData(ctx)["income"] = income
+	getAppData(ctx)["modalTitle"] = "Delete Income"
+	getAppData(ctx)["confirmationMessage"] = "Are you sure you want to delete this income?"
+	getAppData(ctx)["formAction"] = "/budgets/" + budget.UID + "/income-list/" + strconv.Itoa(income.ID) + "/delete"
 	writeTemplate(w, ctx, "income-list/show")
 }
 
