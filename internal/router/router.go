@@ -60,6 +60,10 @@ func RoutesHandler() http.Handler {
 						r.Post("/", handler.PostExpense)
 						r.Route("/{expenseID}", func(r chi.Router) {
 							r.Use(handler.ExpenseCTX)
+							r.Get("/", handler.GetExpense)
+							r.Get("/edit", handler.GetEditExpense)
+							r.Post("/", handler.PatchExpense)
+							r.Post("/delete", handler.DeleteExpense)
 						})
 					})
 				})
