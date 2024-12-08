@@ -18,6 +18,10 @@
     "prettier": "^3.4.2",
     "prettier-plugin-go-template": "^0.0.15",
     "rollup": "^4.28.1",
+    "stylelint": "^16.11.0",
+    "stylelint-config-prettier-scss": "^1.0.0",
+    "stylelint-config-standard-scss": "^14.0.0",
+    "stylelint-config-tailwindcss": "^0.0.7",
     "tailwindcss": "^3.4.16",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.17.0"
@@ -25,8 +29,10 @@
   "license": "MIT",
   "scripts": {
     "lint": "bunx eslint .",
-    "lint-fix": "bunx eslint . --fix",
-    "format": "prettier --write ."
+    "lint:fix": "bunx eslint . --fix",
+    "format": "prettier --write .",
+    "lint:css": "bunx stylelint '**/*.{css,scss}'",
+    "lint:css:fix": "bunx stylelint '**/*.{css,scss}' --fix"
   },
   "dependencies": {
     "htmx.org": "2.0.3",
