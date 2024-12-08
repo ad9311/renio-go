@@ -2,19 +2,15 @@ package model_test
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"os"
 	"testing"
 
-	"github.com/ad9311/renio-go/internal/app"
 	"github.com/ad9311/renio-go/internal/model"
 )
 
 func TestMain(m *testing.M) {
-	if err := app.Init(); err != nil {
-		log.Fatal(err.Error())
-	}
+	// app.Init()
 
 	code := m.Run()
 	os.Exit(code)

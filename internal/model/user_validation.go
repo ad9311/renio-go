@@ -1,13 +1,12 @@
 package model
 
 import (
-	"github.com/ad9311/renio-go/internal/eval"
 	"github.com/ad9311/renio-go/internal/vars"
 )
 
 func (s *SignUpData) Validate() error {
-	data := eval.ModelEval{
-		Strings: []eval.String{
+	data := ModelEval{
+		Strings: []String{
 			{
 				Name:  "Username",
 				Value: s.Username,

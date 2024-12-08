@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/ad9311/renio-go/internal/db"
+	"github.com/ad9311/renio-go/internal/app"
 )
 
 type BudgetAccount struct {
@@ -18,7 +18,7 @@ type BudgetAccount struct {
 func (b *BudgetAccount) Insert(userID int) error {
 	query := "INSERT INTO budget_accounts (user_id) VALUES ($1) RETURNING *"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{userID},
 		Model:     BudgetAccount{},
@@ -36,7 +36,7 @@ func (b *BudgetAccount) Insert(userID int) error {
 
 func (b *BudgetAccount) SelectByUserID(userID int) error {
 	query := "SELECT * FROM budget_accounts WHERE user_id = $1"
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{userID},
 		Model:     BudgetAccount{},
@@ -54,7 +54,7 @@ func (b *BudgetAccount) SelectByUserID(userID int) error {
 
 // --- Helpers --- //
 
-func (b *BudgetAccount) saveBudgetAccountFromDB(queryExec db.QueryExe) error {
+func (b *BudgetAccount) saveBudgetAccountFromDB(queryExec app.QueryExe) error {
 	value, ok := queryExec.Model.(*BudgetAccount)
 	if !ok {
 		return ErrIncompleteQuery{}

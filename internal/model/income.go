@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/ad9311/renio-go/internal/db"
+	"github.com/ad9311/renio-go/internal/app"
 )
 
 type Income struct {
@@ -30,7 +30,7 @@ func (il *IncomeList) Index(budgetID int) error {
 	query := "SELECT * FROM incomes WHERE budget_id = $1 ORDER BY created_at DESC"
 
 	var incomeList []any
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:   query,
 		QueryArgs:  []any{budgetID},
 		Model:      Income{},
@@ -52,7 +52,7 @@ func (il *IncomeList) Index(budgetID int) error {
 func (i *Income) Insert(incomeFormData IncomeFormData, budgetID int) error {
 	query := "INSERT INTO incomes (amount, description, entry_class_id, budget_id) VALUES ($1, $2, $3, $4) RETURNING *"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			incomeFormData.Amount,
@@ -77,7 +77,7 @@ func (i *Income) Insert(incomeFormData IncomeFormData, budgetID int) error {
 func (i *Income) SelectByID(id int) error {
 	query := "SELECT * FROM incomes WHERE id = $1"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{id},
 		Model:     Income{},
@@ -96,7 +96,7 @@ func (i *Income) SelectByID(id int) error {
 func (i *Income) Update(incomeFormData IncomeFormData) error {
 	query := "UPDATE incomes SET amount = $1, description = $2, entry_class_id = $3 WHERE id = $4 RETURNING *"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			incomeFormData.Amount,
@@ -120,7 +120,7 @@ func (i *Income) Update(incomeFormData IncomeFormData) error {
 func (i *Income) Delete() error {
 	query := "DELETE FROM incomes WHERE id = $1 RETURNING *"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{i.ID},
 		Model:     Income{},
@@ -139,7 +139,7 @@ func (i *Income) Delete() error {
 func (i *Income) FindLast(budgetID int) error {
 	query := "SELECT * FROM incomes WHERE budget_id = $1 ORDER BY id DESC LIMIT 1"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{budgetID},
 		Model:     Income{},
@@ -157,7 +157,7 @@ func (i *Income) FindLast(budgetID int) error {
 
 // --- Helpers --- //
 
-func (i *Income) saveIncomeFromDB(queryExec db.QueryExe) error {
+func (i *Income) saveIncomeFromDB(queryExec app.QueryExe) error {
 	value, ok := queryExec.Model.(*Income)
 	if !ok {
 		return ErrIncompleteQuery{}

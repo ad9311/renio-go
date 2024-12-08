@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/ad9311/renio-go/internal/db"
+	"github.com/ad9311/renio-go/internal/app"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -49,7 +49,7 @@ func (u *User) Insert(signUpData SignUpData) error {
 		return err
 	}
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			signUpData.Username,
@@ -73,7 +73,7 @@ func (u *User) Insert(signUpData SignUpData) error {
 func (u *User) SelectByEmail(email string) error {
 	query := "SELECT * FROM users WHERE email = $1"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{email},
 		Model:     User{},
@@ -92,7 +92,7 @@ func (u *User) SelectByEmail(email string) error {
 func (u *User) SelectByID(userID int) error {
 	query := "SELECT * FROM users WHERE id = $1"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{userID},
 		Model:     User{},
@@ -127,7 +127,7 @@ func hashPassword(password string) (string, error) {
 	return string(hash), nil
 }
 
-func (u *User) saveUserFromDB(queryExec db.QueryExe) error {
+func (u *User) saveUserFromDB(queryExec app.QueryExe) error {
 	value, ok := queryExec.Model.(*User)
 	if !ok {
 		return ErrIncompleteQuery{}

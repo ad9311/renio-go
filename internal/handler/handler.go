@@ -6,15 +6,15 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/ad9311/renio-go/internal/conf"
-	"github.com/ad9311/renio-go/internal/eval"
+	"github.com/ad9311/renio-go/internal/app"
+	"github.com/ad9311/renio-go/internal/model"
 	"github.com/ad9311/renio-go/internal/vars"
 )
 
 type TmplData map[string]any
 
 func writeTemplate(w http.ResponseWriter, ctx context.Context, name string) {
-	cache := conf.GetTemplates()
+	cache := app.GetTemplates()
 	tmpl, ok := cache[name]
 	if !ok {
 		msg := fmt.Sprintf("template %s.tmpl.html not found", name)
@@ -58,7 +58,7 @@ func getAppData(ctx context.Context) TmplData {
 
 func getCurrentUserId(ctx context.Context) int {
 	userIDkey := string(vars.UserIDKey)
-	return conf.GetSession().GetInt(ctx, userIDkey)
+	return app.GetSession().GetInt(ctx, userIDkey)
 }
 
 func saveAppDataErrors(ctx context.Context, errStrs []string) {
@@ -67,7 +67,7 @@ func saveAppDataErrors(ctx context.Context, errStrs []string) {
 }
 
 func handleFormError(w http.ResponseWriter, ctx context.Context, err error, tmpl string) {
-	errEval, ok := err.(*eval.ErrEval)
+	errEval, ok := err.(*model.ErrEval)
 	if ok {
 		getAppData(ctx)["errors"] = errEval.Issues
 		w.WriteHeader(http.StatusBadRequest)

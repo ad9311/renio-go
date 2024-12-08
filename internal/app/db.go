@@ -1,4 +1,4 @@
-package db
+package app
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/ad9311/renio-go/internal/conf"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -28,12 +27,12 @@ var (
 	once  sync.Once
 )
 
-func Init() error {
+func InitDB() error {
 	var dbErr error
 
 	once.Do(func() {
 		var err error
-		pool, err = pgxpool.New(context.Background(), conf.GetEnv().DatabaseURL)
+		pool, err = pgxpool.New(context.Background(), GetEnv().DatabaseURL)
 		if err != nil {
 			dbErr = err
 			return
@@ -44,7 +43,7 @@ func Init() error {
 			return
 		}
 
-		pgxConfig, parseErr := pgxpool.ParseConfig(conf.GetEnv().DatabaseURL)
+		pgxConfig, parseErr := pgxpool.ParseConfig(GetEnv().DatabaseURL)
 		if parseErr != nil {
 			dbErr = parseErr
 			return
@@ -145,7 +144,7 @@ func spreadValues(model any) []any {
 }
 
 func printQuery(query string) {
-	if conf.GetEnv().AppEnv != "test" {
+	if GetEnv().AppEnv != "test" {
 		fmt.Printf("BEGIN `%s`\n", query)
 	}
 }

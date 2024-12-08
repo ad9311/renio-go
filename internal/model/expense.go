@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/ad9311/renio-go/internal/db"
+	"github.com/ad9311/renio-go/internal/app"
 )
 
 type Expense struct {
@@ -30,7 +30,7 @@ func (es *Expenses) Index(budgetID int) error {
 	query := "SELECT * FROM expenses WHERE budget_id = $1 ORDER BY created_at DESC"
 
 	var expenses []any
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:   query,
 		QueryArgs:  []any{budgetID},
 		Model:      Expense{},
@@ -52,7 +52,7 @@ func (es *Expenses) Index(budgetID int) error {
 func (e *Expense) Insert(expenseFormData ExpenseFormData, budgetID int) error {
 	query := "INSERT INTO expenses (amount, description, entry_class_id, budget_id) VALUES ($1, $2, $3, $4) RETURNING *"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			expenseFormData.Amount,
@@ -77,7 +77,7 @@ func (e *Expense) Insert(expenseFormData ExpenseFormData, budgetID int) error {
 func (e *Expense) SelectByID(id int) error {
 	query := "SELECT * FROM expenses WHERE id = $1"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{id},
 		Model:     Expense{},
@@ -96,7 +96,7 @@ func (e *Expense) SelectByID(id int) error {
 func (e *Expense) Update(expenseFormData ExpenseFormData) error {
 	query := "UPDATE expenses SET amount = $1, description = $2, entry_class_id = $3 WHERE id = $4 RETURNING *"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			expenseFormData.Amount,
@@ -120,7 +120,7 @@ func (e *Expense) Update(expenseFormData ExpenseFormData) error {
 func (e *Expense) Delete() error {
 	query := "DELETE FROM expenses WHERE id = $1 RETURNING *"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{e.ID},
 		Model:     Expense{},
@@ -139,7 +139,7 @@ func (e *Expense) Delete() error {
 func (e *Expense) FindLast(budgetID int) error {
 	query := "SELECT * FROM expenses WHERE budget_id = $1 ORDER BY id DESC LIMIT 1"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{budgetID},
 		Model:     Expense{},
@@ -157,7 +157,7 @@ func (e *Expense) FindLast(budgetID int) error {
 
 // --- Helpers --- //
 
-func (e *Expense) saveExpenseFromDB(queryExec db.QueryExe) error {
+func (e *Expense) saveExpenseFromDB(queryExec app.QueryExe) error {
 	value, ok := queryExec.Model.(*Expense)
 	if !ok {
 		return ErrIncompleteQuery{}
