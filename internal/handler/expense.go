@@ -74,13 +74,13 @@ func PostExpense(w http.ResponseWriter, r *http.Request) {
 
 	getAppData(ctx)["budget"] = budget
 	getAppData(ctx)["entryClasses"] = entryClasses
-	getAppData(ctx)["turboTemplate"] = true
 
 	if _, err := svc.CreateExpense(expenseFormData, budget); err != nil {
-		handleFormErrorAsTurboTemplate(w, ctx, err, "expenses/new_turbo")
+		handleFormError(w, ctx, err, "expenses/new")
 		return
 	}
 
 	getAppData(ctx)["info"] = "Expense created successfully"
-	writeTurboTemplate(w, ctx, "expenses/new_turbo", http.StatusCreated)
+	w.WriteHeader(http.StatusCreated)
+	writeTemplate(w, ctx, "expenses/new_turbo")
 }

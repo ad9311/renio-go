@@ -50,6 +50,7 @@ func RoutesHandler() http.Handler {
 							r.Get("/", handler.GetIncome)
 							r.Get("/edit", handler.GetEditIncome)
 							r.Post("/", handler.PatchIncome)
+							r.Post("/delete", handler.DeleteIncome)
 						})
 					})
 

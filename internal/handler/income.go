@@ -77,15 +77,15 @@ func PostIncome(w http.ResponseWriter, r *http.Request) {
 
 	getAppData(ctx)["budget"] = budget
 	getAppData(ctx)["entryClasses"] = entryClasses
-	getAppData(ctx)["turboTemplate"] = true
 
 	if _, err := svc.CreateIncome(incomeFormData, budget); err != nil {
-		handleFormErrorAsTurboTemplate(w, ctx, err, "income-list/new_turbo")
+		handleFormError(w, ctx, err, "income-list/new")
 		return
 	}
 
 	getAppData(ctx)["info"] = "Income created successfully"
-	writeTurboTemplate(w, ctx, "income-list/new_turbo", http.StatusCreated)
+	w.WriteHeader(http.StatusCreated)
+	writeTemplate(w, ctx, "income-list/new")
 }
 
 func GetIncome(w http.ResponseWriter, r *http.Request) {
@@ -127,8 +127,8 @@ func PatchIncome(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := r.ParseForm(); err != nil {
-		saveAppDataErrors(ctx, []string{err.Error()})
-		writeTurboTemplate(w, ctx, "income-list/edit_turbo", http.StatusBadRequest)
+		errStr := []string{err.Error()}
+		writeAsBadRequest(w, ctx, errStr, "income-list/edit")
 		return
 	}
 
@@ -143,14 +143,27 @@ func PatchIncome(w http.ResponseWriter, r *http.Request) {
 
 	getAppData(ctx)["budget"] = budget
 	getAppData(ctx)["entryClasses"] = entryClasses
-	getAppData(ctx)["income"] = income
 
-	_, err := svc.UpdateIncome(income, incomeFormData, budget)
+	income, err := svc.UpdateIncome(income, incomeFormData, budget)
+	getAppData(ctx)["income"] = income
 	if err != nil {
-		handleFormErrorAsTurboTemplate(w, ctx, err, "income-list/edit_turbo")
+		handleFormError(w, ctx, err, "income-list/edit")
 		return
 	}
 
 	getAppData(ctx)["info"] = "Income updated successfully"
-	writeTurboTemplate(w, ctx, "income-list/edit_turbo", http.StatusOK)
+	writeTemplate(w, ctx, "income-list/show")
+}
+
+func DeleteIncome(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	budget := ctx.Value(vars.BudgetKey).(model.Budget)
+	income := ctx.Value(vars.IncomeKey).(model.Income)
+
+	if err := svc.DeleteIncome(income, budget); err != nil {
+		writeInternalError(w, ctx, []string{err.Error()})
+		return
+	}
+
+	http.Redirect(w, r, "/budgets/"+budget.UID, http.StatusSeeOther)
 }

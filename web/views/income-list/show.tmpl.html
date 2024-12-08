@@ -1,5 +1,15 @@
 {{ define "content" }}
-<turbo-frame id="income_details">
-  {{ template "income_details" . }}
-</turbo-frame>
+<section class="card">
+  <h2 class="title">Income</h2>
+  <div class="title-links mb-4">
+    <a href="/budgets/{{ .budget.UID }}/income-list/{{ .income.ID }}/edit" class="link">Edit</a>
+    |
+    <form action="/budgets/{{ .budget.UID }}/income-list/{{ .income.ID }}/delete" method="post">
+      <input type="hidden" name="csrf_token" value="{{ .csrfToken }}">
+      <button type="submit" class="link">Delete</button>
+    </form>
+  </div>
+  <p>{{ .income.Description }}</p>
+  <p>{{ .income.Amount }}</p>
+</section>
 {{ end }}

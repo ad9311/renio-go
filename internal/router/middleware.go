@@ -77,7 +77,6 @@ func appData(next http.Handler) http.Handler {
 			"isUserSignedIn": isUserSignedIn,
 			"csrfToken":      nosurf.Token(r),
 			"appEnv":         conf.GetEnv().AppEnv,
-			"turboTemplate":  false,
 		}
 
 		ctx := context.WithValue(r.Context(), vars.AppDataKey, data)
