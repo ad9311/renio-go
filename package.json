@@ -3,20 +3,34 @@
   "version": "0.1.0",
   "author": "Ángel Díaz",
   "devDependencies": {
+    "@eslint/js": "^9.16.0",
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-typescript": "^12.1.1",
+    "@types/jquery": "^3.5.32",
     "autoprefixer": "^10.4.20",
+    "eslint": "^9.16.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.13.0",
     "postcss": "^8.4.49",
     "postcss-cli": "^11.0.0",
+    "prettier": "^3.4.2",
+    "prettier-plugin-go-template": "^0.0.15",
     "rollup": "^4.28.1",
-    "tailwindcss": "^3.4.16"
+    "tailwindcss": "^3.4.16",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.17.0"
   },
   "license": "MIT",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "bunx eslint .",
+    "lint-fix": "bunx eslint . --fix",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "htmx.org": "2.0.3",
-    "jquery": "4.0.0-beta.2"
+    "jquery": "4.0.0-beta.2",
+    "tslib": "^2.8.1"
   }
 }

@@ -6,31 +6,39 @@
 </ul>
 {{ if .expense }}
 <form action="/budgets/{{ .budget.UID }}/expenses/{{ .expense.ID }}" method="post" class="form">
-{{ else }}
-<form action="/budgets/{{ .budget.UID }}/expenses" method="post" class="form">
-{{ end }}
-{{ template "csrf_token" . }}
-<label for="entry_class_id">
-  Category
-  {{ $EntryClassID := .expense.EntryClassID }}
-  <select name="entry_class_id" id="entry_class_id">
-    {{ range .entryClasses }}
-    <option value="{{ .ID }}" {{ if eq .ID $EntryClassID }}selected{{ end }}>{{ .Name }}</option>
-    {{ end }}
-  </select>
-</label>
-<label for="description">
-  Description
-  <textarea name="description" id="description">{{ .expense.Description }}</textarea>
-</label>
-<label for="amount">
-  Amount
-  <input type="number" name="amount" id="amount" step="0.01" min="1" placeholder="100" value="{{ .expense.Amount }}">
-</label>
-<div class="form-actions">
-  <label for="submit">
-    <button type="submit" id="submit">Submit</button>
-  </label>
-</div>
+  {{ else }}
+  <form action="/budgets/{{ .budget.UID }}/expenses" method="post" class="form">
+    {{ end }} {{ template "csrf_token" . }}
+    <label for="entry_class_id">
+      Category {{ $EntryClassID := .expense.EntryClassID }}
+      <select name="entry_class_id" id="entry_class_id">
+        {{ range .entryClasses }}
+        <option value="{{ .ID }}" {{ if eq .ID $EntryClassID }}selected{{ end }}>
+          {{ .Name }}
+        </option>
+        {{ end }}
+      </select>
+    </label>
+    <label for="description">
+      Description
+      <textarea name="description" id="description">{{ .expense.Description }}</textarea>
+    </label>
+    <label for="amount">
+      Amount
+      <input
+        type="number"
+        name="amount"
+        id="amount"
+        step="0.01"
+        min="1"
+        placeholder="100"
+        value="{{ .expense.Amount }}" />
+    </label>
+    <div class="form-actions">
+      <label for="submit">
+        <button type="submit" id="submit">Submit</button>
+      </label>
+    </div>
+  </form>
+  {{ end }}
 </form>
-{{ end }}

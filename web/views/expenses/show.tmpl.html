@@ -1,15 +1,15 @@
 {{ define "content" }}
-<section class="card">
-  <h2 class="title">Expense</h2>
-  <div class="title-links mb-4">
-    <a href="/budgets/{{ .budget.UID }}/expenses/{{ .expense.ID }}/edit" class="link">Edit</a>
-    |
-    <form action="/budgets/{{ .budget.UID }}/expenses/{{ .expense.ID }}/delete" method="post">
-      <input type="hidden" name="csrf_token" value="{{ .csrfToken }}">
-      <button type="submit" class="link">Delete</button>
-    </form>
-  </div>
-  <p>{{ .expense.Description }}</p>
-  <p>{{ .expense.Amount }}</p>
-</section>
+  <section class="card">
+    <h2 class="title">Expense</h2>
+    <div class="title-links mb-4">
+      <a href="/budgets/{{ .budget.UID }}/expenses/{{ .expense.ID }}/edit" class="link">Edit</a>
+      |
+      <form action="/budgets/{{ .budget.UID }}/expenses/{{ .expense.ID }}/delete" method="post">
+        <input type="hidden" name="csrf_token" value="{{ .csrfToken }}" />
+        <button type="submit" class="link">Delete</button>
+      </form>
+    </div>
+    <p>{{ .expense.Description }}</p>
+    <p>{{ .expense.Amount }}</p>
+  </section>
 {{ end }}
