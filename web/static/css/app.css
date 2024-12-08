@@ -8,6 +8,28 @@
   }
 }
 
+@layer components {
+  .title {
+    @apply mb-4 text-xl text-slate-600 font-bold;
+  }
+
+  .title-links {
+    @apply flex items-center gap-2 text-sm;
+  }
+
+  .subtitle {
+    @apply mb-2 text-lg text-slate-500 font-semibold;
+  }
+
+  .link {
+    @apply text-teal-600 cursor-pointer hover:underline;
+  }
+
+  .card {
+    @apply p-4 bg-gray-100 border border-gray-300 rounded;
+  }
+}
+
 @layer utilities {
   main {
     @apply px-4 mt-6;
@@ -51,31 +73,5 @@
 
   .modal {
     @apply fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center;
-  }
-
-  .modal-content {
-    @apply card;
-  }
-}
-
-@layer components {
-  .title {
-    @apply mb-4 text-xl text-slate-600 font-bold;
-  }
-
-  .title-links {
-    @apply flex items-center gap-2 text-sm;
-  }
-
-  .subtitle {
-    @apply mb-2 text-lg text-slate-500 font-semibold;
-  }
-
-  .link {
-    @apply text-teal-600 cursor-pointer hover:underline;
-  }
-
-  .card {
-    @apply p-4 bg-gray-100 border border-gray-300 rounded;
   }
 }
