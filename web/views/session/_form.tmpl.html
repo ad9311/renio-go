@@ -4,7 +4,7 @@
   <li>{{ . }}</li>
   {{ end}}
 </ul>
-<form action="/auth/sign-in" method="post">
+<form action="/auth/sign-in" method="post" class="form">
   {{ template "csrf_token" . }}
   <label for="username">
     Email
@@ -19,8 +19,10 @@
       placeholder="Password"
     />
   </label>
-  <label for="sign_in">
-    <button type="submit" id="sign_in">Sign in</button>
-  </label>
+  <div class="form-actions">
+    <label for="sign_in">
+      <button type="submit" id="sign_in">Sign in</button>
+    </label>
+  </div>
 </form>
 {{ end }}

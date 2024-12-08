@@ -4,7 +4,7 @@
   <li>{{ . }}</li>
   {{ end}}
 </ul>
-<form action="/auth/sign-up" method="post">
+<form action="/auth/sign-up" method="post" class="form">
   {{ template "csrf_token" . }}
   <label for="username">
     Username
@@ -36,8 +36,10 @@
       placeholder="Password confirmation"
     />
   </label>
-  <label for="sign_up">
-    <button type="submit" id="sign_up">Sign up</button>
-  </label>
+  <div class="form-actions">
+    <label for="sign_up">
+      <button type="submit" id="sign_up">Sign up</button>
+    </label>
+  </div>
 </form>
 {{ end }}
