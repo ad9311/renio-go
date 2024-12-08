@@ -1,19 +1,15 @@
 package model
 
-import (
-	"github.com/ad9311/renio-go/internal/eval"
-)
-
 func (e ExpenseFormData) Validate() error {
-	data := eval.ModelEval{
-		Floats: []eval.Float{
+	data := ModelEval{
+		Floats: []Float{
 			{
 				Name:     "Amount",
 				Value:    e.Amount,
 				Positive: true,
 			},
 		},
-		Strings: []eval.String{
+		Strings: []String{
 			{
 				Name:  "Description",
 				Value: e.Description,
@@ -21,7 +17,7 @@ func (e ExpenseFormData) Validate() error {
 				Max:   50,
 			},
 		},
-		Ints: []eval.Int{
+		Ints: []Int{
 			{
 				Name:     "Entry class id",
 				Value:    e.EntryClassID,

@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ad9311/renio-go/internal/db"
-	"github.com/ad9311/renio-go/internal/eval"
+	"github.com/ad9311/renio-go/internal/app"
 )
 
 type Budget struct {
@@ -30,7 +29,7 @@ func (bs *Budgets) Index(budgetAccountID int) error {
 	query := "SELECT * FROM budgets WHERE budget_account_id = $1 ORDER BY uid DESC"
 
 	var budgets []any
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:   query,
 		QueryArgs:  []any{budgetAccountID},
 		Model:      Budget{},
@@ -50,7 +49,7 @@ func (bs *Budgets) Index(budgetAccountID int) error {
 }
 
 func (b *Budget) SelectByUID(uid string, budgetAccountID int) error {
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  "SELECT * FROM budgets WHERE uid = $1 AND budget_account_id = $2",
 		QueryArgs: []any{uid, budgetAccountID},
 		Model:     Budget{},
@@ -69,7 +68,7 @@ func (b *Budget) SelectByUID(uid string, budgetAccountID int) error {
 func (b *Budget) SelectCurrent(budgetAccountID int) error {
 	b.setCurrentUID(budgetAccountID)
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  "SELECT * FROM budgets WHERE uid = $1",
 		QueryArgs: []any{b.UID},
 		Model:     Budget{},
@@ -88,7 +87,7 @@ func (b *Budget) SelectCurrent(budgetAccountID int) error {
 func (b *Budget) Insert(budgetAccountID int) error {
 	query := "INSERT INTO budgets (uid, budget_account_id) VALUES ($1, $2) RETURNING *"
 	b.setCurrentUID(budgetAccountID)
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{b.UID, budgetAccountID},
 		Model:     Budget{},
@@ -110,7 +109,7 @@ func (b *Budget) UpdateOnEntry(credit float32, debit float32, count int) error {
 	b.setBalance(credit, debit)
 	b.addToEntryCount(count)
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			b.Balance,
@@ -136,7 +135,7 @@ func (b *Budget) UpdateOnIncome(credit float32, debit float32, count int) error 
 	b.setTotalIncome(credit, debit)
 	b.addToIncomeCount(count)
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			b.TotalIncome,
@@ -162,7 +161,7 @@ func (b *Budget) UpdateOnExpense(credit float32, debit float32, count int) error
 	b.setTotalExpenses(credit, debit)
 	b.addToExpenseCount(count)
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr: query,
 		QueryArgs: []any{
 			b.TotalExpenses,
@@ -185,15 +184,15 @@ func (b *Budget) UpdateOnExpense(credit float32, debit float32, count int) error
 // --- Validations --- //
 
 func (b *Budget) Validate() error {
-	data := eval.ModelEval{
-		Strings: []eval.String{
+	data := ModelEval{
+		Strings: []String{
 			{
 				Name:    "Budget UID",
 				Value:   b.UID,
 				Pattern: `^\d+-\d{4}-\d{2}$`,
 			},
 		},
-		Ints: []eval.Int{
+		Ints: []Int{
 			{
 				Name:     "Budget ID",
 				Value:    b.ID,
@@ -242,7 +241,7 @@ func (b *Budget) addToExpenseCount(change int) {
 	b.ExpenseCount = b.ExpenseCount + change
 }
 
-func (b *Budget) saveBudgetFromDB(queryExec db.QueryExe) error {
+func (b *Budget) saveBudgetFromDB(queryExec app.QueryExe) error {
 	value, ok := queryExec.Model.(*Budget)
 	if !ok {
 		return ErrIncompleteQuery{}

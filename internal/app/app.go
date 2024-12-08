@@ -1,34 +1,22 @@
 package app
 
 import (
-	"github.com/ad9311/renio-go/internal/conf"
-	"github.com/ad9311/renio-go/internal/db"
-	"github.com/ad9311/renio-go/internal/db/seed"
-	"github.com/ad9311/renio-go/internal/model"
+	"fmt"
+	"path/filepath"
+	"runtime"
 )
 
-func Init() error {
-	if err := conf.Init(); err != nil {
-		return err
+func GetRootDir() (string, error) {
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		return "", fmt.Errorf("unable to determine the root directory")
 	}
 
-	if err := db.Init(); err != nil {
-		return err
+	root := filepath.Join(filepath.Dir(filename), "../..")
+	root, err := filepath.Abs(root)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve root path, %v", err)
 	}
 
-	if conf.GetEnv().AppEnv == conf.Production {
-		if err := db.Migrate(); err != nil {
-			return err
-		}
-	}
-
-	if conf.GetEnv().Seed {
-		if err := seed.Run(); err != nil {
-			return err
-		}
-	}
-
-	model.RegisterModels()
-
-	return nil
+	return root, nil
 }

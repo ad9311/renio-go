@@ -5,14 +5,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ad9311/renio-go/internal/conf"
+	"github.com/ad9311/renio-go/internal/app"
 	"github.com/ad9311/renio-go/internal/handler"
 	"github.com/ad9311/renio-go/internal/vars"
 	"github.com/justinas/nosurf"
 )
 
 func session(next http.Handler) http.Handler {
-	return conf.GetSession().LoadAndSave(next)
+	return app.GetSession().LoadAndSave(next)
 }
 
 func csrf(next http.Handler) http.Handler {
@@ -20,7 +20,7 @@ func csrf(next http.Handler) http.Handler {
 	csrfHandler.SetBaseCookie(http.Cookie{
 		HttpOnly: true,
 		Path:     "/",
-		Secure:   conf.GetEnv().AppEnv == conf.Production,
+		Secure:   app.GetEnv().AppEnv == app.Production,
 		SameSite: http.SameSiteLaxMode,
 	})
 
@@ -35,7 +35,7 @@ func authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		session := conf.GetSession()
+		session := app.GetSession()
 		key := string(vars.UserSignedInKey)
 		isUserSignedIn := session.GetBool(r.Context(), key)
 
@@ -66,8 +66,8 @@ func appData(next http.Handler) http.Handler {
 		userKey := string(vars.CurrentUserKey)
 		isUserSignedInKey := string(vars.UserSignedInKey)
 
-		user := conf.GetSession().Get(r.Context(), userKey)
-		isUserSignedIn := conf.GetSession().GetBool(r.Context(), isUserSignedInKey)
+		user := app.GetSession().Get(r.Context(), userKey)
+		isUserSignedIn := app.GetSession().GetBool(r.Context(), isUserSignedInKey)
 
 		data := handler.TmplData{
 			"errors":         []string{},
@@ -76,7 +76,7 @@ func appData(next http.Handler) http.Handler {
 			"currentUser":    user,
 			"isUserSignedIn": isUserSignedIn,
 			"csrfToken":      nosurf.Token(r),
-			"appEnv":         conf.GetEnv().AppEnv,
+			"appEnv":         app.GetEnv().AppEnv,
 		}
 
 		ctx := context.WithValue(r.Context(), vars.AppDataKey, data)

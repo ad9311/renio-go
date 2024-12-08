@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/ad9311/renio-go/internal/db"
+	"github.com/ad9311/renio-go/internal/app"
 )
 
 type EntryClass struct {
@@ -33,7 +33,7 @@ func (es *EntryClasses) Index() error {
 	query := "SELECT * FROM entry_classes"
 
 	var entryClasses []any
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:   query,
 		QueryArgs:  []any{},
 		Model:      EntryClass{},
@@ -55,7 +55,7 @@ func (es *EntryClasses) Index() error {
 func (e *EntryClass) Insert() error {
 	query := `INSERT INTO entry_classes (uid, name, type) VALUES ($1, $2, $3) RETURNING *`
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{e.UID, e.Name, e.Type},
 		Model:     EntryClass{},
@@ -74,7 +74,7 @@ func (e *EntryClass) Insert() error {
 func (e *EntryClass) InsertIfNotExists() error {
 	query := `INSERT INTO entry_classes (uid, name, type) VALUES ($1, $2, $3) ON CONFLICT (uid) DO NOTHING`
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{e.UID, e.Name, e.Type},
 	}
@@ -88,7 +88,7 @@ func (e *EntryClass) InsertIfNotExists() error {
 func (e *EntryClass) SelectByID(id int) error {
 	query := "SELECT * FROM entry_classes WHERE id = $1"
 
-	queryExec := db.QueryExe{
+	queryExec := app.QueryExe{
 		QueryStr:  query,
 		QueryArgs: []any{id},
 		Model:     EntryClass{},
@@ -110,7 +110,7 @@ func (e *EntryClass) TypeName() string {
 
 // --- Helpers  --- //
 
-func (e *EntryClass) saveEntryClassFromDB(queryExec db.QueryExe) error {
+func (e *EntryClass) saveEntryClassFromDB(queryExec app.QueryExe) error {
 	value, ok := queryExec.Model.(*EntryClass)
 	if !ok {
 		return ErrIncompleteQuery{}

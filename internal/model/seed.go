@@ -1,10 +1,6 @@
-package seed
+package model
 
-import (
-	"github.com/ad9311/renio-go/internal/model"
-)
-
-var entryClassesSeed = []model.EntryClass{
+var entryClassesSeed = []EntryClass{
 	{
 		UID:  "banking",
 		Name: "Banking",
@@ -87,7 +83,7 @@ var entryClassesSeed = []model.EntryClass{
 	},
 }
 
-func seedEntryClasses() error {
+func RunSeeds() error {
 	for _, entryClass := range entryClassesSeed {
 		if err := entryClass.InsertIfNotExists(); err != nil {
 			return err

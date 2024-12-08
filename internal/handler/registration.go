@@ -3,7 +3,6 @@ package handler
 import (
 	"net/http"
 
-	"github.com/ad9311/renio-go/internal/eval"
 	"github.com/ad9311/renio-go/internal/model"
 	"github.com/ad9311/renio-go/internal/svc"
 )
@@ -29,7 +28,7 @@ func PostSignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err := svc.SignUpUser(signUnData)
-	errEval, ok := err.(*eval.ErrEval)
+	errEval, ok := err.(*model.ErrEval)
 	if ok {
 		writeAsBadRequest(w, ctx, errEval.Issues, "registration/index")
 		return
