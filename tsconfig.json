@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "outDir": "./web/static/js/build",
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "sourceMap": false,
+    "paths": {
+      "@/*": ["./web/static/js/*"]
+    }
+  },
+  "include": [
+    "web/static/js/**/*"
+  ],
+  "exclude": [
+    "web/static/js/build/**/*",
+    "node_modules"
+  ]
+}
