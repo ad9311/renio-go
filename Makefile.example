@@ -1,9 +1,9 @@
-migrate_dir=file://./db/migrations
+migrate_dir=./db/migrations
 database_url=REPLACE_ME
 test_database_url=REPLACE_ME
 
 migrate_up:
-	goose -dir $(migrate_dir) postgres $(database_url) up 
+	goose -dir $(migrate_dir) postgres $(database_url) up
 
 migrate_reset:
 	goose -dir $(migrate_dir) postgres '$(database_url)' reset
@@ -17,5 +17,16 @@ migrate_test_reset:
 test: migrate_test_reset migrate_test_up
 	APP_ENV=test go test -v -cover -count=1 ./...
 
-dev:
+server:
 	go run ./cmd/server/main.go
+
+watch-server:
+	air
+
+postcss:
+	bunx postcss-cli web/static/css/app.css -o web/static/css/build/bundle.css --watch & disown
+
+rollup:
+	bunx rollup --config
+
+dev: postcss rollup watch-server

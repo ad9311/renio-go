@@ -27,28 +27,28 @@ func CreateIncome(incomeFormData model.IncomeFormData, budget model.Budget) (mod
 }
 
 func UpdateIncome(
-	income *model.Income,
+	income model.Income,
 	incomeFormData model.IncomeFormData,
 	budget model.Budget,
-) error {
+) (model.Income, error) {
 	if err := incomeFormData.Validate(); err != nil {
-		return err
+		return income, err
 	}
 
 	prevAmount := income.Amount
 	if err := income.Update(incomeFormData); err != nil {
-		return err
+		return income, err
 	}
 
 	if err := budget.UpdateOnEntry(income.Amount, prevAmount, 0); err != nil {
-		return err
+		return income, err
 	}
 
 	if err := budget.UpdateOnIncome(income.Amount, prevAmount, 0); err != nil {
-		return err
+		return income, err
 	}
 
-	return nil
+	return income, nil
 }
 
 func DeleteIncome(income model.Income, budget model.Budget) error {

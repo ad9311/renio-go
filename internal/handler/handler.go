@@ -26,14 +26,6 @@ func writeTemplate(w http.ResponseWriter, ctx context.Context, name string) {
 	executeTemplate(w, tmpl, name, data)
 }
 
-func writeTurboTemplate(w http.ResponseWriter, ctx context.Context, name string, status int) {
-	data := getAppData(ctx)
-	data["turboTemplate"] = true
-	w.Header().Set("Content-Type", "text/vnd.turbo-stream.html; charset=utf-8")
-	w.WriteHeader(status)
-	writeTemplate(w, ctx, name)
-}
-
 func writeErrorPage(w http.ResponseWriter, ctx context.Context, errors []string) {
 	w.WriteHeader(http.StatusBadRequest)
 	saveAppDataErrors(ctx, errors)
@@ -46,15 +38,15 @@ func writeNotFound(w http.ResponseWriter, ctx context.Context) {
 	writeTemplate(w, ctx, "not-found/index")
 }
 
-func writeInternalError(w http.ResponseWriter, ctx context.Context, errors []string) {
+func writeInternalError(w http.ResponseWriter, ctx context.Context, errStrs []string) {
 	w.WriteHeader(http.StatusInternalServerError)
-	saveAppDataErrors(ctx, errors)
+	saveAppDataErrors(ctx, errStrs)
 	writeTemplate(w, ctx, "error/index")
 }
 
-func writeAsBadRequest(w http.ResponseWriter, ctx context.Context, errors []string, page string) {
+func writeAsBadRequest(w http.ResponseWriter, ctx context.Context, errStrs []string, page string) {
 	w.WriteHeader(http.StatusBadRequest)
-	saveAppDataErrors(ctx, errors)
+	saveAppDataErrors(ctx, errStrs)
 	writeTemplate(w, ctx, page)
 }
 
@@ -74,15 +66,15 @@ func saveAppDataErrors(ctx context.Context, errStrs []string) {
 	data["errors"] = errStrs
 }
 
-func handleFormErrorAsTurboTemplate(w http.ResponseWriter, ctx context.Context, err error, turboTemplate string) {
+func handleFormError(w http.ResponseWriter, ctx context.Context, err error, tmpl string) {
 	errEval, ok := err.(*eval.ErrEval)
 	if ok {
 		getAppData(ctx)["errors"] = errEval.Issues
-		writeTurboTemplate(w, ctx, turboTemplate, http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		writeTemplate(w, ctx, tmpl)
 		return
 	} else {
 		errStr := []string{err.Error()}
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		writeInternalError(w, ctx, errStr)
 		return
 	}

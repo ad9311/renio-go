@@ -28,28 +28,28 @@ func CreateExpense(
 }
 
 func UpdateExpense(
-	expense *model.Expense,
+	expense model.Expense,
 	expenseformData model.ExpenseFormData,
 	budget model.Budget,
-) error {
+) (model.Expense, error) {
 	if err := expenseformData.Validate(); err != nil {
-		return err
+		return expense, err
 	}
 
 	prevAmount := expense.Amount
 	if err := expense.Update(expenseformData); err != nil {
-		return err
+		return expense, err
 	}
 
 	if err := budget.UpdateOnEntry(prevAmount, expense.Amount, 0); err != nil {
-		return err
+		return expense, err
 	}
 
 	if err := budget.UpdateOnExpense(expense.Amount, prevAmount, 0); err != nil {
-		return err
+		return expense, err
 	}
 
-	return nil
+	return expense, nil
 }
 
 func DeleteExpense(expense model.Expense, budget model.Budget) error {
