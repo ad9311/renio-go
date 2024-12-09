@@ -1,21 +1,20 @@
 {{ define "income_form" }}
-<ul>
-  {{ range .errors }}
-  <li>{{ . }}</li>
-  {{ end}}
-</ul>
-{{ if .income }}
-<form action="/budgets/{{ .budget.UID }}/income-list/{{ .income.ID }}" method="post" class="form">
-  {{ else }}
-  <form action="/budgets/{{ .budget.UID }}/income-list" method="post" class="form">
-    {{ end }} {{ template "csrf_token" . }}
+  <ul>
+    {{ range .errors }}
+      <li>{{ . }}</li>
+    {{ end }}
+  </ul>
+  {{ $incomeID := .income.ID }}
+  <form action="/budgets/{{ .budget.UID }}/income-list/{{ $incomeID }}" method="post" class="form">
+    {{ template "csrf_token" . }}
     <label for="entry_class_id">
-      Category {{ $entryClassID := .income.EntryClassID }}
+      Category
+      {{ $entryClassID := .income.EntryClassID }}
       <select name="entry_class_id" id="entry_class_id">
         {{ range .entryClasses }}
-        <option value="{{ .ID }}" {{ if eq .ID $entryClassID }}selected{{ end }}>
-          {{ .Name }}
-        </option>
+          <option value="{{ .ID }}" {{ if eq .ID $entryClassID }}selected{{ end }}>
+            {{ .Name }}
+          </option>
         {{ end }}
       </select>
     </label>
@@ -40,5 +39,4 @@
       </label>
     </div>
   </form>
-  {{ end }}
-</form>
+{{ end }}

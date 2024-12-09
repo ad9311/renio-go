@@ -15,8 +15,10 @@
     <div class="flex">
       <main class="w-full">{{ block "content" . }}{{ end }}</main>
       {{ if .isUserSignedIn }}
-      <div id="sidebar-overlay" class="hidden lg:block">
-        <div id="sidebar-container" class="absolute -right-full h-full lg:static lg:pb-4">
+      <div id="sidebar-overlay">
+        <div
+          id="sidebar-container"
+          class="absolute right-0 h-full transform translate-x-full transition-transform lg:static lg:pb-4">
           {{ template "sidebar" . }}
         </div>
       </div>
