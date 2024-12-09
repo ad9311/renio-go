@@ -13,6 +13,11 @@ import (
 
 type TmplData map[string]any
 
+type NavLink struct {
+	Name string
+	URL  string
+}
+
 func writeTemplate(w http.ResponseWriter, ctx context.Context, name string) {
 	cache := app.GetTemplates()
 	tmpl, ok := cache[name]
@@ -48,6 +53,15 @@ func writeAsBadRequest(w http.ResponseWriter, ctx context.Context, errStrs []str
 	w.WriteHeader(http.StatusBadRequest)
 	saveAppDataErrors(ctx, errStrs)
 	writeTemplate(w, ctx, page)
+}
+
+// --- Navigation --- //
+
+func GetNavLinks(ctx context.Context) []NavLink {
+	return []NavLink{
+		{Name: "Home", URL: "/home"},
+		{Name: "Bugets", URL: "/budgets"},
+	}
 }
 
 // --- Helpers --- //

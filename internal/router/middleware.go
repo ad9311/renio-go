@@ -76,6 +76,7 @@ func appData(next http.Handler) http.Handler {
 			"currentUser":    user,
 			"isUserSignedIn": isUserSignedIn,
 			"csrfToken":      nosurf.Token(r),
+			"navLinks":       handler.GetNavLinks(r.Context()),
 			"appEnv":         app.GetEnv().AppEnv,
 		}
 

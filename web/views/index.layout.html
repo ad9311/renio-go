@@ -8,11 +8,20 @@
     <title>RENIO</title>
   </head>
   <body>
-    {{ template "navbar" . }}
-    <turbo-frame id="info">
+    <div>
+      {{ template "navbar" . }}
       <div class="info">{{ .info }}</div>
-    </turbo-frame>
-    <main>{{ block "content" . }}{{ end }}</main>
+    </div>
+    <div class="flex">
+      <main class="w-full">{{ block "content" . }}{{ end }}</main>
+      {{ if .isUserSignedIn }}
+      <div id="sidebar-overlay" class="hidden lg:block">
+        <div id="sidebar-container" class="absolute -right-full h-full lg:static lg:pb-4">
+          {{ template "sidebar" . }}
+        </div>
+      </div>
+      {{ end }}
+    </div>
   </body>
   <script type="module" src="/static/js/build/bundle.js"></script>
 </html>

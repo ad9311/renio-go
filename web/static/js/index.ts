@@ -14,7 +14,19 @@ window.htmx = htmx;
 
 $(() => {
   $('#closeModal').on('click', function () {
-    $('#modal').addClass('hidden').removeClass('modal');
+    $('#modal').addClass('hidden').removeClass('modal-overlay');
+  });
+
+  $('#toggle-sidebar').on('click', function () {
+    $('#sidebar-overlay').removeClass('hidden').addClass('sidebar-overlay');
+    $('#sidebar-container').removeClass('-right-full').addClass('right-0');
+  });
+
+  $('#sidebar-overlay').on('click', function (event) {
+    if (!$(event.target).closest('#sidebar-container').length) {
+      $('#sidebar-overlay').addClass('hidden').removeClass('sidebar-overlay');
+      $('#sidebar-container').addClass('-right-full').removeClass('right-0');
+    }
   });
 
   income();

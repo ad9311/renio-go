@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 @layer base {
+  html,
+  body {
+    @apply h-full;
+  }
+
   body {
     @apply text-slate-700 bg-white;
   }
@@ -71,7 +76,11 @@
     @apply bg-teal-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-teal-700;
   }
 
-  .modal {
+  .modal-overlay {
     @apply fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center;
+  }
+
+  .sidebar-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 lg:static lg:bg-transparent;
   }
 }

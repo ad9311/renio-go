@@ -1,0 +1,12 @@
+{{ define "sidebar" }}
+  <aside class="card w-64 h-full lg:mr-4 lg:mt-6 lg:h-[90vh] xl:w-80">
+    <nav>
+      <ul>
+        {{ range .navLinks }}
+          <li><a href="{{ .URL }}" class="link">{{ .Name }}</a></li>
+        {{ end }}
+      </ul>
+    </nav>
+    {{ template "sign_out_button" . }}
+  </aside>
+{{ end }}
