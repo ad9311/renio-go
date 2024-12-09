@@ -18,6 +18,59 @@ type NavLink struct {
 	URL  string
 }
 
+func GetNavLinks(ctx context.Context) []NavLink {
+	return []NavLink{
+		{Name: "Home", URL: "/home"},
+		{Name: "Bugets", URL: "/budgets"},
+	}
+}
+
+func SetSessionCTX(ctx context.Context, key vars.ContextKey, value any) {
+	app.GetSession().Put(ctx, string(key), value)
+}
+
+func GetAppDataCTX(ctx context.Context) TmplData {
+	return ctx.Value(vars.AppDataKey).(TmplData)
+}
+
+func GetUserCTX(ctx context.Context) model.SafeUser {
+	session := app.GetSession()
+	key := string(vars.CurrentUserKey)
+	user, ok := session.Get(ctx, key).(model.SafeUser)
+	if !ok {
+		return model.SafeUser{}
+	}
+	return user
+}
+
+func IsUserSignedInCTX(ctx context.Context) bool {
+	session := app.GetSession()
+	key := string(vars.UserSignedInKey)
+	return session.GetBool(ctx, key)
+}
+
+func GetUserID_CTX(ctx context.Context) int {
+	session := app.GetSession()
+	key := string(vars.UserIDKey)
+	return session.GetInt(ctx, key)
+}
+
+func GetBudgetAccountCTX(ctx context.Context) model.BudgetAccount {
+	return ctx.Value(vars.BudgetAccountKey).(model.BudgetAccount)
+}
+
+func GetBudgetCTX(ctx context.Context) model.Budget {
+	return ctx.Value(vars.BudgetKey).(model.Budget)
+}
+
+func GetIncomeCTX(ctx context.Context) model.Income {
+	return ctx.Value(vars.IncomeKey).(model.Income)
+}
+
+func GetExpenseCTX(ctx context.Context) model.Expense {
+	return ctx.Value(vars.ExpenseKey).(model.Expense)
+}
+
 func writeTemplate(w http.ResponseWriter, ctx context.Context, name string) {
 	cache := app.GetTemplates()
 	tmpl, ok := cache[name]
@@ -27,7 +80,7 @@ func writeTemplate(w http.ResponseWriter, ctx context.Context, name string) {
 		return
 	}
 
-	data := getAppData(ctx)
+	data := GetAppDataCTX(ctx)
 	executeTemplate(w, tmpl, name, data)
 }
 
@@ -55,35 +108,17 @@ func writeAsBadRequest(w http.ResponseWriter, ctx context.Context, errStrs []str
 	writeTemplate(w, ctx, page)
 }
 
-// --- Navigation --- //
-
-func GetNavLinks(ctx context.Context) []NavLink {
-	return []NavLink{
-		{Name: "Home", URL: "/home"},
-		{Name: "Bugets", URL: "/budgets"},
-	}
-}
-
 // --- Helpers --- //
 
-func getAppData(ctx context.Context) TmplData {
-	return ctx.Value(vars.AppDataKey).(TmplData)
-}
-
-func getCurrentUserId(ctx context.Context) int {
-	userIDkey := string(vars.UserIDKey)
-	return app.GetSession().GetInt(ctx, userIDkey)
-}
-
 func saveAppDataErrors(ctx context.Context, errStrs []string) {
-	data := getAppData(ctx)
+	data := GetAppDataCTX(ctx)
 	data["errors"] = errStrs
 }
 
 func handleFormError(w http.ResponseWriter, ctx context.Context, err error, tmpl string) {
 	errEval, ok := err.(*model.ErrEval)
 	if ok {
-		getAppData(ctx)["errors"] = errEval.Issues
+		GetAppDataCTX(ctx)["errors"] = errEval.Issues
 		w.WriteHeader(http.StatusBadRequest)
 		writeTemplate(w, ctx, tmpl)
 		return
