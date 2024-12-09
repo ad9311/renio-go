@@ -1,21 +1,20 @@
 {{ define "expense_form" }}
-<ul>
-  {{ range .errors }}
-  <li>{{ . }}</li>
-  {{ end}}
-</ul>
-{{ if .expense }}
-<form action="/budgets/{{ .budget.UID }}/expenses/{{ .expense.ID }}" method="post" class="form">
-  {{ else }}
-  <form action="/budgets/{{ .budget.UID }}/expenses" method="post" class="form">
-    {{ end }} {{ template "csrf_token" . }}
+  <ul>
+    {{ range .errors }}
+      <li>{{ . }}</li>
+    {{ end }}
+  </ul>
+  {{ $expenseID := .expense.ID }}
+  <form action="/budgets/{{ .budget.UID }}/expenses/{{ $expenseID }}" method="post" class="form">
+    {{ template "csrf_token" . }}
     <label for="entry_class_id">
-      Category {{ $EntryClassID := .expense.EntryClassID }}
+      Category
+      {{ $EntryClassID := .expense.EntryClassID }}
       <select name="entry_class_id" id="entry_class_id">
         {{ range .entryClasses }}
-        <option value="{{ .ID }}" {{ if eq .ID $EntryClassID }}selected{{ end }}>
-          {{ .Name }}
-        </option>
+          <option value="{{ .ID }}" {{ if eq .ID $EntryClassID }}selected{{ end }}>
+            {{ .Name }}
+          </option>
         {{ end }}
       </select>
     </label>
@@ -40,5 +39,4 @@
       </label>
     </div>
   </form>
-  {{ end }}
-</form>
+{{ end }}
