@@ -17,15 +17,18 @@ $(() => {
     $('#modal').addClass('hidden').removeClass('modal-overlay');
   });
 
-  $('#toggle-sidebar').on('click', function () {
-    $('#sidebar-overlay').removeClass('hidden').addClass('sidebar-overlay');
-    $('#sidebar-container').removeClass('-right-full').addClass('right-0');
+  function toggleSidebar() {
+    $('#sidebar-overlay').toggleClass('sidebar-overlay');
+    $('#sidebar-container').toggleClass('translate-x-full');
+  }
+
+  $('#toggle-sidebar, .close-sidebar').on('click', function () {
+    toggleSidebar();
   });
 
   $('#sidebar-overlay').on('click', function (event) {
     if (!$(event.target).closest('#sidebar-container').length) {
-      $('#sidebar-overlay').addClass('hidden').removeClass('sidebar-overlay');
-      $('#sidebar-container').addClass('-right-full').removeClass('right-0');
+      toggleSidebar();
     }
   });
 
