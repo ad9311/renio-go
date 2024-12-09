@@ -35,10 +35,9 @@ func authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		session := app.GetSession()
-		key := string(vars.UserSignedInKey)
-		isUserSignedIn := session.GetBool(r.Context(), key)
+		ctx := r.Context()
 
+		isUserSignedIn := handler.IsUserSignedInCTX(ctx)
 		isSignInPath := strings.HasPrefix(path, "/auth/sign-in")
 		isSignUpPath := strings.HasPrefix(path, "/auth/sign-up")
 
@@ -63,11 +62,9 @@ func authenticate(next http.Handler) http.Handler {
 
 func appData(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userKey := string(vars.CurrentUserKey)
-		isUserSignedInKey := string(vars.UserSignedInKey)
-
-		user := app.GetSession().Get(r.Context(), userKey)
-		isUserSignedIn := app.GetSession().GetBool(r.Context(), isUserSignedInKey)
+		ctx := r.Context()
+		user := handler.GetUserCTX(ctx)
+		isUserSignedIn := handler.IsUserSignedInCTX(ctx)
 
 		data := handler.TmplData{
 			"errors":         []string{},
@@ -76,11 +73,11 @@ func appData(next http.Handler) http.Handler {
 			"currentUser":    user,
 			"isUserSignedIn": isUserSignedIn,
 			"csrfToken":      nosurf.Token(r),
-			"navLinks":       handler.GetNavLinks(r.Context()),
+			"navLinks":       handler.GetNavLinks(ctx),
 			"appEnv":         app.GetEnv().AppEnv,
 		}
 
-		ctx := context.WithValue(r.Context(), vars.AppDataKey, data)
+		ctx = context.WithValue(ctx, vars.AppDataKey, data)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

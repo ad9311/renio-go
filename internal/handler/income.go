@@ -37,7 +37,7 @@ func IncomeCTX(next http.Handler) http.Handler {
 
 func GetNewIncome(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	budget := ctx.Value(vars.BudgetKey).(model.Budget)
+	budget := GetBudgetCTX(ctx)
 
 	var entryClasses model.EntryClasses
 	if err := entryClasses.Index(); err != nil {
@@ -45,14 +45,14 @@ func GetNewIncome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	getAppData(ctx)["budget"] = budget
-	getAppData(ctx)["entryClasses"] = entryClasses
+	GetAppDataCTX(ctx)["budget"] = budget
+	GetAppDataCTX(ctx)["entryClasses"] = entryClasses
 	writeTemplate(w, ctx, "income-list/new")
 }
 
 func PostIncome(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	budget := ctx.Value(vars.BudgetKey).(model.Budget)
+	budget := GetBudgetCTX(ctx)
 
 	var entryClasses model.EntryClasses
 	if err := entryClasses.Index(); err != nil {
@@ -75,36 +75,36 @@ func PostIncome(w http.ResponseWriter, r *http.Request) {
 		Amount:       float32(amount),
 	}
 
-	getAppData(ctx)["budget"] = budget
-	getAppData(ctx)["entryClasses"] = entryClasses
+	GetAppDataCTX(ctx)["budget"] = budget
+	GetAppDataCTX(ctx)["entryClasses"] = entryClasses
 
 	if _, err := svc.CreateIncome(incomeFormData, budget); err != nil {
 		handleFormError(w, ctx, err, "income-list/new")
 		return
 	}
 
-	getAppData(ctx)["info"] = "Income created successfully"
+	GetAppDataCTX(ctx)["info"] = "Income created successfully"
 	w.WriteHeader(http.StatusCreated)
 	writeTemplate(w, ctx, "income-list/new")
 }
 
 func GetIncome(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	budget := ctx.Value(vars.BudgetKey).(model.Budget)
-	income := ctx.Value(vars.IncomeKey).(model.Income)
+	budget := GetBudgetCTX(ctx)
+	income := GetIncomeCTX(ctx)
 
-	getAppData(ctx)["budget"] = budget
-	getAppData(ctx)["income"] = income
-	getAppData(ctx)["modalTitle"] = "Delete Income"
-	getAppData(ctx)["confirmationMessage"] = "Are you sure you want to delete this income?"
-	getAppData(ctx)["formAction"] = "/budgets/" + budget.UID + "/income-list/" + strconv.Itoa(income.ID) + "/delete"
+	GetAppDataCTX(ctx)["budget"] = budget
+	GetAppDataCTX(ctx)["income"] = income
+	GetAppDataCTX(ctx)["modalTitle"] = "Delete Income"
+	GetAppDataCTX(ctx)["confirmationMessage"] = "Are you sure you want to delete this income?"
+	GetAppDataCTX(ctx)["formAction"] = "/budgets/" + budget.UID + "/income-list/" + strconv.Itoa(income.ID) + "/delete"
 	writeTemplate(w, ctx, "income-list/show")
 }
 
 func GetEditIncome(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	budget := ctx.Value(vars.BudgetKey).(model.Budget)
-	income := ctx.Value(vars.IncomeKey).(model.Income)
+	budget := GetBudgetCTX(ctx)
+	income := GetIncomeCTX(ctx)
 
 	var entryClasses model.EntryClasses
 	if err := entryClasses.Index(); err != nil {
@@ -112,16 +112,16 @@ func GetEditIncome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	getAppData(ctx)["budget"] = budget
-	getAppData(ctx)["entryClasses"] = entryClasses
-	getAppData(ctx)["income"] = income
+	GetAppDataCTX(ctx)["budget"] = budget
+	GetAppDataCTX(ctx)["entryClasses"] = entryClasses
+	GetAppDataCTX(ctx)["income"] = income
 	writeTemplate(w, ctx, "income-list/edit")
 }
 
 func PatchIncome(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	budget := ctx.Value(vars.BudgetKey).(model.Budget)
-	income := ctx.Value(vars.IncomeKey).(model.Income)
+	budget := GetBudgetCTX(ctx)
+	income := GetIncomeCTX(ctx)
 
 	var entryClasses model.EntryClasses
 	if err := entryClasses.Index(); err != nil {
@@ -144,24 +144,24 @@ func PatchIncome(w http.ResponseWriter, r *http.Request) {
 		Amount:       float32(amount),
 	}
 
-	getAppData(ctx)["budget"] = budget
-	getAppData(ctx)["entryClasses"] = entryClasses
+	GetAppDataCTX(ctx)["budget"] = budget
+	GetAppDataCTX(ctx)["entryClasses"] = entryClasses
 
 	income, err := svc.UpdateIncome(income, incomeFormData, budget)
-	getAppData(ctx)["income"] = income
+	GetAppDataCTX(ctx)["income"] = income
 	if err != nil {
 		handleFormError(w, ctx, err, "income-list/edit")
 		return
 	}
 
-	getAppData(ctx)["info"] = "Income updated successfully"
+	GetAppDataCTX(ctx)["info"] = "Income updated successfully"
 	writeTemplate(w, ctx, "income-list/show")
 }
 
 func DeleteIncome(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	budget := ctx.Value(vars.BudgetKey).(model.Budget)
-	income := ctx.Value(vars.IncomeKey).(model.Income)
+	budget := GetBudgetCTX(ctx)
+	income := GetIncomeCTX(ctx)
 
 	if err := svc.DeleteIncome(income, budget); err != nil {
 		writeInternalError(w, ctx, []string{err.Error()})

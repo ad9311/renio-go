@@ -34,7 +34,7 @@ func ExpenseCTX(next http.Handler) http.Handler {
 
 func GetNewExpense(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	budget := ctx.Value(vars.BudgetKey).(model.Budget)
+	budget := GetBudgetCTX(ctx)
 
 	var entryClasses model.EntryClasses
 	if err := entryClasses.Index(); err != nil {
@@ -42,14 +42,14 @@ func GetNewExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	getAppData(ctx)["budget"] = budget
-	getAppData(ctx)["entryClasses"] = entryClasses
+	GetAppDataCTX(ctx)["budget"] = budget
+	GetAppDataCTX(ctx)["entryClasses"] = entryClasses
 	writeTemplate(w, ctx, "expenses/new")
 }
 
 func PostExpense(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	budget := ctx.Value(vars.BudgetKey).(model.Budget)
+	budget := GetBudgetCTX(ctx)
 
 	var entryClasses model.EntryClasses
 	if err := entryClasses.Index(); err != nil {
@@ -72,36 +72,36 @@ func PostExpense(w http.ResponseWriter, r *http.Request) {
 		Amount:       float32(amount),
 	}
 
-	getAppData(ctx)["budget"] = budget
-	getAppData(ctx)["entryClasses"] = entryClasses
+	GetAppDataCTX(ctx)["budget"] = budget
+	GetAppDataCTX(ctx)["entryClasses"] = entryClasses
 
 	if _, err := svc.CreateExpense(expenseFormData, budget); err != nil {
 		handleFormError(w, ctx, err, "expenses/new")
 		return
 	}
 
-	getAppData(ctx)["info"] = "Expense created successfully"
+	GetAppDataCTX(ctx)["info"] = "Expense created successfully"
 	w.WriteHeader(http.StatusCreated)
 	writeTemplate(w, ctx, "expenses/new")
 }
 
 func GetExpense(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	budget := ctx.Value(vars.BudgetKey).(model.Budget)
-	expense := ctx.Value(vars.ExpenseKey).(model.Expense)
+	budget := GetBudgetCTX(ctx)
+	expense := GetExpenseCTX(ctx)
 
-	getAppData(ctx)["budget"] = budget
-	getAppData(ctx)["expense"] = expense
-	getAppData(ctx)["modalTitle"] = "Delete Expense"
-	getAppData(ctx)["confirmationMessage"] = "Are you sure you want to delete this expense?"
-	getAppData(ctx)["formAction"] = "/budgets/" + budget.UID + "/expenses/" + strconv.Itoa(expense.ID) + "/delete"
+	GetAppDataCTX(ctx)["budget"] = budget
+	GetAppDataCTX(ctx)["expense"] = expense
+	GetAppDataCTX(ctx)["modalTitle"] = "Delete Expense"
+	GetAppDataCTX(ctx)["confirmationMessage"] = "Are you sure you want to delete this expense?"
+	GetAppDataCTX(ctx)["formAction"] = "/budgets/" + budget.UID + "/expenses/" + strconv.Itoa(expense.ID) + "/delete"
 	writeTemplate(w, ctx, "expenses/show")
 }
 
 func GetEditExpense(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	budget := ctx.Value(vars.BudgetKey).(model.Budget)
-	expense := ctx.Value(vars.ExpenseKey).(model.Expense)
+	budget := GetBudgetCTX(ctx)
+	expense := GetExpenseCTX(ctx)
 
 	var entryClasses model.EntryClasses
 	if err := entryClasses.Index(); err != nil {
@@ -109,16 +109,16 @@ func GetEditExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	getAppData(ctx)["budget"] = budget
-	getAppData(ctx)["entryClasses"] = entryClasses
-	getAppData(ctx)["expense"] = expense
+	GetAppDataCTX(ctx)["budget"] = budget
+	GetAppDataCTX(ctx)["entryClasses"] = entryClasses
+	GetAppDataCTX(ctx)["expense"] = expense
 	writeTemplate(w, ctx, "expenses/edit")
 }
 
 func PatchExpense(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	budget := ctx.Value(vars.BudgetKey).(model.Budget)
-	expense := ctx.Value(vars.ExpenseKey).(model.Expense)
+	budget := GetBudgetCTX(ctx)
+	expense := GetExpenseCTX(ctx)
 
 	var entryClasses model.EntryClasses
 	if err := entryClasses.Index(); err != nil {
@@ -141,24 +141,24 @@ func PatchExpense(w http.ResponseWriter, r *http.Request) {
 		Amount:       float32(amount),
 	}
 
-	getAppData(ctx)["budget"] = budget
-	getAppData(ctx)["entryClasses"] = entryClasses
+	GetAppDataCTX(ctx)["budget"] = budget
+	GetAppDataCTX(ctx)["entryClasses"] = entryClasses
 
 	expense, err := svc.UpdateExpense(expense, expenseFormData, budget)
-	getAppData(ctx)["expense"] = expense
+	GetAppDataCTX(ctx)["expense"] = expense
 	if err != nil {
 		handleFormError(w, ctx, err, "expenses/edit")
 		return
 	}
 
-	getAppData(ctx)["info"] = "Expense updated successfully"
+	GetAppDataCTX(ctx)["info"] = "Expense updated successfully"
 	writeTemplate(w, ctx, "expenses/show")
 }
 
 func DeleteExpense(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	budget := ctx.Value(vars.BudgetKey).(model.Budget)
-	expense := ctx.Value(vars.ExpenseKey).(model.Expense)
+	budget := GetBudgetCTX(ctx)
+	expense := GetExpenseCTX(ctx)
 
 	if err := svc.DeleteExpense(expense, budget); err != nil {
 		writeInternalError(w, ctx, []string{err.Error()})

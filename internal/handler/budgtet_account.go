@@ -12,7 +12,7 @@ func BudgetAccountCTX(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		var budgetAccount model.BudgetAccount
-		userID := getCurrentUserId(ctx)
+		userID := GetUserID_CTX(ctx)
 
 		if err := budgetAccount.SelectByUserID(userID); err != nil {
 			writeInternalError(w, ctx, []string{err.Error()})

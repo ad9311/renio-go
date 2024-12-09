@@ -11,7 +11,7 @@ func GetHome(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var budgetAccount model.BudgetAccount
-	userID := getCurrentUserId(ctx)
+	userID := GetUserID_CTX(ctx)
 	if err := budgetAccount.SelectByUserID(userID); err != nil {
 		writeNotFound(w, ctx)
 		return
@@ -23,6 +23,6 @@ func GetHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	getAppData(ctx)["budget"] = budgetSummary
+	GetAppDataCTX(ctx)["budget"] = budgetSummary
 	writeTemplate(w, ctx, "home/index")
 }

@@ -34,14 +34,15 @@ func PostSignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.GetSession().Put(ctx, string(vars.UserSignedInKey), true)
-	app.GetSession().Put(ctx, string(vars.CurrentUserKey), user.GetSafeUser())
-	app.GetSession().Put(ctx, string(vars.UserIDKey), user.ID)
+	SetSessionCTX(ctx, vars.UserSignedInKey, true)
+	SetSessionCTX(ctx, vars.CurrentUserKey, user.GetSafeUser())
+	SetSessionCTX(ctx, vars.UserIDKey, user.ID)
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
 func PostSignOut(w http.ResponseWriter, r *http.Request) {
-	_ = app.GetSession().Destroy(r.Context())
-	_ = app.GetSession().RenewToken(r.Context())
+	ctx := r.Context()
+	_ = app.GetSession().Destroy(ctx)
+	_ = app.GetSession().RenewToken(ctx)
 	http.Redirect(w, r, "/auth/sign-in", http.StatusSeeOther)
 }
