@@ -1,6 +1,5 @@
 import htmx from 'htmx.org';
 import $ from 'jquery';
-import income from '@/income';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
@@ -32,5 +31,7 @@ $(() => {
     }
   });
 
-  income();
+  $('#deleteEntry').on('click', function () {
+    $('#modal').removeClass('hidden').addClass('modal-overlay');
+  });
 });

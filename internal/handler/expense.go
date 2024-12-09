@@ -92,6 +92,9 @@ func GetExpense(w http.ResponseWriter, r *http.Request) {
 
 	getAppData(ctx)["budget"] = budget
 	getAppData(ctx)["expense"] = expense
+	getAppData(ctx)["modalTitle"] = "Delete Expense"
+	getAppData(ctx)["confirmationMessage"] = "Are you sure you want to delete this expense?"
+	getAppData(ctx)["formAction"] = "/budgets/" + budget.UID + "/expenses/" + strconv.Itoa(expense.ID) + "/delete"
 	writeTemplate(w, ctx, "expenses/show")
 }
 
