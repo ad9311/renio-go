@@ -3,6 +3,8 @@
     <a href="/home" class="block w-fit">
       <h1 class="title !m-0">RENIO</h1>
     </a>
-    {{ if .isUserSignedIn }}{{ template "sign_out_button" . }}{{ end }}
+    {{ if .isUserSignedIn }}
+      <button class="block lg:hidden" id="toggle-sidebar">MENU</button>
+    {{ end }}
   </div>
 {{ end }}

@@ -1,6 +1,6 @@
 {{ define "sign_out_button" }}
   <form action="/auth/sign-out" method="post">
-    <input type="hidden" name="csrf_token" value="{{ .csrfToken }}" />
+    {{ template "csrf_token" . }}
     <label for="sign_out">
       <button type="submit" id="sign_out">Sign out</button>
     </label>
