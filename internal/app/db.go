@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"reflect"
+	"strings"
 	"sync"
 
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -145,6 +146,8 @@ func spreadValues(model any) []any {
 
 func printQuery(query string) {
 	if GetEnv().AppEnv != "test" {
+		words := strings.Fields(query)
+		query = strings.Join(words, " ")
 		fmt.Printf("BEGIN `%s`\n", query)
 	}
 }

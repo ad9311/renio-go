@@ -7,27 +7,37 @@ import (
 )
 
 type Expense struct {
-	ID           int       `json:"id"`
-	Amount       float32   `json:"amount"`
-	Description  string    `json:"description"`
-	BudgetID     int       `json:"budgetId"`
-	EntryClassID int       `json:"entryClassId"`
-	CreatedAt    time.Time `json:"createAt"`
-	UpdatedAt    time.Time `json:"updatedAt"`
+	ID             int
+	Amount         float32
+	Description    string
+	BudgetID       int
+	EntryClassID   int
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	EntryClassName string
+	EntryClassUID  string
 }
 
 type Expenses []Expense
 
 type ExpenseFormData struct {
-	Amount       float32 `json:"amount"`
-	Description  string  `json:"description"`
-	EntryClassID int     `json:"entryClassId"`
+	Amount       float32
+	Description  string
+	EntryClassID int
 }
 
 // --- Query Functions -- //
 
 func (es *Expenses) Index(budgetID int) error {
-	query := "SELECT * FROM expenses WHERE budget_id = $1 ORDER BY created_at DESC"
+	query := `
+	SELECT expenses.*,
+	entry_classes.name AS entry_class_name,
+	entry_classes.uid AS entry_class_uid
+	FROM expenses
+	INNER JOIN entry_classes ON expenses.entry_class_id = entry_classes.id
+	WHERE budget_id = $1
+	ORDER BY created_at DESC
+	`
 
 	var expenses []any
 	queryExec := app.QueryExe{
@@ -50,7 +60,11 @@ func (es *Expenses) Index(budgetID int) error {
 }
 
 func (e *Expense) Insert(expenseFormData ExpenseFormData, budgetID int) error {
-	query := "INSERT INTO expenses (amount, description, entry_class_id, budget_id) VALUES ($1, $2, $3, $4) RETURNING *"
+	query := `
+	INSERT INTO expenses (amount, description, entry_class_id, budget_id)
+	VALUES ($1, $2, $3, $4)
+	RETURNING *
+	`
 
 	queryExec := app.QueryExe{
 		QueryStr: query,
@@ -75,7 +89,14 @@ func (e *Expense) Insert(expenseFormData ExpenseFormData, budgetID int) error {
 }
 
 func (e *Expense) SelectByID(id int) error {
-	query := "SELECT * FROM expenses WHERE id = $1"
+	query := `
+	SELECT expenses.*,
+	entry_classes.name AS entry_class_name,
+	entry_classes.uid AS entry_class_uid
+	FROM expenses
+	INNER JOIN entry_classes ON expenses.entry_class_id = entry_classes.id
+	WHERE expenses.id = $1
+	`
 
 	queryExec := app.QueryExe{
 		QueryStr:  query,
@@ -94,7 +115,11 @@ func (e *Expense) SelectByID(id int) error {
 }
 
 func (e *Expense) Update(expenseFormData ExpenseFormData) error {
-	query := "UPDATE expenses SET amount = $1, description = $2, entry_class_id = $3 WHERE id = $4 RETURNING *"
+	query := `
+	UPDATE expenses SET amount = $1, description = $2, entry_class_id = $3
+	WHERE id = $4
+	RETURNING *
+	`
 
 	queryExec := app.QueryExe{
 		QueryStr: query,
@@ -137,7 +162,16 @@ func (e *Expense) Delete() error {
 }
 
 func (e *Expense) FindLast(budgetID int) error {
-	query := "SELECT * FROM expenses WHERE budget_id = $1 ORDER BY id DESC LIMIT 1"
+	query := `
+	SELECT expenses.*,
+	entry_classes.name AS entry_class_name,
+	entry_classes.uid AS entry_class_uid
+	FROM expenses
+	INNER JOIN entry_classes ON expenses.entry_class_id = entry_classes.id
+	WHERE budget_id = $1
+	ORDER BY id DESC
+	LIMIT 1
+	`
 
 	queryExec := app.QueryExe{
 		QueryStr:  query,

@@ -1,13 +1,18 @@
 {{ define "content" }}
-  <section class="card">
+  <section class="card max-w-96 mx-auto">
     <h2 class="title">Income</h2>
     <div class="title-links mb-4">
       <a href="/budgets/{{ .budget.UID }}/income-list/{{ .income.ID }}/edit" class="link">Edit</a>
       |
       <button type="button" class="link" id="deleteEntry">Delete</button>
     </div>
-    <p>{{ .income.Description }}</p>
-    <p>{{ .income.Amount }}</p>
+    <div class="description">
+      <p>{{ .income.Description }}</p>
+      <div class="mt-4 flex items-center justify-between">
+        <p>{{ template "income_amount" .income.Amount }}</p>
+        {{ template "entry_class_name" .income }}
+      </div>
+    </div>
   </section>
   {{ template "confirmation_modal" . }}
 {{ end }}

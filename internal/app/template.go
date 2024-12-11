@@ -109,5 +109,44 @@ func generateTmplFunctions() template.FuncMap {
 		return fmt.Sprintf("$%.2f", value)
 	}
 
+	funcs["entryClassColor"] = func(entryClassUID string) string {
+		switch entryClassUID {
+		case "banking":
+			return "#FF5733"
+		case "clothing":
+			return "#2ECC71"
+		case "entertainment":
+			return "#2980B9"
+		case "extra":
+			return "#FF33A1"
+		case "foodDelivery":
+			return "#8E44AD"
+		case "groceries":
+			return "#27AE60"
+		case "home":
+			return "#F39C12"
+		case "insurance":
+			return "#E74C3C"
+		case "onlineShopping":
+			return "#3498DB"
+		case "other":
+			return "#9B59B6"
+		case "restaurants":
+			return "#1ABC9C"
+		case "savings":
+			return "#D35400"
+		case "subscriptions":
+			return "#C0392B"
+		case "transportation":
+			return "#16A085"
+		case "utilities":
+			return "#8E44AD"
+		case "wages":
+			return "#2980B9"
+		default:
+			return "#000000"
+		}
+	}
+
 	return funcs
 }

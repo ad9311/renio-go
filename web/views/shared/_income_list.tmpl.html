@@ -9,9 +9,12 @@
       {{ range .budget.IncomeList }}
         <li>
           <a href="/budgets/{{ $budgetUID }}/income-list/{{ .ID }}">
-            <div class="grid grid-cols-2">
-              <span>{{ .Description }}</span>
-              <span>{{ template "income_amount" .Amount }}</span>
+            <div class="flex justify-between items-end text-xs description">
+              <div class="flex flex-col">
+                <span class="text-sm">{{ .Description }}</span>
+                <span>{{ template "income_amount" .Amount }}</span>
+              </div>
+              {{ template "entry_class_name" . }}
             </div>
           </a>
         </li>

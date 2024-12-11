@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ad9311/renio-go/internal/model"
@@ -19,6 +20,7 @@ func GetHome(w http.ResponseWriter, r *http.Request) {
 
 	budgetSummary, err := svc.FindBudgetSummary(budgetAccount.ID)
 	if err != nil {
+		fmt.Println(err.Error())
 		writeNotFound(w, ctx)
 		return
 	}

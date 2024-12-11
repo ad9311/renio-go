@@ -7,9 +7,9 @@ import (
 )
 
 type EntryClass struct {
-	ID        int    `json:"id"`
-	UID       string `json:"uid"`
-	Name      string `json:"name"`
+	ID        int
+	UID       string
+	Name      string
 	Type      int
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -53,7 +53,11 @@ func (es *EntryClasses) Index() error {
 }
 
 func (e *EntryClass) Insert() error {
-	query := `INSERT INTO entry_classes (uid, name, type) VALUES ($1, $2, $3) RETURNING *`
+	query := `
+	INSERT INTO entry_classes (uid, name, type)
+	VALUES ($1, $2, $3)
+	RETURNING *
+	`
 
 	queryExec := app.QueryExe{
 		QueryStr:  query,
@@ -72,7 +76,12 @@ func (e *EntryClass) Insert() error {
 }
 
 func (e *EntryClass) InsertIfNotExists() error {
-	query := `INSERT INTO entry_classes (uid, name, type) VALUES ($1, $2, $3) ON CONFLICT (uid) DO NOTHING`
+	query := `
+	INSERT INTO entry_classes (uid, name, type)
+	VALUES ($1, $2, $3)
+	ON CONFLICT (uid)
+	DO NOTHING
+	`
 
 	queryExec := app.QueryExe{
 		QueryStr:  query,
